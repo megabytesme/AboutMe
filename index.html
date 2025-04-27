@@ -1,568 +1,745 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="color-scheme" content="light dark" />
     <title>MegaBytesMe - Ben</title>
     <style>
-        :root {
-            --scroll-duration: 70s;
-            --min-card-width: 320px;
-            --min-card-height: 400px;
+      .projects-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
 
-            --card-bg-light: rgba(255, 255, 255, 0.85);
-            --card-bg-dark: rgba(40, 40, 40, 0.85);
-            --text-color-light: #201F1E;
-            --text-color-dark: #f0f0f0;
-            --heading-color-light: #1a1a1a;
-            --heading-color-dark: #ffffff;
-            --subtle-text-light: #333;
-            --subtle-text-dark: #cccccc;
-            --border-color-light: rgba(0, 0, 0, 0.1);
-            --border-color-dark: rgba(255, 255, 255, 0.15);
-            --handle-bg-light: rgba(0,0,0,0.05);
-            --handle-bg-dark: rgba(255,255,255,0.08);
-            --shadow-color-light: rgba(0, 0, 0, 0.15);
-            --shadow-color-dark: rgba(0, 0, 0, 0.4);
-            --link-color-light: #0078D4;
-            --link-color-dark: #2899F5;
-            --link-hover-light: #005a9e;
-            --link-hover-dark: #56b1f7;
-            --button-bg-light: #0078D4;
-            --button-bg-dark: #2899F5;
-            --button-text-light: white;
-            --button-text-dark: black;
-            --button-hover-bg-light: #005a9e;
-            --button-hover-bg-dark: #56b1f7;
-            --button-active-bg-light: #004c87;
-            --button-active-bg-dark: #1a8ad8;
-            --resize-handle-border-light: rgba(0,0,0,0.1);
-            --resize-handle-border-dark: rgba(255,255,255,0.2);
-            --resize-handle-fill-light: rgba(0,0,0,0.1);
-            --resize-handle-fill-dark: rgba(255,255,255,0.2);
-            --section-separator-light: rgba(0, 0, 0, 0.08);
-            --section-separator-dark: rgba(255, 255, 255, 0.1);
-            --window-button-hover-bg-light: rgba(0,0,0,0.1);
-            --window-button-hover-bg-dark: rgba(255,255,255,0.15);
-            --window-button-close-hover-bg-light: #e81123;
-            --window-button-close-hover-bg-dark: #e81123;
-            --window-button-close-hover-text-light: white;
-            --window-button-close-hover-text-dark: white;
-            --window-button-text-light: var(--text-color-light);
-            --window-button-text-dark: var(--text-color-dark);
-            --reopen-button-bg-light: rgba(255, 255, 255, 0.7);
-            --reopen-button-bg-dark: rgba(50, 50, 50, 0.7);
-            --reopen-button-text-light: #000;
-            --reopen-button-text-dark: #fff;
-        }
+      .projects-list li {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--section-separator-light);
+      }
 
-        html {
-             color-scheme: light dark;
-        }
+      .projects-list li:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        *, *:before, *:after {
-            box-sizing: inherit;
-        }
+      .project-title {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 18px;
+        font-weight: 600;
+      }
 
+      .project-title a {
+        color: var(--link-color-light);
+        text-decoration: none;
+      }
+
+      .project-title a:hover {
+        color: var(--link-hover-light);
+        text-decoration: underline;
+      }
+
+      .project-visibility {
+        font-size: 0.75em;
+        font-weight: normal;
+        color: var(--subtle-text-light);
+        border: 1px solid var(--border-color-light);
+        border-radius: 3px;
+        padding: 1px 4px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+
+      .project-desc {
+        font-size: 14px;
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: var(--subtle-text-light);
+      }
+
+      .project-tags span {
+        display: inline-block;
+        background-color: var(--handle-bg-light);
+        color: var(--link-color-light);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
+
+      .project-meta {
+        font-size: 13px;
+        color: var(--subtle-text-light);
+        margin-top: 10px;
+      }
+
+      .project-meta span {
+        margin-right: 15px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .project-lang::before {
+        content: "●";
+        margin-right: 5px;
+        font-size: 1.2em;
+        line-height: 1;
+      }
+
+      .project-lang.csharp::before {
+        color: #9b4f96;
+      }
+      .project-lang.cpp::before,
+      .project-lang.c::before {
+        color: #555555;
+      }
+      .project-lang.java::before {
+        color: #b07219;
+      }
+      .project-lang.lua::before {
+        color: #2c2d72;
+      }
+      .project-lang.other::before {
+        color: #888888;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .projects-list li {
+          border-bottom-color: var(--section-separator-dark);
+        }
+        .project-title a {
+          color: var(--link-color-dark);
+        }
+        .project-title a:hover {
+          color: var(--link-hover-dark);
+        }
+        .project-visibility {
+          color: var(--subtle-text-dark);
+          border-color: var(--border-color-dark);
+        }
+        .project-desc {
+          color: var(--subtle-text-dark);
+        }
+        .project-tags span {
+          background-color: var(--handle-bg-dark);
+          color: var(--link-color-dark);
+        }
+        .project-meta {
+          color: var(--subtle-text-dark);
+        }
+        .project-lang.csharp::before {
+          color: #d8a0df;
+        }
+        .project-lang.cpp::before,
+        .project-lang.c::before {
+          color: #cccccc;
+        }
+        .project-lang.java::before {
+          color: #f1e05a;
+        }
+        .project-lang.lua::before {
+          color: #7e80d4;
+        }
+        .project-lang.other::before {
+          color: #aaaaaa;
+        }
+      }
+
+      :root {
+        --scroll-duration: 70s;
+        --min-card-width: 320px;
+        --min-card-height: 400px;
+
+        --card-bg-light: rgba(255, 255, 255, 0.85);
+        --card-bg-dark: rgba(40, 40, 40, 0.85);
+        --text-color-light: #201f1e;
+        --text-color-dark: #f0f0f0;
+        --heading-color-light: #1a1a1a;
+        --heading-color-dark: #ffffff;
+        --subtle-text-light: #333;
+        --subtle-text-dark: #cccccc;
+        --border-color-light: rgba(0, 0, 0, 0.1);
+        --border-color-dark: rgba(255, 255, 255, 0.15);
+        --handle-bg-light: rgba(0, 0, 0, 0.05);
+        --handle-bg-dark: rgba(255, 255, 255, 0.08);
+        --shadow-color-light: rgba(0, 0, 0, 0.15);
+        --shadow-color-dark: rgba(0, 0, 0, 0.4);
+        --link-color-light: #0078d4;
+        --link-color-dark: #2899f5;
+        --link-hover-light: #005a9e;
+        --link-hover-dark: #56b1f7;
+        --button-bg-light: #0078d4;
+        --button-bg-dark: #2899f5;
+        --button-text-light: white;
+        --button-text-dark: black;
+        --button-hover-bg-light: #005a9e;
+        --button-hover-bg-dark: #56b1f7;
+        --button-active-bg-light: #004c87;
+        --button-active-bg-dark: #1a8ad8;
+        --resize-handle-border-light: rgba(0, 0, 0, 0.1);
+        --resize-handle-border-dark: rgba(255, 255, 255, 0.2);
+        --resize-handle-fill-light: rgba(0, 0, 0, 0.1);
+        --resize-handle-fill-dark: rgba(255, 255, 255, 0.2);
+        --section-separator-light: rgba(0, 0, 0, 0.08);
+        --section-separator-dark: rgba(255, 255, 255, 0.1);
+        --window-button-hover-bg-light: rgba(0, 0, 0, 0.1);
+        --window-button-hover-bg-dark: rgba(255, 255, 255, 0.15);
+        --window-button-close-hover-bg-light: #e81123;
+        --window-button-close-hover-bg-dark: #e81123;
+        --window-button-close-hover-text-light: white;
+        --window-button-close-hover-text-dark: white;
+        --window-button-text-light: var(--text-color-light);
+        --window-button-text-dark: var(--text-color-dark);
+        --reopen-button-bg-light: rgba(255, 255, 255, 0.7);
+        --reopen-button-bg-dark: rgba(50, 50, 50, 0.7);
+        --reopen-button-text-light: #000;
+        --reopen-button-text-dark: #fff;
+      }
+
+      html {
+        color-scheme: light dark;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      body {
+        background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg")
+          no-repeat center center fixed;
+        background-size: cover;
+        color: var(--text-color-light);
+        background-color: #fff;
+      }
+
+      @media (orientation: portrait) {
         body {
-            background: url('https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: var(--text-color-light);
-            background-color: #fff;
+          background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg")
+            no-repeat center center fixed;
+          background-size: cover;
         }
+      }
 
-        @media (orientation: portrait) {
-            body {
-                background: url('https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg') no-repeat center center fixed;
-                background-size: cover;
-            }
+      .fluent-card {
+        position: absolute;
+        width: 90%;
+        max-width: 600px;
+        min-width: var(--min-card-width);
+        height: 75vh;
+        max-height: 95vh;
+        min-height: var(--min-card-height);
+        padding: 0;
+        background: var(--card-bg-light);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 8px;
+        border: 1px solid var(--border-color-light);
+        box-shadow: 0 8px 30px var(--shadow-color-light);
+        text-align: left;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        cursor: default;
+        resize: none;
+        z-index: 1;
+      }
+
+      @media (screen-spanning: single-fold-vertical) {
+        .fluent-card {
+          left: 10px !important;
+          width: calc(env(fold-left, 50vw) - 20px) !important;
+          max-width: none !important;
+          top: 10px !important;
+          height: calc(100vh - 20px) !important;
+          transform: none !important;
+          transition: none !important;
+        }
+      }
+
+      .drag-handle {
+        padding: 6px 5px 6px 15px;
+        cursor: grab;
+        background-color: var(--handle-bg-light);
+        border-bottom: 1px solid var(--border-color-light);
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 20;
+      }
+
+      .drag-handle img.handle-pic {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid var(--border-color-light);
+      }
+
+      .drag-handle h1.handle-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--heading-color-light);
+        flex-grow: 1;
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 5px;
+      }
+
+      .window-controls {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      .window-button {
+        -webkit-appearance: none;
+        appearance: none;
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0 1px;
+        width: 34px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        line-height: 1;
+        color: var(--window-button-text-light);
+        cursor: pointer;
+        pointer-events: auto;
+        transition: background-color 0.1s ease;
+        font-family: "Segoe UI Symbol", sans-serif;
+        border-radius: 2px;
+      }
+
+      .window-button:disabled {
+        opacity: 0.5;
+        cursor: default;
+        pointer-events: none;
+      }
+
+      .window-button:not(:disabled):hover {
+        background-color: var(--window-button-hover-bg-light);
+      }
+
+      .window-button.close:not(:disabled):hover {
+        background-color: var(--window-button-close-hover-bg-light);
+        color: var(--window-button-close-hover-text-light);
+      }
+
+      .fluent-card-content {
+        padding: 20px 30px 15px 30px;
+        overflow-y: auto;
+        flex-grow: 1;
+        position: relative;
+        z-index: 1;
+        color: var(--text-color-light);
+      }
+
+      .content-area {
+        flex-grow: 1;
+        pointer-events: auto;
+        padding-bottom: 15px;
+      }
+
+      .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 20px auto;
+        display: block;
+        object-fit: cover;
+        border: 2px solid var(--border-color-light);
+      }
+
+      .fluent-card-content h1 {
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--heading-color-light);
+      }
+
+      .intro-text {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--subtle-text-light);
+      }
+
+      .fluent-card-content h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--heading-color-light);
+        margin-top: 25px;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-color-light);
+      }
+
+      .fluent-card-content ul {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 0;
+        margin-bottom: 15px;
+      }
+
+      .fluent-card-content li {
+        margin-bottom: 8px;
+        font-size: 15px;
+        color: var(--subtle-text-light);
+        padding-left: 1em;
+        position: relative;
+      }
+      .fluent-card-content li::before {
+        content: "•";
+        color: var(--link-color-light);
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      .tech-details {
+        font-size: 14px;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+
+      .scrolling-icons-container {
+        width: 100%;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .scrolling-icons-track {
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        animation: scrollIcons var(--scroll-duration) linear infinite;
+        will-change: transform;
+      }
+
+      .scrolling-icons-container:hover .scrolling-icons-track {
+        animation-play-state: paused;
+      }
+
+      .scrolling-icons-track img {
+        height: 32px;
+        width: auto;
+        margin: 0 22px;
+        flex-shrink: 0;
+        object-fit: contain;
+        vertical-align: middle;
+        pointer-events: none;
+        user-select: none;
+        filter: brightness(1);
+      }
+
+      @keyframes scrollIcons {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .scrolling-icons-track {
+          animation: none;
+        }
+      }
+
+      .links-section {
+        padding: 15px 30px;
+        border-top: 1px solid var(--section-separator-light);
+        text-align: center;
+        flex-shrink: 0;
+        background-color: var(--handle-bg-light);
+        position: relative;
+        z-index: 5;
+      }
+
+      .fluent-button {
+        display: inline-block;
+        margin: 5px 5px;
+        padding: 10px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        background-color: var(--button-bg-light);
+        border: 1px solid var(--button-bg-light);
+        border-radius: 4px;
+        color: var(--button-text-light);
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease, border-color 0.2s ease,
+          box-shadow 0.2s ease, color 0.2s ease;
+      }
+
+      .fluent-button:hover {
+        background-color: var(--button-hover-bg-light);
+        border-color: var(--button-hover-bg-light);
+        color: var(--button-text-light);
+        text-decoration: none;
+        box-shadow: 0 2px 5px var(--shadow-color-light);
+      }
+
+      .fluent-button:active {
+        background-color: var(--button-active-bg-light);
+        border-color: var(--button-active-bg-light);
+        color: var(--button-text-light);
+        box-shadow: none;
+      }
+
+      .resize-handle {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 15px;
+        height: 15px;
+        background: repeating-linear-gradient(
+          -45deg,
+          var(--resize-handle-fill-light),
+          var(--resize-handle-fill-light) 2px,
+          transparent 2px,
+          transparent 4px
+        );
+        cursor: nwse-resize;
+        border-top: 1px solid var(--resize-handle-border-light);
+        border-left: 1px solid var(--resize-handle-border-light);
+        z-index: 10;
+        touch-action: none;
+      }
+
+      #reopenAboutMeBtn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        padding: 8px 15px;
+        background-color: var(--reopen-button-bg-light);
+        color: var(--reopen-button-text-light);
+        border: 1px solid var(--border-color-light);
+        border-radius: 4px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 2px 5px var(--shadow-color-light);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        font-size: 14px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: var(--text-color-dark);
+          background-color: #1c1c1c;
         }
 
         .fluent-card {
-            position: absolute;
-            width: 90%;
-            max-width: 600px;
-            min-width: var(--min-card-width);
-            height: 75vh;
-            max-height: 95vh;
-            min-height: var(--min-card-height);
-            padding: 0;
-            background: var(--card-bg-light);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 8px;
-            border: 1px solid var(--border-color-light);
-            box-shadow: 0 8px 30px var(--shadow-color-light);
-            text-align: left;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            cursor: default;
-            resize: none;
-            z-index: 1;
-        }
-
-        @media (screen-spanning: single-fold-vertical) {
-            .fluent-card {
-                 left: 10px !important;
-                 width: calc(env(fold-left, 50vw) - 20px) !important;
-                 max-width: none !important;
-                 top: 10px !important;
-                 height: calc(100vh - 20px) !important;
-                 transform: none !important;
-                 transition: none !important;
-            }
+          background: var(--card-bg-dark);
+          border-color: var(--border-color-dark);
+          box-shadow: 0 8px 30px var(--shadow-color-dark);
         }
 
         .drag-handle {
-            padding: 6px 5px 6px 15px;
-            cursor: grab;
-            background-color: var(--handle-bg-light);
-            border-bottom: 1px solid var(--border-color-light);
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 20;
+          background-color: var(--handle-bg-dark);
+          border-color: var(--border-color-dark);
         }
 
+        .drag-handle h1.handle-title {
+          color: var(--heading-color-dark);
+        }
         .drag-handle img.handle-pic {
-             width: 20px;
-             height: 20px;
-             border-radius: 50%;
-             object-fit: cover;
-             flex-shrink: 0;
-             border: 1px solid var(--border-color-light);
-        }
-
-         .drag-handle h1.handle-title {
-             margin: 0;
-             font-size: 15px;
-             font-weight: 600;
-             line-height: 1.4;
-             color: var(--heading-color-light);
-             flex-grow: 1;
-             pointer-events: none;
-             white-space: nowrap;
-             overflow: hidden;
-             text-overflow: ellipsis;
-             margin-right: 5px;
-         }
-
-        .window-controls {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
+          border-color: var(--border-color-dark);
         }
 
         .window-button {
-            -webkit-appearance: none;
-            appearance: none;
-            background: none;
-            border: none;
-            padding: 0;
-            margin: 0 1px;
-            width: 34px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            line-height: 1;
-            color: var(--window-button-text-light);
-            cursor: pointer;
-            pointer-events: auto;
-            transition: background-color 0.1s ease;
-            font-family: 'Segoe UI Symbol', sans-serif;
-            border-radius: 2px;
+          color: var(--window-button-text-dark);
         }
-
-        .window-button:disabled {
-            opacity: 0.5;
-            cursor: default;
-            pointer-events: none;
-        }
-
         .window-button:not(:disabled):hover {
-             background-color: var(--window-button-hover-bg-light);
+          background-color: var(--window-button-hover-bg-dark);
         }
-
         .window-button.close:not(:disabled):hover {
-             background-color: var(--window-button-close-hover-bg-light);
-             color: var(--window-button-close-hover-text-light);
+          background-color: var(--window-button-close-hover-bg-dark);
+          color: var(--window-button-close-hover-text-dark);
         }
 
         .fluent-card-content {
-            padding: 20px 30px 15px 30px;
-            overflow-y: auto;
-            flex-grow: 1;
-            position: relative;
-            z-index: 1;
-            color: var(--text-color-light);
+          color: var(--text-color-dark);
         }
-
-        .content-area {
-           flex-grow: 1;
-           pointer-events: auto;
-           padding-bottom: 15px;
-        }
-
         .profile-pic {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin: 0 auto 20px auto;
-            display: block;
-            object-fit: cover;
-            border: 2px solid var(--border-color-light);
+          border-color: var(--border-color-dark);
         }
 
         .fluent-card-content h1 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--heading-color-light);
+          color: var(--heading-color-dark);
         }
-
-         .intro-text {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--subtle-text-light);
+        .intro-text {
+          color: var(--subtle-text-dark);
         }
-
         .fluent-card-content h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--heading-color-light);
-            margin-top: 25px;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--border-color-light);
+          color: var(--heading-color-dark);
+          border-color: var(--border-color-dark);
         }
-
-        .fluent-card-content ul {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
         .fluent-card-content li {
-             margin-bottom: 8px;
-             font-size: 15px;
-             color: var(--subtle-text-light);
-             padding-left: 1em;
-             position: relative;
-         }
-         .fluent-card-content li::before {
-            content: "•";
-            color: var(--link-color-light);
-            display: inline-block;
-            position: absolute;
-            left: 0;
-            top: 0;
-         }
-
+          color: var(--subtle-text-dark);
+        }
+        .fluent-card-content li::before {
+          color: var(--link-color-dark);
+        }
         .tech-details {
-            font-size: 14px;
-            color: #555;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .scrolling-icons-container {
-            width: 100%;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .scrolling-icons-track {
-            display: flex;
-            width: fit-content;
-            align-items: center;
-            animation: scrollIcons var(--scroll-duration) linear infinite;
-            will-change: transform;
-        }
-
-        .scrolling-icons-container:hover .scrolling-icons-track {
-            animation-play-state: paused;
-        }
-
-        .scrolling-icons-track img {
-            height: 32px;
-            width: auto;
-            margin: 0 22px;
-            flex-shrink: 0;
-            object-fit: contain;
-            vertical-align: middle;
-            pointer-events: none;
-            user-select: none;
-            filter: brightness(1);
-        }
-
-
-        @keyframes scrollIcons {
-            0% { transform: translateX(0%); }
-            100% { transform: translateX(-50%); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .scrolling-icons-track {
-            animation: none;
-          }
+          color: #a0a0a0;
         }
 
         .links-section {
-            padding: 15px 30px;
-            border-top: 1px solid var(--section-separator-light);
-            text-align: center;
-            flex-shrink: 0;
-            background-color: var(--handle-bg-light);
-            position: relative;
-            z-index: 5;
+          border-color: var(--section-separator-dark);
+          background-color: var(--handle-bg-dark);
+        }
+
+        .scrolling-icons-track img {
+          filter: brightness(0.9);
         }
 
         .fluent-button {
-            display: inline-block;
-            margin: 5px 5px;
-            padding: 10px 20px;
-            font-size: 15px;
-            font-weight: 600;
-            background-color: var(--button-bg-light);
-            border: 1px solid var(--button-bg-light);
-            border-radius: 4px;
-            color: var(--button-text-light);
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+          background-color: var(--button-bg-dark);
+          border-color: var(--button-bg-dark);
+          color: var(--button-text-dark);
         }
-
         .fluent-button:hover {
-            background-color: var(--button-hover-bg-light);
-            border-color: var(--button-hover-bg-light);
-            color: var(--button-text-light);
-            text-decoration: none;
-            box-shadow: 0 2px 5px var(--shadow-color-light);
+          background-color: var(--button-hover-bg-dark);
+          border-color: var(--button-hover-bg-dark);
+          color: var(--button-text-dark);
+          box-shadow: 0 2px 5px var(--shadow-color-dark);
         }
-
         .fluent-button:active {
-            background-color: var(--button-active-bg-light);
-            border-color: var(--button-active-bg-light);
-            color: var(--button-text-light);
-            box-shadow: none;
+          background-color: var(--button-active-bg-dark);
+          border-color: var(--button-active-bg-dark);
+          color: var(--button-text-dark);
         }
-
         .resize-handle {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 15px;
-            height: 15px;
-            background: repeating-linear-gradient(
-                -45deg,
-                var(--resize-handle-fill-light),
-                var(--resize-handle-fill-light) 2px,
-                transparent 2px,
-                transparent 4px
-            );
-            cursor: nwse-resize;
-            border-top: 1px solid var(--resize-handle-border-light);
-            border-left: 1px solid var(--resize-handle-border-light);
-            z-index: 10;
-            touch-action: none;
+          background: repeating-linear-gradient(
+            -45deg,
+            var(--resize-handle-fill-dark),
+            var(--resize-handle-fill-dark) 2px,
+            transparent 2px,
+            transparent 4px
+          );
+          border-top-color: var(--resize-handle-border-dark);
+          border-left-color: var(--resize-handle-border-dark);
         }
 
         #reopenAboutMeBtn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 8px 15px;
-            background-color: var(--reopen-button-bg-light);
-            color: var(--reopen-button-text-light);
-            border: 1px solid var(--border-color-light);
-            border-radius: 4px;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 2px 5px var(--shadow-color-light);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            font-size: 14px;
+          background-color: var(--reopen-button-bg-dark);
+          color: var(--reopen-button-text-dark);
+          border-color: var(--border-color-dark);
+          box-shadow: 0 2px 5px var(--shadow-color-dark);
         }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                color: var(--text-color-dark);
-                background-color: #1c1c1c;
-            }
-
-            .fluent-card {
-                background: var(--card-bg-dark);
-                border-color: var(--border-color-dark);
-                box-shadow: 0 8px 30px var(--shadow-color-dark);
-            }
-
-            .drag-handle {
-                background-color: var(--handle-bg-dark);
-                border-color: var(--border-color-dark);
-            }
-
-            .drag-handle h1.handle-title {
-                color: var(--heading-color-dark);
-            }
-            .drag-handle img.handle-pic {
-                 border-color: var(--border-color-dark);
-            }
-
-            .window-button {
-                 color: var(--window-button-text-dark);
-            }
-             .window-button:not(:disabled):hover {
-                background-color: var(--window-button-hover-bg-dark);
-            }
-            .window-button.close:not(:disabled):hover {
-                background-color: var(--window-button-close-hover-bg-dark);
-                color: var(--window-button-close-hover-text-dark);
-            }
-
-            .fluent-card-content {
-                color: var(--text-color-dark);
-            }
-            .profile-pic {
-                 border-color: var(--border-color-dark);
-            }
-
-            .fluent-card-content h1 {
-                color: var(--heading-color-dark);
-            }
-            .intro-text {
-                color: var(--subtle-text-dark);
-            }
-            .fluent-card-content h2 {
-                color: var(--heading-color-dark);
-                border-color: var(--border-color-dark);
-            }
-            .fluent-card-content li {
-                color: var(--subtle-text-dark);
-            }
-            .fluent-card-content li::before {
-                 color: var(--link-color-dark);
-            }
-             .tech-details {
-                color: #a0a0a0;
-            }
-
-            .links-section {
-                border-color: var(--section-separator-dark);
-                 background-color: var(--handle-bg-dark);
-            }
-
-             .scrolling-icons-track img {
-                 filter: brightness(0.9);
-             }
-
-            .fluent-button {
-                background-color: var(--button-bg-dark);
-                border-color: var(--button-bg-dark);
-                color: var(--button-text-dark);
-            }
-            .fluent-button:hover {
-                background-color: var(--button-hover-bg-dark);
-                border-color: var(--button-hover-bg-dark);
-                color: var(--button-text-dark);
-                box-shadow: 0 2px 5px var(--shadow-color-dark);
-            }
-            .fluent-button:active {
-                background-color: var(--button-active-bg-dark);
-                border-color: var(--button-active-bg-dark);
-                color: var(--button-text-dark);
-            }
-             .resize-handle {
-                background: repeating-linear-gradient(
-                    -45deg,
-                    var(--resize-handle-fill-dark),
-                    var(--resize-handle-fill-dark) 2px,
-                    transparent 2px,
-                    transparent 4px
-                );
-                border-top-color: var(--resize-handle-border-dark);
-                border-left-color: var(--resize-handle-border-dark);
-             }
-
-             #reopenAboutMeBtn {
-                 background-color: var(--reopen-button-bg-dark);
-                 color: var(--reopen-button-text-dark);
-                 border-color: var(--border-color-dark);
-                 box-shadow: 0 2px 5px var(--shadow-color-dark);
-             }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <button id="reopenAboutMeBtn">About Me</button>
 
     <script>
-        const windows = {};
-        let highestZ = 1;
-        let activeInteractionWindow = null;
+      const windows = {};
+      let highestZ = 1;
+      let activeInteractionWindow = null;
 
-        const minWidth = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--min-card-width') || '320', 10);
-        const minHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--min-card-height') || '400', 10);
+      const minWidth = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--min-card-width"
+        ) || "320",
+        10
+      );
+      const minHeight = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--min-card-height"
+        ) || "400",
+        10
+      );
 
-        class FluentWindow {
-            constructor(id, title, titleIconUrl, contentHtml, options = {}) {
-                this.id = id;
-                this.isDragging = false;
-                this.isResizing = false;
-                this.positionedWithTopLeft = false;
-                this.dragOffsetX = 0;
-                this.dragOffsetY = 0;
-                this.resizeInitialMouseX = 0;
-                this.resizeInitialMouseY = 0;
-                this.initialWidth = 0;
-                this.initialHeight = 0;
-                this.initialCardX_resize = 0;
-                this.initialCardY_resize = 0;
+      class FluentWindow {
+        constructor(id, title, titleIconUrl, contentHtml, options = {}) {
+          this.id = id;
+          this.isDragging = false;
+          this.isResizing = false;
+          this.positionedWithTopLeft = false;
+          this.dragOffsetX = 0;
+          this.dragOffsetY = 0;
+          this.resizeInitialMouseX = 0;
+          this.resizeInitialMouseY = 0;
+          this.initialWidth = 0;
+          this.initialHeight = 0;
+          this.initialCardX_resize = 0;
+          this.initialCardY_resize = 0;
 
-                this.element = this._createWindowElement(id, title, titleIconUrl, contentHtml, options.footerHtml);
-                this.dragHandle = this.element.querySelector('.drag-handle');
-                this.resizeHandle = this.element.querySelector('.resize-handle');
-                this.closeButton = this.element.querySelector('.window-button.close');
+          this.element = this._createWindowElement(
+            id,
+            title,
+            titleIconUrl,
+            contentHtml,
+            options.footerHtml
+          );
+          this.dragHandle = this.element.querySelector(".drag-handle");
+          this.resizeHandle = this.element.querySelector(".resize-handle");
+          this.closeButton = this.element.querySelector(".window-button.close");
 
-                this._attachEventListeners();
-                this.bringToFront();
-            }
+          this._attachEventListeners();
+          this.bringToFront();
+        }
 
-            _createWindowElement(id, title, titleIconUrl, contentHtml, footerHtml = '') {
-                const card = document.createElement('div');
-                card.className = 'fluent-card';
-                card.id = `window-${id}`;
+        _createWindowElement(
+          id,
+          title,
+          titleIconUrl,
+          contentHtml,
+          footerHtml = ""
+        ) {
+          const card = document.createElement("div");
+          card.className = "fluent-card";
+          card.id = `window-${id}`;
 
-                let footerSection = '';
-                if (footerHtml) {
-                    footerSection = `<div class="links-section">${footerHtml}</div>`;
-                }
+          let footerSection = "";
+          if (footerHtml) {
+            footerSection = `<div class="links-section">${footerHtml}</div>`;
+          }
 
-                card.innerHTML = `
+          card.innerHTML = `
                     <div class="drag-handle">
-                         <img src="${titleIconUrl || 'https://via.placeholder.com/20'}" alt="Window Icon" class="handle-pic">
+                         <img src="${
+                           titleIconUrl || "https://via.placeholder.com/20"
+                         }" alt="Window Icon" class="handle-pic">
                          <h1 class="handle-title">${title}</h1>
                          <div class="window-controls">
                              <button class="window-button minimize" disabled aria-hidden="true">–</button>
@@ -576,279 +753,334 @@
                     ${footerSection}
                     <div class="resize-handle"></div>
                 `;
-                document.body.appendChild(card);
+          document.body.appendChild(card);
 
-                 requestAnimationFrame(() => {
-                    if (!this.positionedWithTopLeft) {
-                        this._setInitialPosition();
-                    }
-                 });
-
-                return card;
+          requestAnimationFrame(() => {
+            if (!this.positionedWithTopLeft) {
+              this._setInitialPosition();
             }
+          });
 
-            _setInitialPosition(offset = { x: 0, y: 0 }) {
-                const cardWidth = this.element.offsetWidth;
-                const cardHeight = this.element.offsetHeight;
-                const viewportWidth = document.documentElement.clientWidth;
-                const viewportHeight = document.documentElement.clientHeight;
-                const isDuoLayout = window.matchMedia("(screen-spanning: single-fold-vertical)").matches;
-
-                let initialLeft, initialTop;
-
-                if (isDuoLayout) {
-                     const computedStyle = getComputedStyle(this.element);
-                     initialLeft = parseFloat(computedStyle.left);
-                     initialTop = parseFloat(computedStyle.top);
-                     this.element.style.transform = 'none';
-                 } else {
-                    initialLeft = Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
-                    initialTop = Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
-                    this.element.style.transform = 'none';
-                }
-
-                if (initialLeft < 0) initialLeft = 0;
-                if (initialTop < 0) initialTop = 0;
-                if (initialLeft > viewportWidth - cardWidth) initialLeft = viewportWidth - cardWidth;
-                if (initialTop > viewportHeight - cardHeight) initialTop = viewportHeight - cardHeight;
-
-                this.element.style.left = `${initialLeft}px`;
-                this.element.style.top = `${initialTop}px`;
-                this.positionedWithTopLeft = true;
-            }
-
-
-            _attachEventListeners() {
-                this.dragHandle.addEventListener('mousedown', this._startDrag.bind(this));
-                this.dragHandle.addEventListener('touchstart', this._startDrag.bind(this), { passive: false });
-
-                this.resizeHandle.addEventListener('mousedown', this._startResize.bind(this));
-                this.resizeHandle.addEventListener('touchstart', this._startResize.bind(this), { passive: false });
-
-                this.element.addEventListener('mousedown', this.bringToFront.bind(this));
-                this.element.addEventListener('touchstart', this.bringToFront.bind(this), { passive: false });
-
-                this.closeButton.addEventListener('click', this.destroy.bind(this));
-            }
-
-             bringToFront() {
-                highestZ++;
-                this.element.style.zIndex = highestZ;
-            }
-
-            _switchToTopLeftPositioningIfNeeded() {
-                if (!this.positionedWithTopLeft) {
-                   this._setInitialPosition();
-                }
-            }
-
-
-            _startDrag(e) {
-                if (this.isResizing || e.target === this.resizeHandle || e.target.closest('.window-controls') || e.target.closest('.fluent-button')) return;
-                if (e.target !== this.dragHandle && !e.target.closest('.drag-handle')) return;
-
-
-                this._switchToTopLeftPositioningIfNeeded();
-                this.bringToFront();
-
-                this.isDragging = true;
-                activeInteractionWindow = this;
-                this.dragHandle.style.cursor = 'grabbing';
-                document.body.style.cursor = 'grabbing';
-
-                const rect = this.element.getBoundingClientRect();
-                let startClientX, startClientY;
-
-                if (e.type === "touchstart") {
-                    startClientX = e.touches[0].clientX;
-                    startClientY = e.touches[0].clientY;
-                } else {
-                    startClientX = e.clientX;
-                    startClientY = e.clientY;
-                }
-
-                this.dragOffsetX = startClientX - rect.left;
-                this.dragOffsetY = startClientY - rect.top;
-
-                e.preventDefault();
-            }
-
-             _doDrag(e) {
-                if (!this.isDragging) return;
-                e.preventDefault();
-
-                let currentMouseX, currentMouseY;
-                if (e.type === "touchmove") {
-                    currentMouseX = e.touches[0].clientX;
-                    currentMouseY = e.touches[0].clientY;
-                } else {
-                    currentMouseX = e.clientX;
-                    currentMouseY = e.clientY;
-                }
-
-                let newCardX = currentMouseX - this.dragOffsetX;
-                let newCardY = currentMouseY - this.dragOffsetY;
-
-                const viewportWidth = document.documentElement.clientWidth;
-                const viewportHeight = document.documentElement.clientHeight;
-                const cardWidth = this.element.offsetWidth;
-                const cardHeight = this.element.offsetHeight;
-
-                if (newCardX < 0) newCardX = 0;
-                if (newCardY < 0) newCardY = 0;
-                if (newCardX > viewportWidth - cardWidth) newCardX = viewportWidth - cardWidth;
-                if (newCardY > viewportHeight - cardHeight) newCardY = viewportHeight - cardHeight;
-
-                this.element.style.left = `${newCardX}px`;
-                this.element.style.top = `${newCardY}px`;
-            }
-
-             _endDrag() {
-                if (this.isDragging) {
-                    this.isDragging = false;
-                    this.dragHandle.style.cursor = 'grab';
-                     if (activeInteractionWindow === this) {
-                         activeInteractionWindow = null;
-                         document.body.style.cursor = 'default';
-                     }
-                }
-            }
-
-            _startResize(e) {
-                if (this.isDragging) return;
-
-                this._switchToTopLeftPositioningIfNeeded();
-                this.bringToFront();
-
-                this.isResizing = true;
-                activeInteractionWindow = this;
-                document.body.style.cursor = 'nwse-resize';
-
-                this.initialWidth = this.element.offsetWidth;
-                this.initialHeight = this.element.offsetHeight;
-                this.initialCardX_resize = this.element.offsetLeft;
-                this.initialCardY_resize = this.element.offsetTop;
-
-                if (e.type === "touchstart") {
-                    this.resizeInitialMouseX = e.touches[0].clientX;
-                    this.resizeInitialMouseY = e.touches[0].clientY;
-                } else {
-                    this.resizeInitialMouseX = e.clientX;
-                    this.resizeInitialMouseY = e.clientY;
-                }
-                e.preventDefault();
-            }
-
-            _doResize(e) {
-                if (!this.isResizing) return;
-                e.preventDefault();
-
-                let currentMouseX, currentMouseY;
-                 if (e.type === "touchmove") {
-                    currentMouseX = e.touches[0].clientX;
-                    currentMouseY = e.touches[0].clientY;
-                } else {
-                    currentMouseX = e.clientX;
-                    currentMouseY = e.clientY;
-                }
-
-                let dx = currentMouseX - this.resizeInitialMouseX;
-                let dy = currentMouseY - this.resizeInitialMouseY;
-
-                let newWidth = this.initialWidth + dx;
-                let newHeight = this.initialHeight + dy;
-
-                newWidth = Math.max(minWidth, newWidth);
-                newHeight = Math.max(minHeight, newHeight);
-
-                const viewportWidth = document.documentElement.clientWidth;
-                const viewportHeight = document.documentElement.clientHeight;
-
-                if (this.initialCardX_resize + newWidth > viewportWidth) {
-                     newWidth = viewportWidth - this.initialCardX_resize;
-                     newWidth = Math.max(minWidth, newWidth);
-                }
-                 if (this.initialCardY_resize + newHeight > viewportHeight) {
-                     newHeight = viewportHeight - this.initialCardY_resize;
-                     newHeight = Math.max(minHeight, newHeight);
-                }
-
-                this.element.style.width = `${newWidth}px`;
-                this.element.style.height = `${newHeight}px`;
-            }
-
-            _endResize() {
-                if (this.isResizing) {
-                    this.isResizing = false;
-                     if (activeInteractionWindow === this) {
-                         activeInteractionWindow = null;
-                         document.body.style.cursor = 'default';
-                     }
-                }
-            }
-
-             destroy() {
-                this.element.remove();
-                delete windows[this.id];
-                if (activeInteractionWindow === this) {
-                    activeInteractionWindow = null;
-                    document.body.style.cursor = 'default';
-                }
-            }
+          return card;
         }
 
-        document.addEventListener('mousemove', (e) => {
-            activeInteractionWindow?._doDrag(e);
-            activeInteractionWindow?._doResize(e);
-        });
-        document.addEventListener('touchmove', (e) => {
-            activeInteractionWindow?._doDrag(e);
-            activeInteractionWindow?._doResize(e);
-        }, { passive: false });
+        _setInitialPosition(offset = { x: 0, y: 0 }) {
+          const cardWidth = this.element.offsetWidth;
+          const cardHeight = this.element.offsetHeight;
+          const viewportWidth = document.documentElement.clientWidth;
+          const viewportHeight = document.documentElement.clientHeight;
+          const isDuoLayout = window.matchMedia(
+            "(screen-spanning: single-fold-vertical)"
+          ).matches;
 
-        document.addEventListener('mouseup', () => {
-            activeInteractionWindow?._endDrag();
-            activeInteractionWindow?._endResize();
-        });
-        document.addEventListener('touchend', () => {
-            activeInteractionWindow?._endDrag();
-            activeInteractionWindow?._endResize();
-        });
+          let initialLeft, initialTop;
 
-        function createWindow(id, title, titleIconUrl, contentHtml, options = {}) {
-             if (windows[id]) {
-                 windows[id].bringToFront();
-                 return windows[id];
-             }
-            const newWindow = new FluentWindow(id, title, titleIconUrl, contentHtml, options);
-            windows[id] = newWindow;
-             const viewProjectsButton = newWindow.element.querySelector('.view-projects-button');
-             if (viewProjectsButton) {
-                 viewProjectsButton.addEventListener('click', (e) => {
-                     e.stopPropagation();
-                     createProjectsWindow();
-                 });
-             }
+          if (isDuoLayout) {
+            const computedStyle = getComputedStyle(this.element);
+            initialLeft = parseFloat(computedStyle.left);
+            initialTop = parseFloat(computedStyle.top);
+            this.element.style.transform = "none";
+          } else {
+            initialLeft =
+              Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
+            initialTop =
+              Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
+            this.element.style.transform = "none";
+          }
 
-             const closeButton = newWindow.element.querySelector('.close-window-button');
-             if (closeButton) {
-                 closeButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    newWindow.destroy();
-                 });
-             }
+          if (initialLeft < 0) initialLeft = 0;
+          if (initialTop < 0) initialTop = 0;
+          if (initialLeft > viewportWidth - cardWidth)
+            initialLeft = viewportWidth - cardWidth;
+          if (initialTop > viewportHeight - cardHeight)
+            initialTop = viewportHeight - cardHeight;
 
-             const someOtherButton = newWindow.element.querySelector('.some-other-action-button');
-             if (someOtherButton) {
-                someOtherButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    alert(`Button in window '${id}' clicked!`);
-                });
-             }
-             return newWindow;
+          this.element.style.left = `${initialLeft}px`;
+          this.element.style.top = `${initialTop}px`;
+          this.positionedWithTopLeft = true;
         }
 
-        const aboutMeContent = `
+        _attachEventListeners() {
+          this.dragHandle.addEventListener(
+            "mousedown",
+            this._startDrag.bind(this)
+          );
+          this.dragHandle.addEventListener(
+            "touchstart",
+            this._startDrag.bind(this),
+            { passive: false }
+          );
+
+          this.resizeHandle.addEventListener(
+            "mousedown",
+            this._startResize.bind(this)
+          );
+          this.resizeHandle.addEventListener(
+            "touchstart",
+            this._startResize.bind(this),
+            { passive: false }
+          );
+
+          this.element.addEventListener(
+            "mousedown",
+            this.bringToFront.bind(this)
+          );
+          this.element.addEventListener(
+            "touchstart",
+            this.bringToFront.bind(this),
+            { passive: false }
+          );
+
+          this.closeButton.addEventListener("click", this.destroy.bind(this));
+        }
+
+        bringToFront() {
+          highestZ++;
+          this.element.style.zIndex = highestZ;
+        }
+
+        _switchToTopLeftPositioningIfNeeded() {
+          if (!this.positionedWithTopLeft) {
+            this._setInitialPosition();
+          }
+        }
+
+        _startDrag(e) {
+          if (
+            this.isResizing ||
+            e.target === this.resizeHandle ||
+            e.target.closest(".window-controls") ||
+            e.target.closest(".fluent-button")
+          )
+            return;
+          if (e.target !== this.dragHandle && !e.target.closest(".drag-handle"))
+            return;
+
+          this._switchToTopLeftPositioningIfNeeded();
+          this.bringToFront();
+
+          this.isDragging = true;
+          activeInteractionWindow = this;
+          this.dragHandle.style.cursor = "grabbing";
+          document.body.style.cursor = "grabbing";
+
+          const rect = this.element.getBoundingClientRect();
+          let startClientX, startClientY;
+
+          if (e.type === "touchstart") {
+            startClientX = e.touches[0].clientX;
+            startClientY = e.touches[0].clientY;
+          } else {
+            startClientX = e.clientX;
+            startClientY = e.clientY;
+          }
+
+          this.dragOffsetX = startClientX - rect.left;
+          this.dragOffsetY = startClientY - rect.top;
+
+          e.preventDefault();
+        }
+
+        _doDrag(e) {
+          if (!this.isDragging) return;
+          e.preventDefault();
+
+          let currentMouseX, currentMouseY;
+          if (e.type === "touchmove") {
+            currentMouseX = e.touches[0].clientX;
+            currentMouseY = e.touches[0].clientY;
+          } else {
+            currentMouseX = e.clientX;
+            currentMouseY = e.clientY;
+          }
+
+          let newCardX = currentMouseX - this.dragOffsetX;
+          let newCardY = currentMouseY - this.dragOffsetY;
+
+          const viewportWidth = document.documentElement.clientWidth;
+          const viewportHeight = document.documentElement.clientHeight;
+          const cardWidth = this.element.offsetWidth;
+          const cardHeight = this.element.offsetHeight;
+
+          if (newCardX < 0) newCardX = 0;
+          if (newCardY < 0) newCardY = 0;
+          if (newCardX > viewportWidth - cardWidth)
+            newCardX = viewportWidth - cardWidth;
+          if (newCardY > viewportHeight - cardHeight)
+            newCardY = viewportHeight - cardHeight;
+
+          this.element.style.left = `${newCardX}px`;
+          this.element.style.top = `${newCardY}px`;
+        }
+
+        _endDrag() {
+          if (this.isDragging) {
+            this.isDragging = false;
+            this.dragHandle.style.cursor = "grab";
+            if (activeInteractionWindow === this) {
+              activeInteractionWindow = null;
+              document.body.style.cursor = "default";
+            }
+          }
+        }
+
+        _startResize(e) {
+          if (this.isDragging) return;
+
+          this._switchToTopLeftPositioningIfNeeded();
+          this.bringToFront();
+
+          this.isResizing = true;
+          activeInteractionWindow = this;
+          document.body.style.cursor = "nwse-resize";
+
+          this.initialWidth = this.element.offsetWidth;
+          this.initialHeight = this.element.offsetHeight;
+          this.initialCardX_resize = this.element.offsetLeft;
+          this.initialCardY_resize = this.element.offsetTop;
+
+          if (e.type === "touchstart") {
+            this.resizeInitialMouseX = e.touches[0].clientX;
+            this.resizeInitialMouseY = e.touches[0].clientY;
+          } else {
+            this.resizeInitialMouseX = e.clientX;
+            this.resizeInitialMouseY = e.clientY;
+          }
+          e.preventDefault();
+        }
+
+        _doResize(e) {
+          if (!this.isResizing) return;
+          e.preventDefault();
+
+          let currentMouseX, currentMouseY;
+          if (e.type === "touchmove") {
+            currentMouseX = e.touches[0].clientX;
+            currentMouseY = e.touches[0].clientY;
+          } else {
+            currentMouseX = e.clientX;
+            currentMouseY = e.clientY;
+          }
+
+          let dx = currentMouseX - this.resizeInitialMouseX;
+          let dy = currentMouseY - this.resizeInitialMouseY;
+
+          let newWidth = this.initialWidth + dx;
+          let newHeight = this.initialHeight + dy;
+
+          newWidth = Math.max(minWidth, newWidth);
+          newHeight = Math.max(minHeight, newHeight);
+
+          const viewportWidth = document.documentElement.clientWidth;
+          const viewportHeight = document.documentElement.clientHeight;
+
+          if (this.initialCardX_resize + newWidth > viewportWidth) {
+            newWidth = viewportWidth - this.initialCardX_resize;
+            newWidth = Math.max(minWidth, newWidth);
+          }
+          if (this.initialCardY_resize + newHeight > viewportHeight) {
+            newHeight = viewportHeight - this.initialCardY_resize;
+            newHeight = Math.max(minHeight, newHeight);
+          }
+
+          this.element.style.width = `${newWidth}px`;
+          this.element.style.height = `${newHeight}px`;
+        }
+
+        _endResize() {
+          if (this.isResizing) {
+            this.isResizing = false;
+            if (activeInteractionWindow === this) {
+              activeInteractionWindow = null;
+              document.body.style.cursor = "default";
+            }
+          }
+        }
+
+        destroy() {
+          this.element.remove();
+          delete windows[this.id];
+          if (activeInteractionWindow === this) {
+            activeInteractionWindow = null;
+            document.body.style.cursor = "default";
+          }
+        }
+      }
+
+      document.addEventListener("mousemove", (e) => {
+        activeInteractionWindow?._doDrag(e);
+        activeInteractionWindow?._doResize(e);
+      });
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          activeInteractionWindow?._doDrag(e);
+          activeInteractionWindow?._doResize(e);
+        },
+        { passive: false }
+      );
+
+      document.addEventListener("mouseup", () => {
+        activeInteractionWindow?._endDrag();
+        activeInteractionWindow?._endResize();
+      });
+      document.addEventListener("touchend", () => {
+        activeInteractionWindow?._endDrag();
+        activeInteractionWindow?._endResize();
+      });
+
+      function createWindow(
+        id,
+        title,
+        titleIconUrl,
+        contentHtml,
+        options = {}
+      ) {
+        if (windows[id]) {
+          windows[id].bringToFront();
+          return windows[id];
+        }
+        const newWindow = new FluentWindow(
+          id,
+          title,
+          titleIconUrl,
+          contentHtml,
+          options
+        );
+        windows[id] = newWindow;
+        const viewProjectsButton = newWindow.element.querySelector(
+          ".view-projects-button"
+        );
+        if (viewProjectsButton) {
+          viewProjectsButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            createProjectsWindow();
+          });
+        }
+
+        const closeButton = newWindow.element.querySelector(
+          ".close-window-button"
+        );
+        if (closeButton) {
+          closeButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            newWindow.destroy();
+          });
+        }
+
+        const someOtherButton = newWindow.element.querySelector(
+          ".some-other-action-button"
+        );
+        if (someOtherButton) {
+          someOtherButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            alert(`Button in window '${id}' clicked!`);
+          });
+        }
+        return newWindow;
+      }
+
+      const aboutMeContent = `
              <div class="content-area">
                 <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
                 <h1>MegaBytesMe (Ben)</h1>
@@ -920,57 +1152,143 @@
                  </div>
             </div>
         `;
-         const aboutMeFooter = `
+      const aboutMeFooter = `
              <button class="fluent-button view-projects-button">View Projects</button>
              <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
          `;
 
-         const projectsContent = `
-             <div class="content-area">
+      const projectsContent = `
+            <div class="content-area projects-list">
                 <h1>My Projects</h1>
-                <p>This window shows a list of projects.</p>
-                 <ul>
-                     <li>Project Alpha: Description...</li>
-                     <li>Project Beta: Description...</li>
-                     <li>Project Gamma: Description...</li>
-                 </ul>
-             </div>
-         `;
-         const projectsFooter = `
+                <p>Here are some of the projects I've worked on:</p>
+                <ul>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/CardBox" target="_blank" rel="noopener noreferrer">CardBox</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">CardBox is an app which is designed to effortlessly present your loyalty cards.</p>
+                        <div class="project-tags">
+                            <span>cards</span> <span>uwp</span> <span>windows-10</span> <span>uwp-apps</span> <span>windows-10-mobile</span> <span>maui</span> <span>loyalty-card</span>
+                        </div>
+                        <div class="project-meta">
+                            <span class="project-lang csharp">C#</span> <span class="project-lang other">1 Other</span> <span class="project-date">Updated 4 hours ago</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/QuickUp-Tool" target="_blank" rel="noopener noreferrer">QuickUp-Tool</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">QuickUp Tool is a Windows utility which allows you to quickly upload files without needing an account.</p>
+                        <div class="project-tags">
+                            <!-- No tags provided -->
+                        </div>
+                        <div class="project-meta">
+                            <span class="project-lang csharp">C#</span> <span class="project-lang other">1 Other</span> <span class="project-date">Updated 4 hours ago</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/wii-ullm" target="_blank" rel="noopener noreferrer">wii-ullm</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">Forked from aarossig/ullm - Tinkering with small LLMs. (Optimised for the Nintendo Wii U)</p>
+                        <div class="project-tags">
+                            <!-- No tags provided -->
+                        </div>
+                        <div class="project-meta">
+                            <span class="project-lang c">C</span> <span class="project-license">Apache License 2.0</span> <span class="project-date">Updated last week</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/CSC3065-Assignment-2" target="_blank" rel="noopener noreferrer">CSC3065-Assignment-2</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">CSC3065 Assignment 2</p>
+                        <div class="project-tags">
+                            <span>docker</span> <span>university-assignment</span> <span>csc3065</span>
+                        </div>
+                        <div class="project-meta">
+                            <!-- No language --> <span class="project-date">Updated 2 weeks ago</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/MiniMinivanMod" target="_blank" rel="noopener noreferrer">MiniMinivanMod</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">MiniMinivanMod is a mod for BeamNG.Drive which aims to add a realistic set of Stellantis-based engines into the Lansdale config.</p>
+                        <div class="project-tags">
+                            <span>mod</span> <span>beamng</span> <span>chrysler</span> <span>jbeam</span> <span>beamng-drive</span>
+                        </div>
+                        <div class="project-meta">
+                            <!-- No language --> <span class="project-date">Updated on Mar 9</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/MineLights" target="_blank" rel="noopener noreferrer">MineLights</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">Add RGB software integration into Minecraft</p>
+                        <div class="project-tags">
+                            <span>icue</span> <span>minecraft-fabric-mod</span>
+                        </div>
+                        <div class="project-meta">
+                            <span class="project-lang cpp">C++</span> <span class="project-lang other">1 Other</span> <span class="project-issues">1 issue needs help</span> <span class="project-date">Updated on Jan 2</span>
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/Community-Connections---The-Game" target="_blank" rel="noopener noreferrer">Community-Connections---The-Game</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">University Software Engineering Project</p>
+                        <div class="project-tags">
+                            <span>university-project</span> <span>software-engineering</span> <span>csc2058</span>
+                        </div>
+                        <div class="project-meta">
+                            <span class="project-lang java">Java</span> <span class="project-date">Updated on Oct 4, 2024</span> <!-- Assuming current year -->
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/Minecraft-Wii-U-World-Collection" target="_blank" rel="noopener noreferrer">Minecraft-Wii-U-World-Collection</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">A collection of Minecraft: Wii U Edition worlds, converted to work with Minecraft: Java Edition (1.14.4 and newer)</p>
+                        <div class="project-tags"></div>
+                        <div class="project-meta">
+                            <!-- No language --> <span class="project-date">Updated on Aug 7, 2024</span> <!-- Assuming current year -->
+                        </div>
+                    </li>
+                    <li>
+                        <h3 class="project-title"><a href="https://github.com/megabytesme/BeamCUE" target="_blank" rel="noopener noreferrer">BeamCUE</a> <span class="project-visibility">Public</span></h3>
+                        <p class="project-desc">OutGauge to CUE SDK</p>
+                        <div class="project-tags"></div>
+                        <div class="project-meta">
+                            <span class="project-lang c">C</span> <span class="project-license">MIT License</span> <span class="project-date">Updated on Nov 10, 2022</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        `;
+
+      const projectsFooter = `
              <button class="fluent-button close-window-button">Close Projects</button>
-             <button class="fluent-button some-other-action-button">Other Action</button>
          `;
 
-        function createProjectsWindow() {
-             const existingWindowCount = Object.keys(windows).length;
-             const offsetX = 30 * existingWindowCount;
-             const offsetY = 30 * existingWindowCount;
+      function createProjectsWindow() {
+        const existingWindowCount = Object.keys(windows).length;
+        const offsetX = 30 * existingWindowCount;
+        const offsetY = 30 * existingWindowCount;
 
-            createWindow(
-                'projects',
-                'My Projects',
-                 'https://git-scm.com/images/logos/downloads/Git-Icon-White.svg',
-                projectsContent,
-                 { footerHtml: projectsFooter, initialOffset: { x: offsetX, y: offsetY } }
-            );
-        }
+        createWindow(
+          "projects",
+          "My Projects",
+          "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg",
+          projectsContent,
+          {
+            footerHtml: projectsFooter,
+            initialOffset: { x: offsetX, y: offsetY },
+          }
+        );
+      }
 
-        function createAboutMeWindow() {
-             createWindow(
-                'about-me',
-                'About Me - Ben',
-                'https://avatars.githubusercontent.com/u/57240557?v=4',
-                aboutMeContent,
-                 { footerHtml: aboutMeFooter }
-             );
-        }
+      function createAboutMeWindow() {
+        createWindow(
+          "about-me",
+          "About Me - Ben",
+          "https://avatars.githubusercontent.com/u/57240557?v=4",
+          aboutMeContent,
+          { footerHtml: aboutMeFooter }
+        );
+      }
 
-        const reopenBtn = document.getElementById('reopenAboutMeBtn');
-        if (reopenBtn) {
-             reopenBtn.addEventListener('click', createAboutMeWindow);
-        }
+      const reopenBtn = document.getElementById("reopenAboutMeBtn");
+      if (reopenBtn) {
+        reopenBtn.addEventListener("click", createAboutMeWindow);
+      }
 
-        createAboutMeWindow();
+      createAboutMeWindow();
     </script>
-</body>
+  </body>
 </html>
