@@ -59,6 +59,13 @@
         --reopen-button-bg-dark: rgba(50, 50, 50, 0.7);
         --reopen-button-text-light: #000;
         --reopen-button-text-dark: #fff;
+        --copyright-bg-light: rgba(0, 0, 0, 0.5);
+        --copyright-bg-dark: rgba(0, 0, 0, 0.7);
+        --copyright-text-light: #ffffff;
+        --copyright-text-dark: #cccccc;
+
+        --bg-image-landscape: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg");
+        --bg-image-portrait: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
       }
 
       html {
@@ -81,8 +88,7 @@
       }
 
       body {
-        background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg")
-          no-repeat center center fixed;
+        background: var(--bg-image-landscape) no-repeat center center fixed;
         background-size: cover;
         color: var(--text-color-light);
         background-color: #fff;
@@ -90,9 +96,7 @@
 
       @media (orientation: portrait) {
         body {
-          background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg")
-            no-repeat center center fixed;
-          background-size: cover;
+          background-image: var(--bg-image-portrait);
         }
       }
 
@@ -227,7 +231,6 @@
         pointer-events: auto;
         padding: 20px 30px 15px 30px;
       }
-
       .projects-list {
         padding: 20px 30px 15px 30px;
         flex-grow: 1;
@@ -423,6 +426,22 @@
         font-size: 14px;
       }
 
+      #copyright-info {
+        position: fixed;
+        bottom: 5px;
+        right: 10px;
+        font-size: 10px;
+        color: var(--copyright-text-light);
+        background-color: var(--copyright-bg-light);
+        padding: 2px 6px;
+        border-radius: 3px;
+        z-index: 0;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        max-width: 40%;
+        text-align: right;
+        pointer-events: none;
+      }
+
       .projects-list ul {
         list-style: none;
         padding: 0;
@@ -509,6 +528,9 @@
       }
       .project-lang.other::before {
         color: #888888;
+      }
+      .project-lang.na::before {
+        display: none;
       }
       .project-license::before {
         content: "⚖️";
@@ -634,6 +656,12 @@
           box-shadow: 0 2px 5px var(--shadow-color-dark);
         }
 
+        #copyright-info {
+          background-color: var(--copyright-bg-dark);
+          color: var(--copyright-text-dark);
+          text-shadow: none;
+        }
+
         .projects-list li {
           border-bottom-color: var(--section-separator-dark);
         }
@@ -683,11 +711,16 @@
   </head>
   <body>
     <button id="reopenAboutMeBtn">About Me</button>
+    <div id="copyright-info"></div>
 
     <script>
       const windows = {};
       let highestZ = 1;
       let activeInteractionWindow = null;
+      let dynamicStyleTag = null;
+
+      const GITHUB_USERNAME = "megabytesme";
+      const BACKEND_API_BASE_URL = "http://megabytesme.ddns.net:7999";
 
       const minWidth = parseInt(
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -731,7 +764,6 @@
           this.closeButton = this.element.querySelector(".window-button.close");
 
           this.setContent(contentHtml);
-
           this._attachEventListeners();
           this._setInitialPosition(options.initialOffset);
           this.bringToFront();
@@ -765,9 +797,7 @@
                              <button class="window-button close" aria-label="Close ${title}">✕</button>
                          </div>
                     </div>
-                    <div class="fluent-card-content">
-                        <!-- Content will be inserted here by setContent -->
-                    </div>
+                    <div class="fluent-card-content"></div>
                     ${footerSection}
                     <div class="resize-handle"></div>
                 `;
@@ -776,9 +806,9 @@
         }
 
         _setInitialPosition(offset = { x: 0, y: 0 }) {
-          this.element.style.transform = "none";
-
           requestAnimationFrame(() => {
+            if (this.positionedWithTopLeft) return;
+
             const cardWidth = this.element.offsetWidth;
             const cardHeight = this.element.offsetHeight;
             const viewportWidth = document.documentElement.clientWidth;
@@ -793,11 +823,13 @@
               const computedStyle = getComputedStyle(this.element);
               initialLeft = parseFloat(computedStyle.left) || 10;
               initialTop = parseFloat(computedStyle.top) || 10;
+              this.element.style.transform = "none";
             } else {
               initialLeft =
                 Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
               initialTop =
                 Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
+              this.element.style.transform = "none";
             }
 
             if (initialLeft < 0) initialLeft = 0;
@@ -1071,19 +1103,14 @@
           windows[id].bringToFront();
           return windows[id];
         }
-
         const newWindow = new FluentWindow(
           id,
           title,
           titleIconUrl,
           contentHtml,
-          {
-            footerHtml: options.footerHtml,
-            initialOffset: options.initialOffset,
-          }
+          options
         );
         windows[id] = newWindow;
-
         return newWindow;
       }
 
@@ -1092,17 +1119,11 @@
         try {
           const response = await fetch(apiUrl);
           if (!response.ok) {
-            if (response.status === 403) {
-              throw new Error(
-                "GitHub API rate limit exceeded. Please wait a while and try again."
-              );
-            }
-            throw new Error(
-              `Failed to fetch repositories: ${response.status} ${response.statusText}`
-            );
+            if (response.status === 403)
+              throw new Error("GitHub API rate limit exceeded.");
+            throw new Error(`GitHub API error! status: ${response.status}`);
           }
           const data = await response.json();
-          return data.filter((repo) => !repo.fork);
           return data;
         } catch (error) {
           console.error("Error fetching projects:", error);
@@ -1113,8 +1134,7 @@
       function formatDate(isoString) {
         if (!isoString) return "N/A";
         try {
-          const date = new Date(isoString);
-          return date.toLocaleDateString(undefined, {
+          return new Date(isoString).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -1126,47 +1146,37 @@
 
       function renderProjects(repos, containerElement) {
         containerElement.innerHTML = "";
-
         if (!repos || repos.length === 0) {
           containerElement.innerHTML =
             '<p class="error-message">No public projects found or failed to load.</p>';
           return;
         }
-
         const list = document.createElement("ul");
         repos.forEach((repo) => {
-          const listItem = document.createElement("li");
-          const topicsHtml = repo.topics
-            .map((topic) => `<span>${topic}</span>`)
-            .join(" ");
-          const licenseHtml = repo.license
+          const li = document.createElement("li");
+          const tags =
+            repo.topics?.map((t) => `<span>${t}</span>`).join(" ") || "";
+          const license = repo.license
             ? `<span class="project-license">${repo.license.name}</span>`
             : "";
-          const languageHtml = repo.language
+          const lang = repo.language
             ? `<span class="project-lang ${repo.language
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, "")}">${repo.language}</span>`
-            : '<span class="project-lang other">N/A</span>';
-
-          listItem.innerHTML = `
-                    <h3 class="project-title"><a href="${
-                      repo.html_url
-                    }" target="_blank" rel="noopener noreferrer">${
+            : '<span class="project-lang na">N/A</span>';
+          li.innerHTML = `<h3 class="project-title"><a href="${
+            repo.html_url
+          }" target="_blank" rel="noopener noreferrer">${
             repo.name
           }</a> <span class="project-visibility">Public</span></h3>
-                    <p class="project-desc">${
-                      repo.description || "No description provided."
-                    }</p>
-                    <div class="project-tags">${topicsHtml}</div>
-                    <div class="project-meta">
-                        ${languageHtml}
-                        ${licenseHtml}
-                        <span class="project-date">Updated on ${formatDate(
-                          repo.updated_at
-                        )}</span>
-                    </div>
-                `;
-          list.appendChild(listItem);
+                                <p class="project-desc">${
+                                  repo.description || "No description."
+                                }</p>
+                                <div class="project-tags">${tags}</div>
+                                <div class="project-meta">${lang}${license}<span class="project-date">Updated ${formatDate(
+            repo.updated_at
+          )}</span></div>`;
+          list.appendChild(li);
         });
         containerElement.appendChild(list);
       }
@@ -1186,7 +1196,7 @@
                     I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.
                 </p>
                 <p class="intro-text">
-                    I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.
+                   I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.
                 </p>
                 <h2>Technologies & Languages</h2>
                 <p>I primarily work with:</p>
@@ -1197,31 +1207,8 @@
                 <h2>Technologies I have worked with:</h2>
                 <div class="scrolling-icons-container">
                     <div class="scrolling-icons-track">
-                        <!-- Icon images -->
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo">
-                         <img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo">
-                         <img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo">
-                         <img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo">
-                         <img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo">
-                         <img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo">
-                         <img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo">
-                         <img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo">
-                         <img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo">
-                         <img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo">
-                         <img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo">
-                         <img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo">
-                         <img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
-
+                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
+                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
                     </div>
                  </div>
             </div>
@@ -1231,22 +1218,13 @@
              <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
          `;
 
-      const projectsInitialContent = `
-             <div class="projects-list">
-                <p class="loading-message">Loading projects from GitHub...</p>
-             </div>
-        `;
-      const projectsFooter = `
-             <button class="fluent-button close-window-button">Close Projects</button>
-         `;
+      const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading projects...</p></div>`;
+      const projectsFooter = `<button class="fluent-button close-window-button">Close Projects</button>`;
 
       async function createProjectsWindow() {
-        const GITHUB_USERNAME = "megabytesme";
         const windowId = "projects";
-        const existingWindow = windows[windowId];
-
-        if (existingWindow) {
-          existingWindow.bringToFront();
+        if (windows[windowId]) {
+          windows[windowId].bringToFront();
           return;
         }
 
@@ -1290,7 +1268,91 @@
         reopenBtn.addEventListener("click", createAboutMeWindow);
       }
 
-      createAboutMeWindow();
+      async function fetchSpotlightData() {
+        const apiUrl = `${BACKEND_API_BASE_URL}/api/spotlight-data`;
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            throw new Error(
+              `Cache Service HTTP error! status: ${response.status}`
+            );
+          }
+          const data = await response.json();
+          applySpotlightBackground(data);
+        } catch (error) {
+          console.error("Failed to fetch cached Spotlight data:", error);
+          const copyrightDiv = document.getElementById("copyright-info");
+          if (copyrightDiv)
+            copyrightDiv.textContent = "Error loading background info.";
+        }
+      }
+
+      function applySpotlightBackground(cachedItems) {
+        try {
+          if (
+            !cachedItems ||
+            !Array.isArray(cachedItems) ||
+            cachedItems.length === 0
+          ) {
+            console.warn("Received empty or invalid cache data.");
+            return;
+          }
+
+          const randomIndex = Math.floor(Math.random() * cachedItems.length);
+          const selectedItem = cachedItems[randomIndex];
+
+          const landscapePath = selectedItem?.landscapePath;
+          const portraitPath = selectedItem?.portraitPath;
+          const copyrightText = selectedItem?.copyright || "";
+          const title = selectedItem?.title || "";
+
+          if (!landscapePath || !portraitPath) {
+            console.warn(
+              "Selected cached item missing image paths:",
+              selectedItem
+            );
+            return;
+          }
+
+          const fullLandscapeUrl = `${BACKEND_API_BASE_URL}/cached-images/${landscapePath}`;
+          const fullPortraitUrl = `${BACKEND_API_BASE_URL}/cached-images/${portraitPath}`;
+
+          document.documentElement.style.setProperty(
+            "--bg-image-landscape",
+            `url('${fullLandscapeUrl}')`
+          );
+          document.documentElement.style.setProperty(
+            "--bg-image-portrait",
+            `url('${fullPortraitUrl}')`
+          );
+
+          const copyrightDiv = document.getElementById("copyright-info");
+          if (copyrightDiv) {
+            let displayText = copyrightText.trim();
+            if (
+              title &&
+              displayText &&
+              !displayText.toLowerCase().includes(title.toLowerCase())
+            ) {
+              displayText = `${title} | ${displayText}`;
+            } else if (title && !displayText) {
+              displayText = title;
+            }
+            copyrightDiv.textContent =
+              displayText || "Image information unavailable";
+          }
+        } catch (error) {
+          console.error("Error applying cached Spotlight data:", error);
+          const copyrightDiv = document.getElementById("copyright-info");
+          if (copyrightDiv)
+            copyrightDiv.textContent = "Error displaying image info.";
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchSpotlightData();
+        createAboutMeWindow();
+      });
     </script>
   </body>
 </html>
