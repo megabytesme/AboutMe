@@ -10,147 +10,6 @@
     <meta name="color-scheme" content="light dark" />
     <title>MegaBytesMe - Ben</title>
     <style>
-      .projects-list ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
-
-      .projects-list li {
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--section-separator-light);
-      }
-
-      .projects-list li:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-      }
-
-      .project-title {
-        margin-top: 0;
-        margin-bottom: 5px;
-        font-size: 18px;
-        font-weight: 600;
-      }
-
-      .project-title a {
-        color: var(--link-color-light);
-        text-decoration: none;
-      }
-
-      .project-title a:hover {
-        color: var(--link-hover-light);
-        text-decoration: underline;
-      }
-
-      .project-visibility {
-        font-size: 0.75em;
-        font-weight: normal;
-        color: var(--subtle-text-light);
-        border: 1px solid var(--border-color-light);
-        border-radius: 3px;
-        padding: 1px 4px;
-        margin-left: 8px;
-        vertical-align: middle;
-      }
-
-      .project-desc {
-        font-size: 14px;
-        margin-top: 0;
-        margin-bottom: 10px;
-        color: var(--subtle-text-light);
-      }
-
-      .project-tags span {
-        display: inline-block;
-        background-color: var(--handle-bg-light);
-        color: var(--link-color-light);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 12px;
-        margin-right: 5px;
-        margin-bottom: 5px;
-      }
-
-      .project-meta {
-        font-size: 13px;
-        color: var(--subtle-text-light);
-        margin-top: 10px;
-      }
-
-      .project-meta span {
-        margin-right: 15px;
-        display: inline-flex;
-        align-items: center;
-      }
-      .project-lang::before {
-        content: "●";
-        margin-right: 5px;
-        font-size: 1.2em;
-        line-height: 1;
-      }
-
-      .project-lang.csharp::before {
-        color: #9b4f96;
-      }
-      .project-lang.cpp::before,
-      .project-lang.c::before {
-        color: #555555;
-      }
-      .project-lang.java::before {
-        color: #b07219;
-      }
-      .project-lang.lua::before {
-        color: #2c2d72;
-      }
-      .project-lang.other::before {
-        color: #888888;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        .projects-list li {
-          border-bottom-color: var(--section-separator-dark);
-        }
-        .project-title a {
-          color: var(--link-color-dark);
-        }
-        .project-title a:hover {
-          color: var(--link-hover-dark);
-        }
-        .project-visibility {
-          color: var(--subtle-text-dark);
-          border-color: var(--border-color-dark);
-        }
-        .project-desc {
-          color: var(--subtle-text-dark);
-        }
-        .project-tags span {
-          background-color: var(--handle-bg-dark);
-          color: var(--link-color-dark);
-        }
-        .project-meta {
-          color: var(--subtle-text-dark);
-        }
-        .project-lang.csharp::before {
-          color: #d8a0df;
-        }
-        .project-lang.cpp::before,
-        .project-lang.c::before {
-          color: #cccccc;
-        }
-        .project-lang.java::before {
-          color: #f1e05a;
-        }
-        .project-lang.lua::before {
-          color: #7e80d4;
-        }
-        .project-lang.other::before {
-          color: #aaaaaa;
-        }
-      }
-
       :root {
         --scroll-duration: 70s;
         --min-card-width: 320px;
@@ -239,6 +98,9 @@
 
       .fluent-card {
         position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         width: 90%;
         max-width: 600px;
         min-width: var(--min-card-width);
@@ -264,10 +126,10 @@
       @media (screen-spanning: single-fold-vertical) {
         .fluent-card {
           left: 10px !important;
-          width: calc(env(fold-left, 50vw) - 20px) !important;
-          max-width: none !important;
           top: 10px !important;
+          width: calc(env(fold-left, 50vw) - 20px) !important;
           height: calc(100vh - 20px) !important;
+          max-width: none !important;
           transform: none !important;
           transition: none !important;
         }
@@ -288,7 +150,6 @@
         position: relative;
         z-index: 20;
       }
-
       .drag-handle img.handle-pic {
         width: 20px;
         height: 20px;
@@ -297,7 +158,6 @@
         flex-shrink: 0;
         border: 1px solid var(--border-color-light);
       }
-
       .drag-handle h1.handle-title {
         margin: 0;
         font-size: 15px;
@@ -339,7 +199,6 @@
         font-family: "Segoe UI Symbol", sans-serif;
         border-radius: 2px;
       }
-
       .window-button:disabled {
         opacity: 0.5;
         cursor: default;
@@ -349,14 +208,13 @@
       .window-button:not(:disabled):hover {
         background-color: var(--window-button-hover-bg-light);
       }
-
       .window-button.close:not(:disabled):hover {
         background-color: var(--window-button-close-hover-bg-light);
         color: var(--window-button-close-hover-text-light);
       }
 
       .fluent-card-content {
-        padding: 20px 30px 15px 30px;
+        padding: 0;
         overflow-y: auto;
         flex-grow: 1;
         position: relative;
@@ -367,7 +225,12 @@
       .content-area {
         flex-grow: 1;
         pointer-events: auto;
-        padding-bottom: 15px;
+        padding: 20px 30px 15px 30px;
+      }
+
+      .projects-list {
+        padding: 20px 30px 15px 30px;
+        flex-grow: 1;
       }
 
       .profile-pic {
@@ -560,6 +423,111 @@
         font-size: 14px;
       }
 
+      .projects-list ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .projects-list li {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--section-separator-light);
+      }
+      .projects-list li:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      .project-title {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .project-title a {
+        color: var(--link-color-light);
+        text-decoration: none;
+      }
+      .project-title a:hover {
+        color: var(--link-hover-light);
+        text-decoration: underline;
+      }
+      .project-visibility {
+        font-size: 0.75em;
+        font-weight: normal;
+        color: var(--subtle-text-light);
+        border: 1px solid var(--border-color-light);
+        border-radius: 3px;
+        padding: 1px 4px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      .project-desc {
+        font-size: 14px;
+        margin-top: 0;
+        margin-bottom: 10px;
+        color: var(--subtle-text-light);
+      }
+      .project-tags span {
+        display: inline-block;
+        background-color: var(--handle-bg-light);
+        color: var(--link-color-light);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
+      .project-meta {
+        font-size: 13px;
+        color: var(--subtle-text-light);
+        margin-top: 10px;
+      }
+      .project-meta span {
+        margin-right: 15px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .project-lang::before {
+        content: "●";
+        margin-right: 5px;
+        font-size: 1.2em;
+        line-height: 1;
+      }
+      .project-lang.csharp::before {
+        color: #9b4f96;
+      }
+      .project-lang.cpp::before,
+      .project-lang.c::before {
+        color: #555555;
+      }
+      .project-lang.java::before {
+        color: #b07219;
+      }
+      .project-lang.lua::before {
+        color: #2c2d72;
+      }
+      .project-lang.other::before {
+        color: #888888;
+      }
+      .project-license::before {
+        content: "⚖️";
+        margin-right: 5px;
+        font-size: 0.9em;
+      }
+      .project-issues::before {
+        content: "⚠️";
+        margin-right: 5px;
+        font-size: 0.9em;
+      }
+
+      .loading-message,
+      .error-message {
+        padding: 20px;
+        text-align: center;
+        color: var(--subtle-text-light);
+      }
+
       @media (prefers-color-scheme: dark) {
         body {
           color: var(--text-color-dark);
@@ -665,6 +633,51 @@
           border-color: var(--border-color-dark);
           box-shadow: 0 2px 5px var(--shadow-color-dark);
         }
+
+        .projects-list li {
+          border-bottom-color: var(--section-separator-dark);
+        }
+        .project-title a {
+          color: var(--link-color-dark);
+        }
+        .project-title a:hover {
+          color: var(--link-hover-dark);
+        }
+        .project-visibility {
+          color: var(--subtle-text-dark);
+          border-color: var(--border-color-dark);
+        }
+        .project-desc {
+          color: var(--subtle-text-dark);
+        }
+        .project-tags span {
+          background-color: var(--handle-bg-dark);
+          color: var(--link-color-dark);
+        }
+        .project-meta {
+          color: var(--subtle-text-dark);
+        }
+        .project-lang.csharp::before {
+          color: #d8a0df;
+        }
+        .project-lang.cpp::before,
+        .project-lang.c::before {
+          color: #cccccc;
+        }
+        .project-lang.java::before {
+          color: #f1e05a;
+        }
+        .project-lang.lua::before {
+          color: #7e80d4;
+        }
+        .project-lang.other::before {
+          color: #aaaaaa;
+        }
+
+        .loading-message,
+        .error-message {
+          color: var(--subtle-text-dark);
+        }
       }
     </style>
   </head>
@@ -708,24 +721,29 @@
             id,
             title,
             titleIconUrl,
-            contentHtml,
             options.footerHtml
+          );
+          this.contentContainer = this.element.querySelector(
+            ".fluent-card-content"
           );
           this.dragHandle = this.element.querySelector(".drag-handle");
           this.resizeHandle = this.element.querySelector(".resize-handle");
           this.closeButton = this.element.querySelector(".window-button.close");
 
+          this.setContent(contentHtml);
+
           this._attachEventListeners();
+          this._setInitialPosition(options.initialOffset);
           this.bringToFront();
         }
 
-        _createWindowElement(
-          id,
-          title,
-          titleIconUrl,
-          contentHtml,
-          footerHtml = ""
-        ) {
+        setContent(html) {
+          if (this.contentContainer) {
+            this.contentContainer.innerHTML = html;
+          }
+        }
+
+        _createWindowElement(id, title, titleIconUrl, footerHtml = "") {
           const card = document.createElement("div");
           card.className = "fluent-card";
           card.id = `window-${id}`;
@@ -748,56 +766,51 @@
                          </div>
                     </div>
                     <div class="fluent-card-content">
-                        ${contentHtml}
+                        <!-- Content will be inserted here by setContent -->
                     </div>
                     ${footerSection}
                     <div class="resize-handle"></div>
                 `;
           document.body.appendChild(card);
-
-          requestAnimationFrame(() => {
-            if (!this.positionedWithTopLeft) {
-              this._setInitialPosition();
-            }
-          });
-
           return card;
         }
 
         _setInitialPosition(offset = { x: 0, y: 0 }) {
-          const cardWidth = this.element.offsetWidth;
-          const cardHeight = this.element.offsetHeight;
-          const viewportWidth = document.documentElement.clientWidth;
-          const viewportHeight = document.documentElement.clientHeight;
-          const isDuoLayout = window.matchMedia(
-            "(screen-spanning: single-fold-vertical)"
-          ).matches;
+          this.element.style.transform = "none";
 
-          let initialLeft, initialTop;
+          requestAnimationFrame(() => {
+            const cardWidth = this.element.offsetWidth;
+            const cardHeight = this.element.offsetHeight;
+            const viewportWidth = document.documentElement.clientWidth;
+            const viewportHeight = document.documentElement.clientHeight;
+            const isDuoLayout = window.matchMedia(
+              "(screen-spanning: single-fold-vertical)"
+            ).matches;
 
-          if (isDuoLayout) {
-            const computedStyle = getComputedStyle(this.element);
-            initialLeft = parseFloat(computedStyle.left);
-            initialTop = parseFloat(computedStyle.top);
-            this.element.style.transform = "none";
-          } else {
-            initialLeft =
-              Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
-            initialTop =
-              Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
-            this.element.style.transform = "none";
-          }
+            let initialLeft, initialTop;
 
-          if (initialLeft < 0) initialLeft = 0;
-          if (initialTop < 0) initialTop = 0;
-          if (initialLeft > viewportWidth - cardWidth)
-            initialLeft = viewportWidth - cardWidth;
-          if (initialTop > viewportHeight - cardHeight)
-            initialTop = viewportHeight - cardHeight;
+            if (isDuoLayout) {
+              const computedStyle = getComputedStyle(this.element);
+              initialLeft = parseFloat(computedStyle.left) || 10;
+              initialTop = parseFloat(computedStyle.top) || 10;
+            } else {
+              initialLeft =
+                Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
+              initialTop =
+                Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
+            }
 
-          this.element.style.left = `${initialLeft}px`;
-          this.element.style.top = `${initialTop}px`;
-          this.positionedWithTopLeft = true;
+            if (initialLeft < 0) initialLeft = 0;
+            if (initialTop < 0) initialTop = 0;
+            if (initialLeft > viewportWidth - cardWidth)
+              initialLeft = viewportWidth - cardWidth;
+            if (initialTop > viewportHeight - cardHeight)
+              initialTop = viewportHeight - cardHeight;
+
+            this.element.style.left = `${initialLeft}px`;
+            this.element.style.top = `${initialTop}px`;
+            this.positionedWithTopLeft = true;
+          });
         }
 
         _attachEventListeners() {
@@ -832,6 +845,24 @@
           );
 
           this.closeButton.addEventListener("click", this.destroy.bind(this));
+
+          const footer = this.element.querySelector(".links-section");
+          if (footer) {
+            footer.addEventListener("click", (e) => {
+              if (e.target.classList.contains("view-projects-button")) {
+                e.stopPropagation();
+                createProjectsWindow();
+              } else if (e.target.classList.contains("close-window-button")) {
+                e.stopPropagation();
+                this.destroy();
+              } else if (
+                e.target.classList.contains("some-other-action-button")
+              ) {
+                e.stopPropagation();
+                alert(`Button in window '${this.id}' clicked!`);
+              }
+            });
+          }
         }
 
         bringToFront() {
@@ -1040,44 +1071,110 @@
           windows[id].bringToFront();
           return windows[id];
         }
+
         const newWindow = new FluentWindow(
           id,
           title,
           titleIconUrl,
           contentHtml,
-          options
+          {
+            footerHtml: options.footerHtml,
+            initialOffset: options.initialOffset,
+          }
         );
         windows[id] = newWindow;
-        const viewProjectsButton = newWindow.element.querySelector(
-          ".view-projects-button"
-        );
-        if (viewProjectsButton) {
-          viewProjectsButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            createProjectsWindow();
-          });
-        }
 
-        const closeButton = newWindow.element.querySelector(
-          ".close-window-button"
-        );
-        if (closeButton) {
-          closeButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            newWindow.destroy();
-          });
-        }
-
-        const someOtherButton = newWindow.element.querySelector(
-          ".some-other-action-button"
-        );
-        if (someOtherButton) {
-          someOtherButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            alert(`Button in window '${id}' clicked!`);
-          });
-        }
         return newWindow;
+      }
+
+      async function fetchProjects(username) {
+        const apiUrl = `https://api.github.com/users/${username}/repos?sort=updated&per_page=20`;
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            if (response.status === 403) {
+              throw new Error(
+                "GitHub API rate limit exceeded. Please wait a while and try again."
+              );
+            }
+            throw new Error(
+              `Failed to fetch repositories: ${response.status} ${response.statusText}`
+            );
+          }
+          const data = await response.json();
+          return data.filter((repo) => !repo.fork);
+          return data;
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+          throw error;
+        }
+      }
+
+      function formatDate(isoString) {
+        if (!isoString) return "N/A";
+        try {
+          const date = new Date(isoString);
+          return date.toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        } catch (e) {
+          return "Invalid Date";
+        }
+      }
+
+      function renderProjects(repos, containerElement) {
+        containerElement.innerHTML = "";
+
+        if (!repos || repos.length === 0) {
+          containerElement.innerHTML =
+            '<p class="error-message">No public projects found or failed to load.</p>';
+          return;
+        }
+
+        const list = document.createElement("ul");
+        repos.forEach((repo) => {
+          const listItem = document.createElement("li");
+          const topicsHtml = repo.topics
+            .map((topic) => `<span>${topic}</span>`)
+            .join(" ");
+          const licenseHtml = repo.license
+            ? `<span class="project-license">${repo.license.name}</span>`
+            : "";
+          const languageHtml = repo.language
+            ? `<span class="project-lang ${repo.language
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, "")}">${repo.language}</span>`
+            : '<span class="project-lang other">N/A</span>';
+
+          listItem.innerHTML = `
+                    <h3 class="project-title"><a href="${
+                      repo.html_url
+                    }" target="_blank" rel="noopener noreferrer">${
+            repo.name
+          }</a> <span class="project-visibility">Public</span></h3>
+                    <p class="project-desc">${
+                      repo.description || "No description provided."
+                    }</p>
+                    <div class="project-tags">${topicsHtml}</div>
+                    <div class="project-meta">
+                        ${languageHtml}
+                        ${licenseHtml}
+                        <span class="project-date">Updated on ${formatDate(
+                          repo.updated_at
+                        )}</span>
+                    </div>
+                `;
+          list.appendChild(listItem);
+        });
+        containerElement.appendChild(list);
+      }
+
+      function displayError(error, containerElement) {
+        containerElement.innerHTML = `<p class="error-message">Error loading projects: ${
+          error.message || "Unknown error"
+        }</p>`;
       }
 
       const aboutMeContent = `
@@ -1125,29 +1222,6 @@
                          <img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo">
                          <img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
 
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo">
-                         <img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo">
-                         <img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo">
-                         <img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo">
-                         <img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo">
-                         <img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo">
-                         <img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo">
-                         <img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo">
-                         <img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo">
-                         <img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo">
-                         <img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo">
-                         <img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo">
-                         <img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
                     </div>
                  </div>
             </div>
@@ -1157,120 +1231,48 @@
              <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
          `;
 
-      const projectsContent = `
-            <div class="content-area projects-list">
-                <h1>My Projects</h1>
-                <p>Here are some of the projects I've worked on:</p>
-                <ul>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/CardBox" target="_blank" rel="noopener noreferrer">CardBox</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">CardBox is an app which is designed to effortlessly present your loyalty cards.</p>
-                        <div class="project-tags">
-                            <span>cards</span> <span>uwp</span> <span>windows-10</span> <span>uwp-apps</span> <span>windows-10-mobile</span> <span>maui</span> <span>loyalty-card</span>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-lang csharp">C#</span> <span class="project-lang other">1 Other</span> <span class="project-date">Updated 4 hours ago</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/QuickUp-Tool" target="_blank" rel="noopener noreferrer">QuickUp-Tool</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">QuickUp Tool is a Windows utility which allows you to quickly upload files without needing an account.</p>
-                        <div class="project-tags">
-                            <!-- No tags provided -->
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-lang csharp">C#</span> <span class="project-lang other">1 Other</span> <span class="project-date">Updated 4 hours ago</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/wii-ullm" target="_blank" rel="noopener noreferrer">wii-ullm</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">Forked from aarossig/ullm - Tinkering with small LLMs. (Optimised for the Nintendo Wii U)</p>
-                        <div class="project-tags">
-                            <!-- No tags provided -->
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-lang c">C</span> <span class="project-license">Apache License 2.0</span> <span class="project-date">Updated last week</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/CSC3065-Assignment-2" target="_blank" rel="noopener noreferrer">CSC3065-Assignment-2</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">CSC3065 Assignment 2</p>
-                        <div class="project-tags">
-                            <span>docker</span> <span>university-assignment</span> <span>csc3065</span>
-                        </div>
-                        <div class="project-meta">
-                            <!-- No language --> <span class="project-date">Updated 2 weeks ago</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/MiniMinivanMod" target="_blank" rel="noopener noreferrer">MiniMinivanMod</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">MiniMinivanMod is a mod for BeamNG.Drive which aims to add a realistic set of Stellantis-based engines into the Lansdale config.</p>
-                        <div class="project-tags">
-                            <span>mod</span> <span>beamng</span> <span>chrysler</span> <span>jbeam</span> <span>beamng-drive</span>
-                        </div>
-                        <div class="project-meta">
-                            <!-- No language --> <span class="project-date">Updated on Mar 9</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/MineLights" target="_blank" rel="noopener noreferrer">MineLights</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">Add RGB software integration into Minecraft</p>
-                        <div class="project-tags">
-                            <span>icue</span> <span>minecraft-fabric-mod</span>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-lang cpp">C++</span> <span class="project-lang other">1 Other</span> <span class="project-issues">1 issue needs help</span> <span class="project-date">Updated on Jan 2</span>
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/Community-Connections---The-Game" target="_blank" rel="noopener noreferrer">Community-Connections---The-Game</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">University Software Engineering Project</p>
-                        <div class="project-tags">
-                            <span>university-project</span> <span>software-engineering</span> <span>csc2058</span>
-                        </div>
-                        <div class="project-meta">
-                            <span class="project-lang java">Java</span> <span class="project-date">Updated on Oct 4, 2024</span> <!-- Assuming current year -->
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/Minecraft-Wii-U-World-Collection" target="_blank" rel="noopener noreferrer">Minecraft-Wii-U-World-Collection</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">A collection of Minecraft: Wii U Edition worlds, converted to work with Minecraft: Java Edition (1.14.4 and newer)</p>
-                        <div class="project-tags"></div>
-                        <div class="project-meta">
-                            <!-- No language --> <span class="project-date">Updated on Aug 7, 2024</span> <!-- Assuming current year -->
-                        </div>
-                    </li>
-                    <li>
-                        <h3 class="project-title"><a href="https://github.com/megabytesme/BeamCUE" target="_blank" rel="noopener noreferrer">BeamCUE</a> <span class="project-visibility">Public</span></h3>
-                        <p class="project-desc">OutGauge to CUE SDK</p>
-                        <div class="project-tags"></div>
-                        <div class="project-meta">
-                            <span class="project-lang c">C</span> <span class="project-license">MIT License</span> <span class="project-date">Updated on Nov 10, 2022</span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+      const projectsInitialContent = `
+             <div class="projects-list">
+                <p class="loading-message">Loading projects from GitHub...</p>
+             </div>
         `;
-
       const projectsFooter = `
              <button class="fluent-button close-window-button">Close Projects</button>
          `;
 
-      function createProjectsWindow() {
+      async function createProjectsWindow() {
+        const GITHUB_USERNAME = "megabytesme";
+        const windowId = "projects";
+        const existingWindow = windows[windowId];
+
+        if (existingWindow) {
+          existingWindow.bringToFront();
+          return;
+        }
+
         const existingWindowCount = Object.keys(windows).length;
         const offsetX = 30 * existingWindowCount;
         const offsetY = 30 * existingWindowCount;
 
-        createWindow(
-          "projects",
+        const projectsWindow = createWindow(
+          windowId,
           "My Projects",
           "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg",
-          projectsContent,
+          projectsInitialContent,
           {
             footerHtml: projectsFooter,
             initialOffset: { x: offsetX, y: offsetY },
           }
         );
+
+        const projectsListContainer =
+          projectsWindow.element.querySelector(".projects-list");
+        try {
+          const repos = await fetchProjects(GITHUB_USERNAME);
+          renderProjects(repos, projectsListContainer);
+        } catch (error) {
+          displayError(error, projectsListContainer);
+        }
       }
 
       function createAboutMeWindow() {
