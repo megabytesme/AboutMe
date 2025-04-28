@@ -720,7 +720,7 @@
       let dynamicStyleTag = null;
 
       const GITHUB_USERNAME = "megabytesme";
-      const BACKEND_API_BASE_URL = "https://megabytesme.ddns.net";
+      const BACKEND_API_BASE_URL = "";
 
       const minWidth = parseInt(
         getComputedStyle(document.documentElement).getPropertyValue(
@@ -779,28 +779,25 @@
           const card = document.createElement("div");
           card.className = "fluent-card";
           card.id = `window-${id}`;
-
-          let footerSection = "";
-          if (footerHtml) {
-            footerSection = `<div class="links-section">${footerHtml}</div>`;
-          }
-
+          let footerSection = footerHtml
+            ? `<div class="links-section">${footerHtml}</div>`
+            : "";
           card.innerHTML = `
-                    <div class="drag-handle">
-                         <img src="${
-                           titleIconUrl || "https://via.placeholder.com/20"
-                         }" alt="Window Icon" class="handle-pic">
-                         <h1 class="handle-title">${title}</h1>
-                         <div class="window-controls">
-                             <button class="window-button minimize" disabled aria-hidden="true">–</button>
-                             <button class="window-button maximize" disabled aria-hidden="true">▢</button>
-                             <button class="window-button close" aria-label="Close ${title}">✕</button>
-                         </div>
-                    </div>
-                    <div class="fluent-card-content"></div>
-                    ${footerSection}
-                    <div class="resize-handle"></div>
-                `;
+            <div class="drag-handle">
+                 <img src="${
+                   titleIconUrl || "https://via.placeholder.com/20"
+                 }" alt="Window Icon" class="handle-pic">
+                 <h1 class="handle-title">${title}</h1>
+                 <div class="window-controls">
+                     <button class="window-button minimize" disabled aria-hidden="true">–</button>
+                     <button class="window-button maximize" disabled aria-hidden="true">▢</button>
+                     <button class="window-button close" aria-label="Close ${title}">✕</button>
+                 </div>
+            </div>
+            <div class="fluent-card-content"></div>
+            ${footerSection}
+            <div class="resize-handle"></div>
+          `;
           document.body.appendChild(card);
           return card;
         }
@@ -808,7 +805,6 @@
         _setInitialPosition(offset = { x: 0, y: 0 }) {
           requestAnimationFrame(() => {
             if (this.positionedWithTopLeft) return;
-
             const cardWidth = this.element.offsetWidth;
             const cardHeight = this.element.offsetHeight;
             const viewportWidth = document.documentElement.clientWidth;
@@ -816,9 +812,7 @@
             const isDuoLayout = window.matchMedia(
               "(screen-spanning: single-fold-vertical)"
             ).matches;
-
             let initialLeft, initialTop;
-
             if (isDuoLayout) {
               const computedStyle = getComputedStyle(this.element);
               initialLeft = parseFloat(computedStyle.left) || 10;
@@ -831,14 +825,12 @@
                 Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
               this.element.style.transform = "none";
             }
-
             if (initialLeft < 0) initialLeft = 0;
             if (initialTop < 0) initialTop = 0;
             if (initialLeft > viewportWidth - cardWidth)
               initialLeft = viewportWidth - cardWidth;
             if (initialTop > viewportHeight - cardHeight)
               initialTop = viewportHeight - cardHeight;
-
             this.element.style.left = `${initialLeft}px`;
             this.element.style.top = `${initialTop}px`;
             this.positionedWithTopLeft = true;
@@ -855,7 +847,6 @@
             this._startDrag.bind(this),
             { passive: false }
           );
-
           this.resizeHandle.addEventListener(
             "mousedown",
             this._startResize.bind(this)
@@ -865,7 +856,6 @@
             this._startResize.bind(this),
             { passive: false }
           );
-
           this.element.addEventListener(
             "mousedown",
             this.bringToFront.bind(this)
@@ -875,7 +865,6 @@
             this.bringToFront.bind(this),
             { passive: false }
           );
-
           this.closeButton.addEventListener("click", this.destroy.bind(this));
 
           const footer = this.element.querySelector(".links-section");
@@ -884,14 +873,15 @@
               if (e.target.classList.contains("view-projects-button")) {
                 e.stopPropagation();
                 createProjectsWindow();
+              } else if (e.target.classList.contains("view-rigs-button")) {
+                e.stopPropagation();
+                createPcRigsWindow();
+              } else if (e.target.classList.contains("view-vehicles-button")) {
+                e.stopPropagation();
+                createVehiclesWindow();
               } else if (e.target.classList.contains("close-window-button")) {
                 e.stopPropagation();
                 this.destroy();
-              } else if (
-                e.target.classList.contains("some-other-action-button")
-              ) {
-                e.stopPropagation();
-                alert(`Button in window '${this.id}' clicked!`);
               }
             });
           }
@@ -918,18 +908,14 @@
             return;
           if (e.target !== this.dragHandle && !e.target.closest(".drag-handle"))
             return;
-
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
-
           this.isDragging = true;
           activeInteractionWindow = this;
           this.dragHandle.style.cursor = "grabbing";
           document.body.style.cursor = "grabbing";
-
           const rect = this.element.getBoundingClientRect();
           let startClientX, startClientY;
-
           if (e.type === "touchstart") {
             startClientX = e.touches[0].clientX;
             startClientY = e.touches[0].clientY;
@@ -937,17 +923,14 @@
             startClientX = e.clientX;
             startClientY = e.clientY;
           }
-
           this.dragOffsetX = startClientX - rect.left;
           this.dragOffsetY = startClientY - rect.top;
-
           e.preventDefault();
         }
 
         _doDrag(e) {
           if (!this.isDragging) return;
           e.preventDefault();
-
           let currentMouseX, currentMouseY;
           if (e.type === "touchmove") {
             currentMouseX = e.touches[0].clientX;
@@ -956,22 +939,18 @@
             currentMouseX = e.clientX;
             currentMouseY = e.clientY;
           }
-
           let newCardX = currentMouseX - this.dragOffsetX;
           let newCardY = currentMouseY - this.dragOffsetY;
-
           const viewportWidth = document.documentElement.clientWidth;
           const viewportHeight = document.documentElement.clientHeight;
           const cardWidth = this.element.offsetWidth;
           const cardHeight = this.element.offsetHeight;
-
           if (newCardX < 0) newCardX = 0;
           if (newCardY < 0) newCardY = 0;
           if (newCardX > viewportWidth - cardWidth)
             newCardX = viewportWidth - cardWidth;
           if (newCardY > viewportHeight - cardHeight)
             newCardY = viewportHeight - cardHeight;
-
           this.element.style.left = `${newCardX}px`;
           this.element.style.top = `${newCardY}px`;
         }
@@ -989,19 +968,15 @@
 
         _startResize(e) {
           if (this.isDragging) return;
-
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
-
           this.isResizing = true;
           activeInteractionWindow = this;
           document.body.style.cursor = "nwse-resize";
-
           this.initialWidth = this.element.offsetWidth;
           this.initialHeight = this.element.offsetHeight;
           this.initialCardX_resize = this.element.offsetLeft;
           this.initialCardY_resize = this.element.offsetTop;
-
           if (e.type === "touchstart") {
             this.resizeInitialMouseX = e.touches[0].clientX;
             this.resizeInitialMouseY = e.touches[0].clientY;
@@ -1015,7 +990,6 @@
         _doResize(e) {
           if (!this.isResizing) return;
           e.preventDefault();
-
           let currentMouseX, currentMouseY;
           if (e.type === "touchmove") {
             currentMouseX = e.touches[0].clientX;
@@ -1024,19 +998,14 @@
             currentMouseX = e.clientX;
             currentMouseY = e.clientY;
           }
-
           let dx = currentMouseX - this.resizeInitialMouseX;
           let dy = currentMouseY - this.resizeInitialMouseY;
-
           let newWidth = this.initialWidth + dx;
           let newHeight = this.initialHeight + dy;
-
           newWidth = Math.max(minWidth, newWidth);
           newHeight = Math.max(minHeight, newHeight);
-
           const viewportWidth = document.documentElement.clientWidth;
           const viewportHeight = document.documentElement.clientHeight;
-
           if (this.initialCardX_resize + newWidth > viewportWidth) {
             newWidth = viewportWidth - this.initialCardX_resize;
             newWidth = Math.max(minWidth, newWidth);
@@ -1045,7 +1014,6 @@
             newHeight = viewportHeight - this.initialCardY_resize;
             newHeight = Math.max(minHeight, newHeight);
           }
-
           this.element.style.width = `${newWidth}px`;
           this.element.style.height = `${newHeight}px`;
         }
@@ -1082,7 +1050,6 @@
         },
         { passive: false }
       );
-
       document.addEventListener("mouseup", () => {
         activeInteractionWindow?._endDrag();
         activeInteractionWindow?._endResize();
@@ -1169,11 +1136,11 @@
           }" target="_blank" rel="noopener noreferrer">${
             repo.name
           }</a> <span class="project-visibility">Public</span></h3>
-                                <p class="project-desc">${
-                                  repo.description || "No description."
-                                }</p>
-                                <div class="project-tags">${tags}</div>
-                                <div class="project-meta">${lang}${license}<span class="project-date">Updated ${formatDate(
+                          <p class="project-desc">${
+                            repo.description || "No description."
+                          }</p>
+                          <div class="project-tags">${tags}</div>
+                          <div class="project-meta">${lang}${license}<span class="project-date">Updated ${formatDate(
             repo.updated_at
           )}</span></div>`;
           list.appendChild(li);
@@ -1188,38 +1155,90 @@
       }
 
       const aboutMeContent = `
-             <div class="content-area">
-                <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
-                <h1>MegaBytesMe (Ben)</h1>
-                <p class="intro-text">
-                    Hey! 👋🏻<br>
-                    I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.
-                </p>
-                <p class="intro-text">
-                   I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.
-                </p>
-                <h2>Technologies & Languages</h2>
-                <p>I primarily work with:</p>
-                <ul><li>C#</li><li>C++</li><li>Java</li><li>Lua</li><li>TypeScript</li></ul>
-                <p class="tech-details">
-                    I have also tinkered with technologies and concepts such as .NET, React, CMake, Docker, JBeam (BeamNG.drive's vehicle description language), and various game modding APIs including Fabric (Minecraft) alongside working with RGB SDKs (Primarily iCue). I also have worked with cloud services - Beyond AWS, I also have my own cloud instance too which I run containers on.
-                </p>
-                <h2>Technologies I have worked with:</h2>
-                <div class="scrolling-icons-container">
-                    <div class="scrolling-icons-track">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
-                         <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
-                    </div>
-                 </div>
-            </div>
-        `;
+        <div class="content-area">
+            <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
+            <h1>MegaBytesMe (Ben)</h1>
+            <p class="intro-text">Hey! 👋🏻<br>I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.</p>
+            <p class="intro-text">I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.</p>
+            <h2>Technologies & Languages</h2><p>I primarily work with:</p>
+            <ul><li>C#</li><li>C++</li><li>Java</li><li>Lua</li><li>TypeScript</li></ul>
+            <p class="tech-details">I have also tinkered with technologies and concepts such as .NET, React, CMake, Docker, JBeam (BeamNG.drive's vehicle description language), and various game modding APIs including Fabric (Minecraft) alongside working with RGB SDKs (Primarily iCue). I also have worked with cloud services - Beyond AWS, I also have my own cloud instance too which I run containers on.</p>
+            <h2>Technologies I have worked with:</h2>
+            <div class="scrolling-icons-container"><div class="scrolling-icons-track">
+                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
+                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
+            </div></div>
+        </div>
+      `;
       const aboutMeFooter = `
-             <button class="fluent-button view-projects-button">View Projects</button>
-             <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
-         `;
 
-      const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading projects...</p></div>`;
-      const projectsFooter = `<button class="fluent-button close-window-button">Close Projects</button>`;
+        <button class="fluent-button view-projects-button">View Projects</button>
+
+        <button class="fluent-button view-rigs-button">View PC Rigs</button>
+
+        <button class="fluent-button view-vehicles-button">View Vehicles</button>
+      `;
+
+      const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>`;
+
+      const projectsFooter = `
+        <button class="fluent-button close-window-button">Close GitHub Projects</button>
+        <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
+      `;
+
+      const pcRigsContent = `
+
+        <div class="content-area">
+
+            <h1>My PC Rigs</h1>
+
+            <h2>Main Desktop (2025)</h2>
+
+            <ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>
+
+            <p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>
+
+            <h2>Surface Book 3 15" Laptop</h2>
+
+            <ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA Quadro RTX 3000 Mobile</li><li>RAM: 32GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
+
+            <p class="intro-text">Portable power for gaming and development on the go.</p>
+
+            <h2>Surface Pro X SQ1 LTE" Tablet</h2>
+
+            <ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomn Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
+
+            <p class="intro-text">Lightweight & low-power for light development and media on the go.</p>
+
+        </div>
+
+      `;
+
+      const pcRigsFooter = `<button class="fluent-button close-window-button">Close Rigs</button>`;
+
+      const vehiclesContent = `
+
+        <div class="content-area">
+
+            <h1>My Vehicles</h1>
+
+            <h2>Alfa Romeo 159 (Saloon)</h2>
+
+            <ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>
+
+            <p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>
+
+            <h2>Chrysler Grand Voyager</h2>
+
+            <ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>
+
+            <p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>
+
+        </div>
+
+      `;
+
+      const vehiclesFooter = `<button class="fluent-button close-window-button">Close Vehicles</button>`;
 
       async function createProjectsWindow() {
         const windowId = "projects";
@@ -1227,11 +1246,9 @@
           windows[windowId].bringToFront();
           return;
         }
-
         const existingWindowCount = Object.keys(windows).length;
         const offsetX = 30 * existingWindowCount;
         const offsetY = 30 * existingWindowCount;
-
         const projectsWindow = createWindow(
           windowId,
           "My Projects",
@@ -1242,7 +1259,6 @@
             initialOffset: { x: offsetX, y: offsetY },
           }
         );
-
         const projectsListContainer =
           projectsWindow.element.querySelector(".projects-list");
         try {
@@ -1263,13 +1279,55 @@
         );
       }
 
+      function createPcRigsWindow() {
+        const windowId = "pc-rigs";
+        if (windows[windowId]) {
+          windows[windowId].bringToFront();
+          return;
+        }
+        const existingWindowCount = Object.keys(windows).length;
+        const offsetX = 30 * existingWindowCount;
+        const offsetY = 30 * existingWindowCount;
+        createWindow(
+          windowId,
+          "PC Rigs",
+          "https://img.icons8.com/fluency/48/workstation.png",
+          pcRigsContent,
+          {
+            footerHtml: pcRigsFooter,
+            initialOffset: { x: offsetX, y: offsetY },
+          }
+        );
+      }
+
+      function createVehiclesWindow() {
+        const windowId = "vehicles";
+        if (windows[windowId]) {
+          windows[windowId].bringToFront();
+          return;
+        }
+        const existingWindowCount = Object.keys(windows).length;
+        const offsetX = 30 * existingWindowCount;
+        const offsetY = 30 * existingWindowCount;
+        createWindow(
+          windowId,
+          "My Vehicles",
+          "https://img.icons8.com/fluency/48/car.png",
+          vehiclesContent,
+          {
+            footerHtml: vehiclesFooter,
+            initialOffset: { x: offsetX, y: offsetY },
+          }
+        );
+      }
+
       const reopenBtn = document.getElementById("reopenAboutMeBtn");
       if (reopenBtn) {
         reopenBtn.addEventListener("click", createAboutMeWindow);
       }
 
       async function fetchSpotlightData() {
-        const apiUrl = `${BACKEND_API_BASE_URL}/api/spotlight-data`;
+        const apiUrl = `/api/spotlight-data`;
         try {
           const response = await fetch(apiUrl);
           if (!response.ok) {
@@ -1297,15 +1355,12 @@
             console.warn("Received empty or invalid cache data.");
             return;
           }
-
           const randomIndex = Math.floor(Math.random() * cachedItems.length);
           const selectedItem = cachedItems[randomIndex];
-
           const landscapePath = selectedItem?.landscapePath;
           const portraitPath = selectedItem?.portraitPath;
           const copyrightText = selectedItem?.copyright || "";
           const title = selectedItem?.title || "";
-
           if (!landscapePath || !portraitPath) {
             console.warn(
               "Selected cached item missing image paths:",
@@ -1313,10 +1368,8 @@
             );
             return;
           }
-
-          const fullLandscapeUrl = `${BACKEND_API_BASE_URL}/cached-images/${landscapePath}`;
-          const fullPortraitUrl = `${BACKEND_API_BASE_URL}/cached-images/${portraitPath}`;
-
+          const fullLandscapeUrl = `/cached-images/${landscapePath}`;
+          const fullPortraitUrl = `/cached-images/${portraitPath}`;
           document.documentElement.style.setProperty(
             "--bg-image-landscape",
             `url('${fullLandscapeUrl}')`
@@ -1325,7 +1378,6 @@
             "--bg-image-portrait",
             `url('${fullPortraitUrl}')`
           );
-
           const copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv) {
             let displayText = copyrightText.trim();
