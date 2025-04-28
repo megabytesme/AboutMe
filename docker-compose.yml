@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  proxy:
+    build: ./proxy
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN_NAME: megabytesme.ddns.net
+      CERT_EMAIL: 57240557+megabytesme@users.noreply.github.com
+    volumes:
+      - ./proxy/logs:/var/log/letsencrypt
+      - spotlight_cache_data:/var/www/cache:ro
+      - letsencrypt_data:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+      - ./proxy/scripts/options-ssl-nginx.conf:/etc/nginx/options-ssl-nginx.conf:ro
+      - ./proxy/scripts/ssl-dhparams.pem:/etc/nginx/ssl/ssl-dhparams.pem:ro
+    networks:
+      - webnet
+    restart: unless-stopped
+
+  content_server:
+    build: ./content
+    container_name: static_content
+    networks:
+      - webnet
+    restart: unless-stopped
+
+  spotlight_api:
+    build: ./SpotlightCacheService
+    container_name: spotlight_api_service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+    volumes:
+      - spotlight_cache_data:/app/cache
+    networks:
+      - webnet
+    restart: unless-stopped
+
+networks:
+  webnet:
+    driver: bridge
+
+volumes:
+  letsencrypt_data:
+  certbot_webroot:
+  spotlight_cache_data:
