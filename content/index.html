@@ -1516,7 +1516,7 @@
       }
 
       async function fetchSpotlightData() {
-        const apiUrl = `/api/spotlight-data`;
+        const apiUrl = `https://megabytesme.ddns.net/api/spotlight-data`;
         try {
           const response = await fetch(apiUrl);
           if (!response.ok) {
@@ -1533,6 +1533,7 @@
       }
 
       function applySpotlightBackground(cachedItems) {
+        const copyrightDiv = document.getElementById("copyright-info");
         try {
           if (
             !cachedItems ||
@@ -1540,10 +1541,13 @@
             cachedItems.length === 0
           ) {
             console.warn(
-              "Received empty or invalid Spotlight cache data. Using fallback backgrounds."
+              "Received empty or invalid Spotlight data. Using fallback backgrounds."
             );
+            if (copyrightDiv)
+              copyrightDiv.textContent = "Image information unavailable";
             return;
           }
+
           const randomIndex = Math.floor(Math.random() * cachedItems.length);
           const selectedItem = cachedItems[randomIndex];
 
@@ -1557,48 +1561,42 @@
               "Selected cached item missing image paths:",
               selectedItem
             );
+            if (copyrightDiv)
+              copyrightDiv.textContent = "Image information unavailable";
             return;
           }
 
-          const fullLandscapeUrl = `/cached-images/${landscapePath}`;
-          const fullPortraitUrl = `/cached-images/${portraitPath}`;
-          const supportsCssVars =
-            window.CSS && CSS.supports && CSS.supports("--foo", "bar");
-
-          if (supportsCssVars) {
-            document.documentElement.style.setProperty(
-              "--bg-image-landscape",
-              `url('${fullLandscapeUrl}')`
-            );
-            document.documentElement.style.setProperty(
-              "--bg-image-portrait",
-              `url('${fullPortraitUrl}')`
-            );
-          } else {
-            const setBgFallback = function () {
-              const imageUrl = window.matchMedia("(orientation: portrait)")
-                .matches
-                ? fullPortraitUrl
-                : fullLandscapeUrl;
-
-              document.body.style.backgroundImage = `url('${imageUrl}')`;
-              document.body.style.backgroundRepeat = "no-repeat";
-              document.body.style.backgroundPosition = "center center";
-              document.body.style.backgroundAttachment = "fixed";
-              document.body.style.backgroundSize = "cover";
-            };
-
-            setBgFallback();
-
-            const mediaQuery = window.matchMedia("(orientation: portrait)");
-            if (mediaQuery.addEventListener) {
-              mediaQuery.addEventListener("change", setBgFallback);
-            } else if (mediaQuery.addListener) {
-              mediaQuery.addListener(setBgFallback);
+          const formatPath = (path) => {
+            if (!path) return "";
+            if (path.startsWith("http") || path.startsWith("/")) {
+              return path;
             }
+            return `https://megabytesme.ddns.net/cached-images/${path}`;
+          };
+
+          const fullLandscapeUrl = formatPath(landscapePath);
+          const fullPortraitUrl = formatPath(portraitPath);
+
+          const setBackgroundDirectly = function () {
+            const isPortrait = window.matchMedia(
+              "(orientation: portrait)"
+            ).matches;
+            const imageUrl = isPortrait ? fullPortraitUrl : fullLandscapeUrl;
+
+            document.body.style.background = `url('${imageUrl}') no-repeat center center fixed`;
+            document.body.style.backgroundSize = "cover";
+            console.log("Applied background:", imageUrl);
+          };
+
+          setBackgroundDirectly();
+
+          const mediaQuery = window.matchMedia("(orientation: portrait)");
+          if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener("change", setBackgroundDirectly);
+          } else if (mediaQuery.addListener) {
+            mediaQuery.addListener(setBackgroundDirectly);
           }
 
-          const copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv) {
             let displayText = copyrightText.trim();
             if (
@@ -1612,11 +1610,18 @@
             }
             copyrightDiv.textContent =
               displayText || "Image information unavailable";
+            copyrightDiv.style.maxWidth = "40%";
+            copyrightDiv.style.overflowWrap = "normal";
           }
         } catch (error) {
-          const copyrightDiv = document.getElementById("copyright-info");
-          if (copyrightDiv)
+          console.error(
+            "Error applying cached Spotlight data:",
+            error.message,
+            error.stack
+          );
+          if (copyrightDiv) {
             copyrightDiv.textContent = "Error displaying image info.";
+          }
         }
       }
 
