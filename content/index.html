@@ -4,72 +4,13 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="dark light" />
     <title>MegaBytesMe - Ben</title>
     <style>
-      :root {
-        --scroll-duration: 70s;
-        --min-card-width: 320px;
-        --min-card-height: 400px;
-
-        --card-bg-light: rgba(255, 255, 255, 0.85);
-        --card-bg-dark: rgba(40, 40, 40, 0.85);
-        --text-color-light: #201f1e;
-        --text-color-dark: #f0f0f0;
-        --heading-color-light: #1a1a1a;
-        --heading-color-dark: #ffffff;
-        --subtle-text-light: #333;
-        --subtle-text-dark: #cccccc;
-        --border-color-light: rgba(0, 0, 0, 0.1);
-        --border-color-dark: rgba(255, 255, 255, 0.15);
-        --handle-bg-light: rgba(0, 0, 0, 0.05);
-        --handle-bg-dark: rgba(255, 255, 255, 0.08);
-        --shadow-color-light: rgba(0, 0, 0, 0.15);
-        --shadow-color-dark: rgba(0, 0, 0, 0.4);
-        --link-color-light: #0078d4;
-        --link-color-dark: #2899f5;
-        --link-hover-light: #005a9e;
-        --link-hover-dark: #56b1f7;
-        --button-bg-light: #0078d4;
-        --button-bg-dark: #2899f5;
-        --button-text-light: white;
-        --button-text-dark: black;
-        --button-hover-bg-light: #005a9e;
-        --button-hover-bg-dark: #56b1f7;
-        --button-active-bg-light: #004c87;
-        --button-active-bg-dark: #1a8ad8;
-        --resize-handle-border-light: rgba(0, 0, 0, 0.1);
-        --resize-handle-border-dark: rgba(255, 255, 255, 0.2);
-        --resize-handle-fill-light: rgba(0, 0, 0, 0.1);
-        --resize-handle-fill-dark: rgba(255, 255, 255, 0.2);
-        --section-separator-light: rgba(0, 0, 0, 0.08);
-        --section-separator-dark: rgba(255, 255, 255, 0.1);
-        --window-button-hover-bg-light: rgba(0, 0, 0, 0.1);
-        --window-button-hover-bg-dark: rgba(255, 255, 255, 0.15);
-        --window-button-close-hover-bg-light: #e81123;
-        --window-button-close-hover-bg-dark: #e81123;
-        --window-button-close-hover-text-light: white;
-        --window-button-close-hover-text-dark: white;
-        --window-button-text-light: var(--text-color-light);
-        --window-button-text-dark: var(--text-color-dark);
-        --reopen-button-bg-light: rgba(255, 255, 255, 0.7);
-        --reopen-button-bg-dark: rgba(50, 50, 50, 0.7);
-        --reopen-button-text-light: #000;
-        --reopen-button-text-dark: #fff;
-        --copyright-bg-light: rgba(0, 0, 0, 0.5);
-        --copyright-bg-dark: rgba(0, 0, 0, 0.7);
-        --copyright-text-light: #ffffff;
-        --copyright-text-dark: #cccccc;
-
-        --bg-image-landscape: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg");
-        --bg-image-portrait: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
-      }
-
       html {
-        color-scheme: light dark;
       }
 
       body,
@@ -88,68 +29,51 @@
       }
 
       body {
-        background: var(--bg-image-landscape) no-repeat center center fixed;
+        background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg")
+          no-repeat center center fixed;
         background-size: cover;
-        color: var(--text-color-light);
-        background-color: #fff;
+        color: #f0f0f0;
+        background-color: #1c1c1c;
       }
 
       @media (orientation: portrait) {
         body {
-          background-image: var(--bg-image-portrait);
+          background-image: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
         }
       }
 
       .fluent-card {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
         width: 90%;
         max-width: 600px;
-        min-width: var(--min-card-width);
+        min-width: 320px;
         height: 75vh;
         max-height: 95vh;
-        min-height: var(--min-card-height);
+        min-height: 400px;
         padding: 0;
-        background: var(--card-bg-light);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
+        background: rgba(40, 40, 40, 0.9);
         border-radius: 8px;
-        border: 1px solid var(--border-color-light);
-        box-shadow: 0 8px 30px var(--shadow-color-light);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         text-align: left;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         cursor: default;
-        resize: none;
         z-index: 1;
-      }
-
-      @media (screen-spanning: single-fold-vertical) {
-        .fluent-card {
-          left: 10px !important;
-          top: 10px !important;
-          width: calc(env(fold-left, 50vw) - 20px) !important;
-          height: calc(100vh - 20px) !important;
-          max-width: none !important;
-          transform: none !important;
-          transition: none !important;
-        }
       }
 
       .drag-handle {
         padding: 6px 5px 6px 15px;
         cursor: grab;
-        background-color: var(--handle-bg-light);
-        border-bottom: 1px solid var(--border-color-light);
+        background-color: rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         user-select: none;
         -webkit-user-select: none;
+        -ms-user-select: none;
         touch-action: none;
         display: flex;
         align-items: center;
-        gap: 10px;
         flex-shrink: 0;
         position: relative;
         z-index: 20;
@@ -158,32 +82,34 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        object-fit: cover;
         flex-shrink: 0;
-        border: 1px solid var(--border-color-light);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        margin-right: 10px;
       }
       .drag-handle h1.handle-title {
         margin: 0;
         font-size: 15px;
         font-weight: 600;
         line-height: 1.4;
-        color: var(--heading-color-light);
+        color: #ffffff;
         flex-grow: 1;
         pointer-events: none;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin-right: 5px;
+        margin-right: 10px;
       }
 
       .window-controls {
         display: flex;
         align-items: center;
         flex-shrink: 0;
+        margin-left: auto;
       }
 
       .window-button {
         -webkit-appearance: none;
+        -ms-appearance: none;
         appearance: none;
         background: none;
         border: none;
@@ -196,7 +122,7 @@
         justify-content: center;
         font-size: 16px;
         line-height: 1;
-        color: var(--window-button-text-light);
+        color: #f0f0f0;
         cursor: pointer;
         pointer-events: auto;
         transition: background-color 0.1s ease;
@@ -208,13 +134,12 @@
         cursor: default;
         pointer-events: none;
       }
-
       .window-button:not(:disabled):hover {
-        background-color: var(--window-button-hover-bg-light);
+        background-color: rgba(255, 255, 255, 0.15);
       }
       .window-button.close:not(:disabled):hover {
-        background-color: var(--window-button-close-hover-bg-light);
-        color: var(--window-button-close-hover-text-light);
+        background-color: #e81123;
+        color: white;
       }
 
       .fluent-card-content {
@@ -223,7 +148,7 @@
         flex-grow: 1;
         position: relative;
         z-index: 1;
-        color: var(--text-color-light);
+        color: #f0f0f0;
       }
 
       .content-area {
@@ -242,8 +167,7 @@
         border-radius: 50%;
         margin: 0 auto 20px auto;
         display: block;
-        object-fit: cover;
-        border: 2px solid var(--border-color-light);
+        border: 2px solid rgba(255, 255, 255, 0.15);
       }
 
       .fluent-card-content h1 {
@@ -252,7 +176,7 @@
         margin-bottom: 10px;
         font-size: 28px;
         font-weight: 600;
-        color: var(--heading-color-light);
+        color: #ffffff;
       }
 
       .intro-text {
@@ -260,17 +184,17 @@
         margin-bottom: 15px;
         font-size: 15px;
         line-height: 1.6;
-        color: var(--subtle-text-light);
+        color: #cccccc;
       }
 
       .fluent-card-content h2 {
         font-size: 20px;
         font-weight: 600;
-        color: var(--heading-color-light);
+        color: #ffffff;
         margin-top: 25px;
         margin-bottom: 10px;
         padding-bottom: 5px;
-        border-bottom: 1px solid var(--border-color-light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       }
 
       .fluent-card-content ul {
@@ -283,13 +207,13 @@
       .fluent-card-content li {
         margin-bottom: 8px;
         font-size: 15px;
-        color: var(--subtle-text-light);
+        color: #cccccc;
         padding-left: 1em;
         position: relative;
       }
       .fluent-card-content li::before {
         content: "•";
-        color: var(--link-color-light);
+        color: #2899f5;
         display: inline-block;
         position: absolute;
         left: 0;
@@ -298,7 +222,7 @@
 
       .tech-details {
         font-size: 14px;
-        color: #555;
+        color: #a0a0a0;
         line-height: 1.5;
         margin-bottom: 20px;
       }
@@ -311,26 +235,23 @@
 
       .scrolling-icons-track {
         display: flex;
-        width: fit-content;
         align-items: center;
-        animation: scrollIcons var(--scroll-duration) linear infinite;
-        will-change: transform;
+        animation: scrollIcons 70s linear infinite;
       }
-
       .scrolling-icons-container:hover .scrolling-icons-track {
         animation-play-state: paused;
       }
-
       .scrolling-icons-track img {
         height: 32px;
         width: auto;
         margin: 0 22px;
         flex-shrink: 0;
-        object-fit: contain;
         vertical-align: middle;
         pointer-events: none;
         user-select: none;
-        filter: brightness(1);
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        filter: brightness(0.9);
       }
 
       @keyframes scrollIcons {
@@ -341,7 +262,6 @@
           transform: translateX(-50%);
         }
       }
-
       @media (prefers-reduced-motion: reduce) {
         .scrolling-icons-track {
           animation: none;
@@ -350,10 +270,10 @@
 
       .links-section {
         padding: 15px 30px;
-        border-top: 1px solid var(--section-separator-light);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
         flex-shrink: 0;
-        background-color: var(--handle-bg-light);
+        background-color: rgba(255, 255, 255, 0.08);
         position: relative;
         z-index: 5;
       }
@@ -364,28 +284,26 @@
         padding: 10px 20px;
         font-size: 15px;
         font-weight: 600;
-        background-color: var(--button-bg-light);
-        border: 1px solid var(--button-bg-light);
+        background-color: #2899f5;
+        border: 1px solid #2899f5;
         border-radius: 4px;
-        color: var(--button-text-light);
+        color: black;
         text-decoration: none;
         cursor: pointer;
         transition: background-color 0.2s ease, border-color 0.2s ease,
           box-shadow 0.2s ease, color 0.2s ease;
       }
-
       .fluent-button:hover {
-        background-color: var(--button-hover-bg-light);
-        border-color: var(--button-hover-bg-light);
-        color: var(--button-text-light);
+        background-color: #56b1f7;
+        border-color: #56b1f7;
+        color: black;
         text-decoration: none;
-        box-shadow: 0 2px 5px var(--shadow-color-light);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
       }
-
       .fluent-button:active {
-        background-color: var(--button-active-bg-light);
-        border-color: var(--button-active-bg-light);
-        color: var(--button-text-light);
+        background-color: #1a8ad8;
+        border-color: #1a8ad8;
+        color: black;
         box-shadow: none;
       }
 
@@ -397,14 +315,14 @@
         height: 15px;
         background: repeating-linear-gradient(
           -45deg,
-          var(--resize-handle-fill-light),
-          var(--resize-handle-fill-light) 2px,
+          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.2) 2px,
           transparent 2px,
           transparent 4px
         );
         cursor: nwse-resize;
-        border-top: 1px solid var(--resize-handle-border-light);
-        border-left: 1px solid var(--resize-handle-border-light);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
         z-index: 10;
         touch-action: none;
       }
@@ -414,15 +332,13 @@
         bottom: 20px;
         left: 20px;
         padding: 8px 15px;
-        background-color: var(--reopen-button-bg-light);
-        color: var(--reopen-button-text-light);
-        border: 1px solid var(--border-color-light);
+        background-color: rgba(50, 50, 50, 0.7);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 4px;
         cursor: pointer;
         z-index: 1000;
-        box-shadow: 0 2px 5px var(--shadow-color-light);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
         font-size: 14px;
       }
 
@@ -431,12 +347,12 @@
         bottom: 5px;
         right: 10px;
         font-size: 10px;
-        color: var(--copyright-text-light);
-        background-color: var(--copyright-bg-light);
+        color: #cccccc;
+        background-color: rgba(0, 0, 0, 0.7);
         padding: 2px 6px;
         border-radius: 3px;
         z-index: 0;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        text-shadow: none;
         max-width: 40%;
         text-align: right;
         pointer-events: none;
@@ -450,7 +366,7 @@
       .projects-list li {
         margin-bottom: 25px;
         padding-bottom: 15px;
-        border-bottom: 1px solid var(--section-separator-light);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
       .projects-list li:last-child {
         margin-bottom: 0;
@@ -464,18 +380,18 @@
         font-weight: 600;
       }
       .project-title a {
-        color: var(--link-color-light);
+        color: #2899f5;
         text-decoration: none;
       }
       .project-title a:hover {
-        color: var(--link-hover-light);
+        color: #56b1f7;
         text-decoration: underline;
       }
       .project-visibility {
         font-size: 0.75em;
         font-weight: normal;
-        color: var(--subtle-text-light);
-        border: 1px solid var(--border-color-light);
+        color: #cccccc;
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 3px;
         padding: 1px 4px;
         margin-left: 8px;
@@ -485,12 +401,12 @@
         font-size: 14px;
         margin-top: 0;
         margin-bottom: 10px;
-        color: var(--subtle-text-light);
+        color: #cccccc;
       }
       .project-tags span {
         display: inline-block;
-        background-color: var(--handle-bg-light);
-        color: var(--link-color-light);
+        background-color: rgba(255, 255, 255, 0.08);
+        color: #2899f5;
         padding: 2px 6px;
         border-radius: 4px;
         font-size: 12px;
@@ -499,7 +415,7 @@
       }
       .project-meta {
         font-size: 13px;
-        color: var(--subtle-text-light);
+        color: #cccccc;
         margin-top: 10px;
       }
       .project-meta span {
@@ -508,26 +424,26 @@
         align-items: center;
       }
       .project-lang::before {
-        content: "●";
+        content: "•";
         margin-right: 5px;
         font-size: 1.2em;
         line-height: 1;
       }
       .project-lang.csharp::before {
-        color: #9b4f96;
+        color: #d8a0df;
       }
       .project-lang.cpp::before,
       .project-lang.c::before {
-        color: #555555;
+        color: #cccccc;
       }
       .project-lang.java::before {
-        color: #b07219;
+        color: #f1e05a;
       }
       .project-lang.lua::before {
-        color: #2c2d72;
+        color: #7e80d4;
       }
       .project-lang.other::before {
-        color: #888888;
+        color: #aaaaaa;
       }
       .project-lang.na::before {
         display: none;
@@ -547,164 +463,421 @@
       .error-message {
         padding: 20px;
         text-align: center;
-        color: var(--subtle-text-light);
+        color: #cccccc;
       }
 
-      @media (prefers-color-scheme: dark) {
+      @media (prefers-color-scheme: light) {
         body {
-          color: var(--text-color-dark);
-          background-color: #1c1c1c;
+          color: #201f1e;
+          background-color: #fff;
         }
 
         .fluent-card {
-          background: var(--card-bg-dark);
-          border-color: var(--border-color-dark);
-          box-shadow: 0 8px 30px var(--shadow-color-dark);
+          background: rgba(255, 255, 255, 0.9);
+          border-color: rgba(0, 0, 0, 0.1);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
 
         .drag-handle {
-          background-color: var(--handle-bg-dark);
-          border-color: var(--border-color-dark);
-        }
-
-        .drag-handle h1.handle-title {
-          color: var(--heading-color-dark);
+          background-color: rgba(0, 0, 0, 0.05);
+          border-bottom-color: rgba(0, 0, 0, 0.1);
         }
         .drag-handle img.handle-pic {
-          border-color: var(--border-color-dark);
+          border-color: rgba(0, 0, 0, 0.1);
+        }
+        .drag-handle h1.handle-title {
+          color: #1a1a1a;
         }
 
         .window-button {
-          color: var(--window-button-text-dark);
+          color: #201f1e;
         }
         .window-button:not(:disabled):hover {
-          background-color: var(--window-button-hover-bg-dark);
-        }
-        .window-button.close:not(:disabled):hover {
-          background-color: var(--window-button-close-hover-bg-dark);
-          color: var(--window-button-close-hover-text-dark);
+          background-color: rgba(0, 0, 0, 0.1);
         }
 
         .fluent-card-content {
-          color: var(--text-color-dark);
+          color: #201f1e;
         }
         .profile-pic {
-          border-color: var(--border-color-dark);
+          border-color: rgba(0, 0, 0, 0.1);
         }
-
         .fluent-card-content h1 {
-          color: var(--heading-color-dark);
+          color: #1a1a1a;
         }
         .intro-text {
-          color: var(--subtle-text-dark);
+          color: #333;
         }
         .fluent-card-content h2 {
-          color: var(--heading-color-dark);
-          border-color: var(--border-color-dark);
+          color: #1a1a1a;
+          border-bottom-color: rgba(0, 0, 0, 0.1);
         }
         .fluent-card-content li {
-          color: var(--subtle-text-dark);
+          color: #333;
         }
         .fluent-card-content li::before {
-          color: var(--link-color-dark);
+          color: #0078d4;
         }
         .tech-details {
-          color: #a0a0a0;
+          color: #555;
+        }
+        .scrolling-icons-track img {
+          filter: none;
         }
 
         .links-section {
-          border-color: var(--section-separator-dark);
-          background-color: var(--handle-bg-dark);
-        }
-
-        .scrolling-icons-track img {
-          filter: brightness(0.9);
+          border-top-color: rgba(0, 0, 0, 0.08);
+          background-color: rgba(0, 0, 0, 0.05);
         }
 
         .fluent-button {
-          background-color: var(--button-bg-dark);
-          border-color: var(--button-bg-dark);
-          color: var(--button-text-dark);
+          background-color: #0078d4;
+          border-color: #0078d4;
+          color: white;
         }
         .fluent-button:hover {
-          background-color: var(--button-hover-bg-dark);
-          border-color: var(--button-hover-bg-dark);
-          color: var(--button-text-dark);
-          box-shadow: 0 2px 5px var(--shadow-color-dark);
+          background-color: #005a9e;
+          border-color: #005a9e;
+          color: white;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
         .fluent-button:active {
-          background-color: var(--button-active-bg-dark);
-          border-color: var(--button-active-bg-dark);
-          color: var(--button-text-dark);
+          background-color: #004c87;
+          border-color: #004c87;
+          color: white;
         }
+
         .resize-handle {
           background: repeating-linear-gradient(
             -45deg,
-            var(--resize-handle-fill-dark),
-            var(--resize-handle-fill-dark) 2px,
+            rgba(0, 0, 0, 0.1),
+            rgba(0, 0, 0, 0.1) 2px,
             transparent 2px,
             transparent 4px
           );
-          border-top-color: var(--resize-handle-border-dark);
-          border-left-color: var(--resize-handle-border-dark);
+          border-top-color: rgba(0, 0, 0, 0.1);
+          border-left-color: rgba(0, 0, 0, 0.1);
         }
 
         #reopenAboutMeBtn {
-          background-color: var(--reopen-button-bg-dark);
-          color: var(--reopen-button-text-dark);
-          border-color: var(--border-color-dark);
-          box-shadow: 0 2px 5px var(--shadow-color-dark);
+          background-color: rgba(255, 255, 255, 0.7);
+          color: #000;
+          border-color: rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
 
         #copyright-info {
-          background-color: var(--copyright-bg-dark);
-          color: var(--copyright-text-dark);
-          text-shadow: none;
+          color: #ffffff;
+          background-color: rgba(0, 0, 0, 0.5);
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
         }
 
         .projects-list li {
-          border-bottom-color: var(--section-separator-dark);
+          border-bottom-color: rgba(0, 0, 0, 0.08);
         }
         .project-title a {
-          color: var(--link-color-dark);
+          color: #0078d4;
         }
         .project-title a:hover {
-          color: var(--link-hover-dark);
+          color: #005a9e;
         }
         .project-visibility {
-          color: var(--subtle-text-dark);
-          border-color: var(--border-color-dark);
+          color: #333;
+          border-color: rgba(0, 0, 0, 0.1);
         }
         .project-desc {
-          color: var(--subtle-text-dark);
+          color: #333;
         }
         .project-tags span {
-          background-color: var(--handle-bg-dark);
-          color: var(--link-color-dark);
+          background-color: rgba(0, 0, 0, 0.05);
+          color: #0078d4;
         }
         .project-meta {
-          color: var(--subtle-text-dark);
+          color: #333;
         }
         .project-lang.csharp::before {
-          color: #d8a0df;
+          color: #9b4f96;
         }
         .project-lang.cpp::before,
         .project-lang.c::before {
-          color: #cccccc;
+          color: #555555;
         }
         .project-lang.java::before {
-          color: #f1e05a;
+          color: #b07219;
         }
         .project-lang.lua::before {
-          color: #7e80d4;
+          color: #2c2d72;
         }
         .project-lang.other::before {
-          color: #aaaaaa;
+          color: #888888;
         }
 
         .loading-message,
         .error-message {
-          color: var(--subtle-text-dark);
+          color: #333;
+        }
+      }
+
+      @supports (--foo: bar) and
+        ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+        :root {
+          --scroll-duration: 70s;
+          --min-card-width: 320px;
+          --min-card-height: 400px;
+
+          --body-bg: #1c1c1c;
+          --body-text: #f0f0f0;
+          --heading-color: #ffffff;
+          --subtle-text: #cccccc;
+          --link-color: #2899f5;
+          --link-hover: #56b1f7;
+          --border-color: rgba(255, 255, 255, 0.15);
+
+          --card-bg: rgba(40, 40, 40, 0.85);
+          --card-shadow: rgba(0, 0, 0, 0.4);
+
+          --handle-bg: rgba(255, 255, 255, 0.08);
+          --section-separator: rgba(255, 255, 255, 0.1);
+
+          --button-bg: #2899f5;
+          --button-text: black;
+          --button-hover-bg: #56b1f7;
+          --button-active-bg: #1a8ad8;
+
+          --window-button-text: var(--body-text);
+          --window-button-hover-bg: rgba(255, 255, 255, 0.15);
+          --window-button-close-hover-bg: #e81123;
+          --window-button-close-hover-text: white;
+
+          --resize-handle-border: rgba(255, 255, 255, 0.2);
+          --resize-handle-fill: rgba(255, 255, 255, 0.2);
+
+          --reopen-button-bg: rgba(50, 50, 50, 0.7);
+          --reopen-button-text: #fff;
+          --reopen-button-shadow: var(--card-shadow);
+
+          --copyright-bg: rgba(0, 0, 0, 0.7);
+          --copyright-text: #cccccc;
+
+          --project-lang-csharp: #d8a0df;
+          --project-lang-cpp: #cccccc;
+          --project-lang-java: #f1e05a;
+          --project-lang-lua: #7e80d4;
+          --project-lang-other: #aaaaaa;
+
+          --bg-image-landscape: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg");
+          --bg-image-portrait: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
+        }
+
+        @media (prefers-color-scheme: light) {
+          :root {
+            --body-bg: #fff;
+            --body-text: #201f1e;
+            --heading-color: #1a1a1a;
+            --subtle-text: #333;
+            --link-color: #0078d4;
+            --link-hover: #005a9e;
+            --border-color: rgba(0, 0, 0, 0.1);
+
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-shadow: rgba(0, 0, 0, 0.15);
+
+            --handle-bg: rgba(0, 0, 0, 0.05);
+            --section-separator: rgba(0, 0, 0, 0.08);
+
+            --button-bg: #0078d4;
+            --button-text: white;
+            --button-hover-bg: #005a9e;
+            --button-active-bg: #004c87;
+
+            --resize-handle-border: rgba(0, 0, 0, 0.1);
+            --resize-handle-fill: rgba(0, 0, 0, 0.1);
+
+            --reopen-button-bg: rgba(255, 255, 255, 0.7);
+            --reopen-button-text: #000;
+            --reopen-button-shadow: var(--card-shadow);
+
+            --copyright-bg: rgba(0, 0, 0, 0.5);
+            --copyright-text: #ffffff;
+
+            --project-lang-csharp: #9b4f96;
+            --project-lang-cpp: #555555;
+            --project-lang-java: #b07219;
+            --project-lang-lua: #2c2d72;
+            --project-lang-other: #888888;
+          }
+        }
+
+        html {
+          color-scheme: dark light;
+        }
+
+        body {
+          background: var(--bg-image-landscape) no-repeat center center fixed;
+          background-size: cover;
+          color: var(--body-text);
+          background-color: var(--body-bg);
+        }
+        @media (orientation: portrait) {
+          body {
+            background-image: var(--bg-image-portrait);
+          }
+        }
+
+        .fluent-card {
+          background: var(--card-bg);
+          backdrop-filter: blur(15px);
+          -webkit-backdrop-filter: blur(15px);
+          border-color: var(--border-color);
+          box-shadow: 0 8px 30px var(--card-shadow);
+        }
+
+        .drag-handle {
+          background-color: var(--handle-bg);
+          border-bottom-color: var(--border-color);
+        }
+        .drag-handle img.handle-pic {
+          border-color: var(--border-color);
+        }
+        .drag-handle h1.handle-title {
+          color: var(--heading-color);
+        }
+
+        .window-button {
+          color: var(--window-button-text);
+        }
+        .window-button:not(:disabled):hover {
+          background-color: var(--window-button-hover-bg);
+        }
+        .window-button.close:not(:disabled):hover {
+          background-color: var(--window-button-close-hover-bg);
+          color: var(--window-button-close-hover-text);
+        }
+
+        .fluent-card-content {
+          color: var(--body-text);
+        }
+        .profile-pic {
+          border-color: var(--border-color);
+        }
+        .fluent-card-content h1 {
+          color: var(--heading-color);
+        }
+        .intro-text {
+          color: var(--subtle-text);
+        }
+        .fluent-card-content h2 {
+          color: var(--heading-color);
+          border-bottom-color: var(--border-color);
+        }
+        .fluent-card-content li {
+          color: var(--subtle-text);
+        }
+        .fluent-card-content li::before {
+          color: var(--link-color);
+        }
+        .tech-details {
+          color: var(--subtle-text);
+        }
+        .scrolling-icons-track {
+          animation-duration: var(--scroll-duration);
+        }
+        .scrolling-icons-track img {
+          filter: brightness(0.9);
+        }
+        @media (prefers-color-scheme: light) {
+          .scrolling-icons-track img {
+            filter: none;
+          }
+        }
+
+        .links-section {
+          border-top-color: var(--section-separator);
+          background-color: var(--handle-bg);
+        }
+
+        .fluent-button {
+          background-color: var(--button-bg);
+          border-color: var(--button-bg);
+          color: var(--button-text);
+        }
+        .fluent-button:hover {
+          background-color: var(--button-hover-bg);
+          border-color: var(--button-hover-bg);
+          color: var(--button-text);
+          box-shadow: 0 2px 5px var(--card-shadow);
+        }
+        .fluent-button:active {
+          background-color: var(--button-active-bg);
+          border-color: var(--button-active-bg);
+          color: var(--button-text);
+        }
+
+        .resize-handle {
+          background: repeating-linear-gradient(
+            -45deg,
+            var(--resize-handle-fill),
+            var(--resize-handle-fill) 2px,
+            transparent 2px,
+            transparent 4px
+          );
+          border-top-color: var(--resize-handle-border);
+          border-left-color: var(--resize-handle-border);
+        }
+        #reopenAboutMeBtn {
+          background-color: var(--reopen-button-bg);
+          color: var(--reopen-button-text);
+          border-color: var(--border-color);
+          box-shadow: 0 2px 5px var(--reopen-button-shadow);
+        }
+        #copyright-info {
+          color: var(--copyright-text);
+          background-color: var(--copyright-bg);
+          text-shadow: none;
+        }
+
+        .projects-list li {
+          border-bottom-color: var(--section-separator);
+        }
+        .project-title a {
+          color: var(--link-color);
+        }
+        .project-title a:hover {
+          color: var(--link-hover);
+        }
+        .project-visibility {
+          color: var(--subtle-text);
+          border-color: var(--border-color);
+        }
+        .project-desc {
+          color: var(--subtle-text);
+        }
+        .project-tags span {
+          background-color: var(--handle-bg);
+          color: var(--link-color);
+        }
+        .project-meta {
+          color: var(--subtle-text);
+        }
+        .project-lang.csharp::before {
+          color: var(--project-lang-csharp);
+        }
+        .project-lang.cpp::before,
+        .project-lang.c::before {
+          color: var(--project-lang-cpp);
+        }
+        .project-lang.java::before {
+          color: var(--project-lang-java);
+        }
+        .project-lang.lua::before {
+          color: var(--project-lang-lua);
+        }
+        .project-lang.other::before {
+          color: var(--project-lang-other);
+        }
+        .loading-message,
+        .error-message {
+          color: var(--subtle-text);
         }
       }
     </style>
@@ -717,23 +890,12 @@
       const windows = {};
       let highestZ = 1;
       let activeInteractionWindow = null;
-      let dynamicStyleTag = null;
 
       const GITHUB_USERNAME = "megabytesme";
       const BACKEND_API_BASE_URL = "";
 
-      const minWidth = parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--min-card-width"
-        ) || "320",
-        10
-      );
-      const minHeight = parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--min-card-height"
-        ) || "400",
-        10
-      );
+      const minWidth = 320;
+      const minHeight = 400;
 
       class FluentWindow {
         constructor(id, title, titleIconUrl, contentHtml, options = {}) {
@@ -804,33 +966,43 @@
 
         _setInitialPosition(offset = { x: 0, y: 0 }) {
           requestAnimationFrame(() => {
-            if (this.positionedWithTopLeft) return;
+            if (this.element.style.left || this.element.style.top) {
+              return;
+            }
+
             const cardWidth = this.element.offsetWidth;
             const cardHeight = this.element.offsetHeight;
             const viewportWidth = document.documentElement.clientWidth;
             const viewportHeight = document.documentElement.clientHeight;
-            const isDuoLayout = window.matchMedia(
-              "(screen-spanning: single-fold-vertical)"
-            ).matches;
-            let initialLeft, initialTop;
-            if (isDuoLayout) {
-              const computedStyle = getComputedStyle(this.element);
-              initialLeft = parseFloat(computedStyle.left) || 10;
-              initialTop = parseFloat(computedStyle.top) || 10;
-              this.element.style.transform = "none";
-            } else {
-              initialLeft =
-                Math.max(0, (viewportWidth - cardWidth) / 2) + offset.x;
-              initialTop =
-                Math.max(0, (viewportHeight - cardHeight) / 2) + offset.y;
-              this.element.style.transform = "none";
+
+            if (cardWidth <= 0 || cardHeight <= 0) {
+              console.warn(
+                `Window ${this.id} has invalid dimensions, retrying positioning.`
+              );
+              requestAnimationFrame(() => this._setInitialPosition(offset));
+              return;
             }
-            if (initialLeft < 0) initialLeft = 0;
-            if (initialTop < 0) initialTop = 0;
-            if (initialLeft > viewportWidth - cardWidth)
-              initialLeft = viewportWidth - cardWidth;
-            if (initialTop > viewportHeight - cardHeight)
-              initialTop = viewportHeight - cardHeight;
+
+            let initialLeft =
+              viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
+            let initialTop =
+              viewportHeight > cardHeight
+                ? (viewportHeight - cardHeight) / 2
+                : 0;
+
+            initialLeft += offset.x;
+            initialTop += offset.y;
+
+            initialLeft = Math.max(0, initialLeft);
+            initialTop = Math.max(0, initialTop);
+
+            if (initialLeft + cardWidth > viewportWidth) {
+              initialLeft = Math.max(0, viewportWidth - cardWidth);
+            }
+            if (initialTop + cardHeight > viewportHeight) {
+              initialTop = Math.max(0, viewportHeight - cardHeight);
+            }
+
             this.element.style.left = `${initialLeft}px`;
             this.element.style.top = `${initialTop}px`;
             this.positionedWithTopLeft = true;
@@ -839,47 +1011,48 @@
 
         _attachEventListeners() {
           this.dragHandle.addEventListener(
-            "mousedown",
+            "pointerdown",
             this._startDrag.bind(this)
           );
-          this.dragHandle.addEventListener(
-            "touchstart",
-            this._startDrag.bind(this),
-            { passive: false }
-          );
           this.resizeHandle.addEventListener(
-            "mousedown",
+            "pointerdown",
             this._startResize.bind(this)
           );
-          this.resizeHandle.addEventListener(
-            "touchstart",
-            this._startResize.bind(this),
-            { passive: false }
-          );
           this.element.addEventListener(
-            "mousedown",
+            "pointerdown",
             this.bringToFront.bind(this)
-          );
-          this.element.addEventListener(
-            "touchstart",
-            this.bringToFront.bind(this),
-            { passive: false }
           );
           this.closeButton.addEventListener("click", this.destroy.bind(this));
 
           const footer = this.element.querySelector(".links-section");
           if (footer) {
             footer.addEventListener("click", (e) => {
-              if (e.target.classList.contains("view-projects-button")) {
+              if (
+                e.target &&
+                e.target.classList &&
+                e.target.classList.contains("view-projects-button")
+              ) {
                 e.stopPropagation();
                 createProjectsWindow();
-              } else if (e.target.classList.contains("view-rigs-button")) {
+              } else if (
+                e.target &&
+                e.target.classList &&
+                e.target.classList.contains("view-rigs-button")
+              ) {
                 e.stopPropagation();
                 createPcRigsWindow();
-              } else if (e.target.classList.contains("view-vehicles-button")) {
+              } else if (
+                e.target &&
+                e.target.classList &&
+                e.target.classList.contains("view-vehicles-button")
+              ) {
                 e.stopPropagation();
                 createVehiclesWindow();
-              } else if (e.target.classList.contains("close-window-button")) {
+              } else if (
+                e.target &&
+                e.target.classList &&
+                e.target.classList.contains("close-window-button")
+              ) {
                 e.stopPropagation();
                 this.destroy();
               }
@@ -893,64 +1066,71 @@
         }
 
         _switchToTopLeftPositioningIfNeeded() {
-          if (!this.positionedWithTopLeft) {
+          if (
+            !this.positionedWithTopLeft &&
+            !this.element.style.left &&
+            !this.element.style.top
+          ) {
             this._setInitialPosition();
           }
         }
 
         _startDrag(e) {
           if (
-            this.isResizing ||
-            e.target === this.resizeHandle ||
-            e.target.closest(".window-controls") ||
-            e.target.closest(".fluent-button")
-          )
+            e.target === this.closeButton ||
+            (e.target.closest && e.target.closest(".window-controls"))
+          ) {
             return;
-          if (e.target !== this.dragHandle && !e.target.closest(".drag-handle"))
+          }
+          if (
+            e.target !== this.dragHandle &&
+            !(e.target.closest && e.target.closest(".drag-handle"))
+          ) {
             return;
+          }
+
+          if (this.isResizing) return;
+
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
           this.isDragging = true;
           activeInteractionWindow = this;
           this.dragHandle.style.cursor = "grabbing";
           document.body.style.cursor = "grabbing";
+
           const rect = this.element.getBoundingClientRect();
-          let startClientX, startClientY;
-          if (e.type === "touchstart") {
-            startClientX = e.touches[0].clientX;
-            startClientY = e.touches[0].clientY;
-          } else {
-            startClientX = e.clientX;
-            startClientY = e.clientY;
-          }
-          this.dragOffsetX = startClientX - rect.left;
-          this.dragOffsetY = startClientY - rect.top;
-          e.preventDefault();
+          const startClientX = e.clientX;
+          const startClientY = e.clientY;
+
+          const currentLeft = parseFloat(this.element.style.left) || rect.left;
+          const currentTop = parseFloat(this.element.style.top) || rect.top;
+
+          this.dragOffsetX = startClientX - currentLeft;
+          this.dragOffsetY = startClientY - currentTop;
         }
 
         _doDrag(e) {
           if (!this.isDragging) return;
           e.preventDefault();
-          let currentMouseX, currentMouseY;
-          if (e.type === "touchmove") {
-            currentMouseX = e.touches[0].clientX;
-            currentMouseY = e.touches[0].clientY;
-          } else {
-            currentMouseX = e.clientX;
-            currentMouseY = e.clientY;
-          }
+
+          const currentMouseX = e.clientX;
+          const currentMouseY = e.clientY;
+
           let newCardX = currentMouseX - this.dragOffsetX;
           let newCardY = currentMouseY - this.dragOffsetY;
+
           const viewportWidth = document.documentElement.clientWidth;
           const viewportHeight = document.documentElement.clientHeight;
           const cardWidth = this.element.offsetWidth;
           const cardHeight = this.element.offsetHeight;
+
           if (newCardX < 0) newCardX = 0;
           if (newCardY < 0) newCardY = 0;
           if (newCardX > viewportWidth - cardWidth)
             newCardX = viewportWidth - cardWidth;
           if (newCardY > viewportHeight - cardHeight)
             newCardY = viewportHeight - cardHeight;
+
           this.element.style.left = `${newCardX}px`;
           this.element.style.top = `${newCardY}px`;
         }
@@ -967,45 +1147,46 @@
         }
 
         _startResize(e) {
+          if (e.target !== this.resizeHandle) {
+            return;
+          }
+
           if (this.isDragging) return;
+
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
           this.isResizing = true;
           activeInteractionWindow = this;
           document.body.style.cursor = "nwse-resize";
+
           this.initialWidth = this.element.offsetWidth;
           this.initialHeight = this.element.offsetHeight;
           this.initialCardX_resize = this.element.offsetLeft;
           this.initialCardY_resize = this.element.offsetTop;
-          if (e.type === "touchstart") {
-            this.resizeInitialMouseX = e.touches[0].clientX;
-            this.resizeInitialMouseY = e.touches[0].clientY;
-          } else {
-            this.resizeInitialMouseX = e.clientX;
-            this.resizeInitialMouseY = e.clientY;
-          }
-          e.preventDefault();
+
+          this.resizeInitialMouseX = e.clientX;
+          this.resizeInitialMouseY = e.clientY;
         }
 
         _doResize(e) {
           if (!this.isResizing) return;
           e.preventDefault();
-          let currentMouseX, currentMouseY;
-          if (e.type === "touchmove") {
-            currentMouseX = e.touches[0].clientX;
-            currentMouseY = e.touches[0].clientY;
-          } else {
-            currentMouseX = e.clientX;
-            currentMouseY = e.clientY;
-          }
+
+          const currentMouseX = e.clientX;
+          const currentMouseY = e.clientY;
+
           let dx = currentMouseX - this.resizeInitialMouseX;
           let dy = currentMouseY - this.resizeInitialMouseY;
+
           let newWidth = this.initialWidth + dx;
           let newHeight = this.initialHeight + dy;
+
           newWidth = Math.max(minWidth, newWidth);
           newHeight = Math.max(minHeight, newHeight);
+
           const viewportWidth = document.documentElement.clientWidth;
           const viewportHeight = document.documentElement.clientHeight;
+
           if (this.initialCardX_resize + newWidth > viewportWidth) {
             newWidth = viewportWidth - this.initialCardX_resize;
             newWidth = Math.max(minWidth, newWidth);
@@ -1014,6 +1195,7 @@
             newHeight = viewportHeight - this.initialCardY_resize;
             newHeight = Math.max(minHeight, newHeight);
           }
+
           this.element.style.width = `${newWidth}px`;
           this.element.style.height = `${newHeight}px`;
         }
@@ -1029,7 +1211,9 @@
         }
 
         destroy() {
-          this.element.remove();
+          if (this.element && this.element.parentNode) {
+            this.element.remove();
+          }
           delete windows[this.id];
           if (activeInteractionWindow === this) {
             activeInteractionWindow = null;
@@ -1038,25 +1222,26 @@
         }
       }
 
-      document.addEventListener("mousemove", (e) => {
-        activeInteractionWindow?._doDrag(e);
-        activeInteractionWindow?._doResize(e);
+      document.addEventListener("pointermove", (e) => {
+        if (activeInteractionWindow) {
+          if (
+            activeInteractionWindow.isDragging ||
+            activeInteractionWindow.isResizing
+          ) {
+            e.preventDefault();
+          }
+          if (activeInteractionWindow.isDragging)
+            activeInteractionWindow._doDrag(e);
+          if (activeInteractionWindow.isResizing)
+            activeInteractionWindow._doResize(e);
+        }
       });
-      document.addEventListener(
-        "touchmove",
-        (e) => {
-          activeInteractionWindow?._doDrag(e);
-          activeInteractionWindow?._doResize(e);
-        },
-        { passive: false }
-      );
-      document.addEventListener("mouseup", () => {
-        activeInteractionWindow?._endDrag();
-        activeInteractionWindow?._endResize();
-      });
-      document.addEventListener("touchend", () => {
-        activeInteractionWindow?._endDrag();
-        activeInteractionWindow?._endResize();
+
+      document.addEventListener("pointerup", () => {
+        if (activeInteractionWindow) {
+          activeInteractionWindow._endDrag();
+          activeInteractionWindow._endResize();
+        }
       });
 
       function createWindow(
@@ -1086,8 +1271,9 @@
         try {
           const response = await fetch(apiUrl);
           if (!response.ok) {
-            if (response.status === 403)
+            if (response.status === 403) {
               throw new Error("GitHub API rate limit exceeded.");
+            }
             throw new Error(`GitHub API error! status: ${response.status}`);
           }
           const data = await response.json();
@@ -1107,34 +1293,45 @@
             day: "numeric",
           });
         } catch (e) {
+          console.error("Error formatting date:", e);
           return "Invalid Date";
         }
       }
 
       function renderProjects(repos, containerElement) {
+        if (!containerElement) return;
+
         containerElement.innerHTML = "";
+
         if (!repos || repos.length === 0) {
           containerElement.innerHTML =
             '<p class="error-message">No public projects found or failed to load.</p>';
           return;
         }
+
         const list = document.createElement("ul");
         repos.forEach((repo) => {
           const li = document.createElement("li");
+
           const tags =
-            repo.topics?.map((t) => `<span>${t}</span>`).join(" ") || "";
+            repo.topics && Array.isArray(repo.topics)
+              ? repo.topics.map((t) => `<span>${t}</span>`).join(" ")
+              : "";
+
           const license = repo.license
             ? `<span class="project-license">${repo.license.name}</span>`
             : "";
+
           const lang = repo.language
             ? `<span class="project-lang ${repo.language
                 .toLowerCase()
                 .replace(/[^a-z0-9]/g, "")}">${repo.language}</span>`
             : '<span class="project-lang na">N/A</span>';
+
           li.innerHTML = `<h3 class="project-title"><a href="${
             repo.html_url
           }" target="_blank" rel="noopener noreferrer">${
-            repo.name
+            repo.name || "Unnamed Repo"
           }</a> <span class="project-visibility">Public</span></h3>
                           <p class="project-desc">${
                             repo.description || "No description."
@@ -1149,9 +1346,10 @@
       }
 
       function displayError(error, containerElement) {
-        containerElement.innerHTML = `<p class="error-message">Error loading projects: ${
-          error.message || "Unknown error"
-        }</p>`;
+        if (!containerElement) return;
+        const errorMessage =
+          error && error.message ? error.message : "Unknown error";
+        containerElement.innerHTML = `<p class="error-message">Error loading projects: ${errorMessage}</p>`;
       }
 
       const aboutMeContent = `
@@ -1171,73 +1369,41 @@
         </div>
       `;
       const aboutMeFooter = `
-
         <button class="fluent-button view-projects-button">View Projects</button>
-
         <button class="fluent-button view-rigs-button">View PC Rigs</button>
-
         <button class="fluent-button view-vehicles-button">View Vehicles</button>
       `;
-
       const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>`;
-
       const projectsFooter = `
         <button class="fluent-button close-window-button">Close GitHub Projects</button>
         <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
       `;
-
       const pcRigsContent = `
-
         <div class="content-area">
-
             <h1>My PC Rigs</h1>
-
             <h2>Main Desktop (2025)</h2>
-
             <ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>
-
             <p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>
-
             <h2>Surface Book 3 15" Laptop</h2>
-
             <ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA Quadro RTX 3000 Mobile</li><li>RAM: 32GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
-
             <p class="intro-text">Portable power for gaming and development on the go.</p>
-
             <h2>Surface Pro X SQ1 LTE" Tablet</h2>
-
             <ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomn Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
-
             <p class="intro-text">Lightweight & low-power for light development and media on the go.</p>
-
         </div>
-
       `;
-
       const pcRigsFooter = `<button class="fluent-button close-window-button">Close Rigs</button>`;
-
       const vehiclesContent = `
-
         <div class="content-area">
-
             <h1>My Vehicles</h1>
-
             <h2>Alfa Romeo 159 (Saloon)</h2>
-
             <ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>
-
             <p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>
-
             <h2>Chrysler Grand Voyager</h2>
-
             <ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>
-
             <p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>
-
         </div>
-
       `;
-
       const vehiclesFooter = `<button class="fluent-button close-window-button">Close Vehicles</button>`;
 
       async function createProjectsWindow() {
@@ -1259,13 +1425,21 @@
             initialOffset: { x: offsetX, y: offsetY },
           }
         );
-        const projectsListContainer =
-          projectsWindow.element.querySelector(".projects-list");
-        try {
-          const repos = await fetchProjects(GITHUB_USERNAME);
-          renderProjects(repos, projectsListContainer);
-        } catch (error) {
-          displayError(error, projectsListContainer);
+        const projectsListContainer = projectsWindow.element
+          ? projectsWindow.element.querySelector(".projects-list")
+          : null;
+
+        if (projectsListContainer) {
+          try {
+            const repos = await fetchProjects(GITHUB_USERNAME);
+            renderProjects(repos, projectsListContainer);
+          } catch (error) {
+            displayError(error, projectsListContainer);
+          }
+        } else {
+          console.error(
+            "Could not find .projects-list container in projects window."
+          );
         }
       }
 
@@ -1331,14 +1505,12 @@
         try {
           const response = await fetch(apiUrl);
           if (!response.ok) {
-            throw new Error(
-              `Cache Service HTTP error! status: ${response.status}`
-            );
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
           applySpotlightBackground(data);
         } catch (error) {
-          console.error("Failed to fetch cached Spotlight data:", error);
+          console.error("Failed to fetch or apply Spotlight data:", error);
           const copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv)
             copyrightDiv.textContent = "Error loading background info.";
@@ -1352,15 +1524,19 @@
             !Array.isArray(cachedItems) ||
             cachedItems.length === 0
           ) {
-            console.warn("Received empty or invalid cache data.");
+            console.warn(
+              "Received empty or invalid Spotlight cache data. Using fallback backgrounds."
+            );
             return;
           }
           const randomIndex = Math.floor(Math.random() * cachedItems.length);
           const selectedItem = cachedItems[randomIndex];
-          const landscapePath = selectedItem?.landscapePath;
-          const portraitPath = selectedItem?.portraitPath;
-          const copyrightText = selectedItem?.copyright || "";
-          const title = selectedItem?.title || "";
+
+          const landscapePath = selectedItem && selectedItem.landscapePath;
+          const portraitPath = selectedItem && selectedItem.portraitPath;
+          const copyrightText = (selectedItem && selectedItem.copyright) || "";
+          const title = (selectedItem && selectedItem.title) || "";
+
           if (!landscapePath || !portraitPath) {
             console.warn(
               "Selected cached item missing image paths:",
@@ -1368,16 +1544,31 @@
             );
             return;
           }
+
           const fullLandscapeUrl = `/cached-images/${landscapePath}`;
           const fullPortraitUrl = `/cached-images/${portraitPath}`;
-          document.documentElement.style.setProperty(
-            "--bg-image-landscape",
-            `url('${fullLandscapeUrl}')`
-          );
-          document.documentElement.style.setProperty(
-            "--bg-image-portrait",
-            `url('${fullPortraitUrl}')`
-          );
+
+          const landscapeStyle = `url('${fullLandscapeUrl}') no-repeat center center fixed`;
+          const portraitStyle = `url('${fullPortraitUrl}') no-repeat center center fixed`;
+
+          const setBg = () => {
+            if (window.matchMedia("(orientation: portrait)").matches) {
+              document.body.style.backgroundImage = portraitStyle;
+            } else {
+              document.body.style.backgroundImage = landscapeStyle;
+            }
+            document.body.style.backgroundSize = "cover";
+          };
+
+          setBg();
+
+          const mediaQuery = window.matchMedia("(orientation: portrait)");
+          if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener("change", setBg);
+          } else if (mediaQuery.addListener) {
+            mediaQuery.addListener(setBg);
+          }
+
           const copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv) {
             let displayText = copyrightText.trim();
