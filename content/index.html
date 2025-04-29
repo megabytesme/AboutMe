@@ -892,7 +892,6 @@
       let activeInteractionWindow = null;
 
       const GITHUB_USERNAME = "megabytesme";
-      const BACKEND_API_BASE_URL = "";
 
       const minWidth = 320;
       const minHeight = 400;
@@ -1532,10 +1531,10 @@
           const randomIndex = Math.floor(Math.random() * cachedItems.length);
           const selectedItem = cachedItems[randomIndex];
 
-          const landscapePath = selectedItem && selectedItem.landscapePath;
-          const portraitPath = selectedItem && selectedItem.portraitPath;
-          const copyrightText = (selectedItem && selectedItem.copyright) || "";
-          const title = (selectedItem && selectedItem.title) || "";
+          const landscapePath = selectedItem?.landscapePath;
+          const portraitPath = selectedItem?.portraitPath;
+          const copyrightText = selectedItem?.copyright || "";
+          const title = selectedItem?.title || "";
 
           if (!landscapePath || !portraitPath) {
             console.warn(
@@ -1547,26 +1546,40 @@
 
           const fullLandscapeUrl = `/cached-images/${landscapePath}`;
           const fullPortraitUrl = `/cached-images/${portraitPath}`;
+          const supportsCssVars =
+            window.CSS && CSS.supports && CSS.supports("--foo", "bar");
 
-          const landscapeStyle = `url('${fullLandscapeUrl}') no-repeat center center fixed`;
-          const portraitStyle = `url('${fullPortraitUrl}') no-repeat center center fixed`;
+          if (supportsCssVars) {
+            document.documentElement.style.setProperty(
+              "--bg-image-landscape",
+              `url('${fullLandscapeUrl}')`
+            );
+            document.documentElement.style.setProperty(
+              "--bg-image-portrait",
+              `url('${fullPortraitUrl}')`
+            );
+          } else {
+            const setBgFallback = () => {
+              const imageUrl = window.matchMedia("(orientation: portrait)")
+                .matches
+                ? fullPortraitUrl
+                : fullLandscapeUrl;
 
-          const setBg = () => {
-            if (window.matchMedia("(orientation: portrait)").matches) {
-              document.body.style.backgroundImage = portraitStyle;
-            } else {
-              document.body.style.backgroundImage = landscapeStyle;
+              document.body.style.backgroundImage = `url('${imageUrl}')`;
+              document.body.style.backgroundRepeat = "no-repeat";
+              document.body.style.backgroundPosition = "center center";
+              document.body.style.backgroundAttachment = "fixed";
+              document.body.style.backgroundSize = "cover";
+            };
+
+            setBgFallback();
+
+            const mediaQuery = window.matchMedia("(orientation: portrait)");
+            if (mediaQuery.addEventListener) {
+              mediaQuery.addEventListener("change", setBgFallback);
+            } else if (mediaQuery.addListener) {
+              mediaQuery.addListener(setBgFallback);
             }
-            document.body.style.backgroundSize = "cover";
-          };
-
-          setBg();
-
-          const mediaQuery = window.matchMedia("(orientation: portrait)");
-          if (mediaQuery.addEventListener) {
-            mediaQuery.addEventListener("change", setBg);
-          } else if (mediaQuery.addListener) {
-            mediaQuery.addListener(setBg);
           }
 
           const copyrightDiv = document.getElementById("copyright-info");
