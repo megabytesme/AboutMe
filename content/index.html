@@ -889,6 +889,57 @@
         border-radius: 4px;
         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
       }
+
+      #discord-status-container h2 {
+        margin-bottom: 5px;
+        margin-top: 5px;
+        border-bottom: none;
+        font-size: 18px;
+      }
+
+      #discord-status-area {
+        font-size: 0.9em;
+        color: var(--subtle-text, #cccccc);
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding: 8px 12px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        min-height: 2.5em;
+        display: flex;
+        align-items: center;
+      }
+
+      @media (prefers-color-scheme: light) {
+        #discord-status-area {
+          background-color: rgba(0, 0, 0, 0.04);
+          border-color: rgba(0, 0, 0, 0.06);
+        }
+      }
+
+      #discord-status-area .loading-message,
+      #discord-status-area .error-message {
+        padding: 0;
+        text-align: left;
+        font-style: italic;
+        width: 100%;
+        color: var(--subtle-text, #cccccc);
+      }
+      @media (prefers-color-scheme: light) {
+        #discord-status-area .loading-message,
+        #discord-status-area .error-message {
+          color: var(--subtle-text, #555);
+        }
+      }
+
+      .status-online {
+        color: #78d47b;
+      }
+      .status-offline {
+        color: #a0a0a0;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
@@ -1364,6 +1415,12 @@
         <div class="content-area">
             <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
             <h1>MegaBytesMe (Ben)</h1>
+            <div id="discord-status-container">
+                <h2>Current Status</h2>
+                <div id="discord-status-area">
+                    <p class="loading-message">Loading Discord status...</p>
+                </div>
+            </div>
             <p class="intro-text">Hey! 👋🏻<br>I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.</p>
             <p class="intro-text">I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.</p>
             <h2>Technologies & Languages</h2><p>I primarily work with:</p>
@@ -1381,13 +1438,13 @@
         <button class="fluent-button view-rigs-button">View PC Rigs</button>
         <button class="fluent-button view-vehicles-button">View Vehicles</button>
       `;
-      
+
       const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>`;
       const projectsFooter = `
         <button class="fluent-button close-window-button">Close GitHub Projects</button>
         <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
       `;
-      
+
       const pcRigsContent = `
         <div class="content-area">
             <h1>My PC Rigs</h1>
@@ -1403,7 +1460,7 @@
         </div>
       `;
       const pcRigsFooter = `<button class="fluent-button close-window-button">Close Rigs</button>`;
-      
+
       const vehiclesContent = `
         <div class="content-area">
             <h1>My Vehicles</h1>
@@ -1464,13 +1521,48 @@
       }
 
       function createAboutMeWindow() {
-        createWindow(
-          "about-me",
+        const windowId = "about-me";
+        const discordUserId = "374261881143296000";
+
+        if (windows[windowId]) {
+          windows[windowId].bringToFront();
+          console.log("About Me window already exists. Bringing to front.");
+          return;
+        }
+
+        console.log("Creating About Me window...");
+        const aboutWindow = createWindow(
+          windowId,
           "About Me - Ben",
           "https://avatars.githubusercontent.com/u/57240557?v=4",
           aboutMeContent,
           { footerHtml: aboutMeFooter }
         );
+
+        console.log("Fetching Discord status for user:", discordUserId);
+        fetchDiscordStatus(discordUserId)
+          .then((statusData) => {
+            let statusHtml;
+            if (statusData) {
+              console.log("Discord status data received:", statusData);
+              statusHtml = parseDiscordStatus(statusData);
+              console.log("Parsed status HTML:", statusHtml);
+            } else {
+              console.warn("Failed to fetch Discord status or user not found.");
+              statusHtml =
+                '<p class="error-message">Could not load Discord status.</p>';
+            }
+            updateDiscordStatusUI(statusHtml);
+          })
+          .catch((error) => {
+            console.error(
+              "Unhandled error during Discord status fetch/parse:",
+              error
+            );
+            updateDiscordStatusUI(
+              '<p class="error-message">Error displaying status.</p>'
+            );
+          });
       }
 
       function createPcRigsWindow() {
@@ -1627,6 +1719,129 @@
           if (copyrightDiv) {
             copyrightDiv.textContent = "Error displaying image info.";
           }
+        }
+      }
+
+      async function fetchDiscordStatus(userId) {
+        const apiUrl = `https://statusstream.many.win/users/${userId}`;
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            if (response.status === 404) {
+              console.warn(`StatusStream API: User ${userId} not found.`);
+              return null;
+            }
+            throw new Error(
+              `StatusStream API error! status: ${response.status}`
+            );
+          }
+          const data = await response.json();
+          if (!data || !data.statusstream) {
+            throw new Error(
+              "Invalid data structure received from StatusStream API"
+            );
+          }
+          return data.statusstream;
+        } catch (error) {
+          console.error("Error fetching Discord status:", error);
+          return null;
+        }
+      }
+
+      function parseDiscordStatus(statusData) {
+        if (
+          !statusData ||
+          statusData.presence === "offline" ||
+          !statusData.activities ||
+          statusData.activities.length === 0
+        ) {
+          return '<span class="status-offline">Offline / No specific activity</span>';
+        }
+
+        const activities = statusData.activities;
+        let displayActivity = null;
+        let customStatus = null;
+
+        for (const activity of activities) {
+          if (activity.type === 4 && activity.state) {
+            customStatus = activity.state;
+          } else if (
+            activity.type !== 4 &&
+            (activity.name || activity.details) &&
+            !displayActivity
+          ) {
+            displayActivity = activity;
+          }
+        }
+
+        let statusHtml = "";
+
+        if (displayActivity) {
+          let icon = "💡";
+          let primaryText = "";
+          let secondaryText = "";
+          let tertiaryText = "";
+
+          if (
+            displayActivity.type === 2 &&
+            displayActivity.name === "Spotify"
+          ) {
+            icon = "🎧";
+            primaryText = displayActivity.details || "Unknown Song";
+            secondaryText = displayActivity.state
+              ? `by ${displayActivity.state}`
+              : "by Unknown Artist";
+            tertiaryText =
+              displayActivity.assets && displayActivity.assets.largeText
+                ? `(${displayActivity.assets.largeText})`
+                : ""; // Album in brackets
+          } else if (
+            displayActivity.applicationId === "383226320970055681" &&
+            displayActivity.assets &&
+            displayActivity.assets.largeText
+          ) {
+            icon = "💻";
+            primaryText = displayActivity.assets.largeText;
+            secondaryText = displayActivity.state || "";
+            tertiaryText = "";
+          } else if (displayActivity.type === 0) {
+            icon = "🎮";
+            primaryText = `Playing ${displayActivity.name}`;
+            secondaryText = displayActivity.details || "";
+            tertiaryText = displayActivity.state || "";
+          } else if (displayActivity.type === 3) {
+            icon = "📺";
+            primaryText = `Watching ${displayActivity.name}`;
+            secondaryText = displayActivity.details || "";
+            tertiaryText = displayActivity.state || "";
+          } else {
+            icon = "💡";
+            primaryText = displayActivity.name || "Unknown Activity";
+            secondaryText = displayActivity.details || "";
+            tertiaryText = displayActivity.state || "";
+          }
+
+          statusHtml = `${icon} ${primaryText}`;
+          if (secondaryText) statusHtml += ` ${secondaryText}`;
+          if (tertiaryText) statusHtml += ` ${tertiaryText}`;
+        } else if (customStatus) {
+          statusHtml = `💬 ${customStatus}`;
+        } else {
+          statusHtml = `✨ Online`;
+        }
+
+        return `<span class="status-online">${statusHtml}</span>`;
+      }
+
+      function updateDiscordStatusUI(statusHtml) {
+        const statusElement = document.getElementById("discord-status-area");
+        if (statusElement) {
+          statusElement.innerHTML = statusHtml;
+        } else {
+          console.warn(
+            "Discord status area element not found when trying to update UI."
+          );
         }
       }
 
