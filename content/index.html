@@ -882,12 +882,12 @@
       }
 
       .vehicle-image {
-         float: right;
-         max-width: 150px;
-         height: auto;
-         margin: 0 0 10px 15px;
-         border-radius: 4px;
-         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+        float: right;
+        max-width: 150px;
+        height: auto;
+        margin: 0 0 10px 15px;
+        border-radius: 4px;
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
       }
     </style>
   </head>
@@ -1547,10 +1547,10 @@
           const randomIndex = Math.floor(Math.random() * cachedItems.length);
           const selectedItem = cachedItems[randomIndex];
 
-          const landscapePath = selectedItem?.landscapePath;
-          const portraitPath = selectedItem?.portraitPath;
-          const copyrightText = selectedItem?.copyright || "";
-          const title = selectedItem?.title || "";
+          const landscapePath = selectedItem && selectedItem.landscapePath;
+          const portraitPath = selectedItem && selectedItem.portraitPath;
+          const copyrightText = (selectedItem && selectedItem.copyright) || "";
+          const title = (selectedItem && selectedItem.title) || "";
 
           if (!landscapePath || !portraitPath) {
             console.warn(
@@ -1575,7 +1575,7 @@
               `url('${fullPortraitUrl}')`
             );
           } else {
-            const setBgFallback = () => {
+            const setBgFallback = function () {
               const imageUrl = window.matchMedia("(orientation: portrait)")
                 .matches
                 ? fullPortraitUrl
@@ -1606,7 +1606,7 @@
               displayText &&
               !displayText.toLowerCase().includes(title.toLowerCase())
             ) {
-              displayText = `${title} | ${displayText}`;
+              displayText = title + " | " + displayText;
             } else if (title && !displayText) {
               displayText = title;
             }
@@ -1614,7 +1614,6 @@
               displayText || "Image information unavailable";
           }
         } catch (error) {
-          console.error("Error applying cached Spotlight data:", error);
           const copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv)
             copyrightDiv.textContent = "Error displaying image info.";
