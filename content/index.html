@@ -26,8 +26,7 @@
       }
 
       body {
-        background: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg")
-          no-repeat center center fixed;
+        background: none no-repeat center center fixed;
         background-size: cover;
         color: #f0f0f0;
         background-color: #1c1c1c;
@@ -35,7 +34,7 @@
 
       @media (orientation: portrait) {
         body {
-          background-image: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
+          background-image: none;
         }
       }
 
@@ -840,8 +839,8 @@
           --project-lang-java: #f1e05a;
           --project-lang-lua: #7e80d4;
           --project-lang-other: #aaaaaa;
-          --bg-image-landscape: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg");
-          --bg-image-portrait: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
+          --bg-image-landscape: none;
+          --bg-image-portrait: none;
         }
         @media (prefers-color-scheme: light) {
           :root {
@@ -2531,8 +2530,10 @@
           }
           var randomIndex = Math.floor(Math.random() * cachedItems.length);
           var selectedItem = cachedItems[randomIndex];
-          var landscapePath = selectedItem && selectedItem.landscapePath;
-          var portraitPath = selectedItem && selectedItem.portraitPath;
+          var landscapePath =
+            selectedItem && selectedItem.landscapePathCompressed;
+          var portraitPath =
+            selectedItem && selectedItem.portraitPathCompressed;
           var copyrightText = (selectedItem && selectedItem.copyright) || "";
           var title = (selectedItem && selectedItem.title) || "";
           if (!landscapePath || !portraitPath) {
