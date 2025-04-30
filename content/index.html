@@ -10,9 +10,6 @@
     <meta name="color-scheme" content="dark light" />
     <title>MegaBytesMe - Ben</title>
     <style>
-      html {
-      }
-
       body,
       html {
         margin: 0;
@@ -236,7 +233,7 @@
       .scrolling-icons-track {
         display: flex;
         align-items: center;
-        animation: scrollIcons 70s linear infinite;
+        animation: scrollIcons 14s linear infinite;
       }
       .scrolling-icons-container:hover .scrolling-icons-track {
         animation-play-state: paused;
@@ -466,18 +463,131 @@
         color: #cccccc;
       }
 
+      .profile-header {
+        position: relative;
+        width: 100px;
+        margin: 0 auto 5px auto;
+        height: 100px;
+      }
+      .profile-pic {
+        margin: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-color: var(--border-color, rgba(255, 255, 255, 0.15));
+      }
+      .custom-status-bubble {
+        position: absolute;
+        top: -15px;
+        right: -120px;
+        max-width: 160px;
+        padding: 5px 10px;
+        background-color: var(--card-bg, rgba(40, 40, 40, 0.9));
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+        border-radius: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        font-size: 0.8em;
+        color: var(--subtle-text, #cccccc);
+        text-align: center;
+        z-index: 5;
+        word-wrap: break-word;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .custom-status-bubble::after {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 15px;
+        border-width: 6px 6px 0 6px;
+        border-style: solid;
+        border-color: var(--border-color, rgba(255, 255, 255, 0.15)) transparent
+          transparent transparent;
+      }
+      .custom-status-bubble::before {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 16px;
+        border-width: 5px 5px 0 5px;
+        border-style: solid;
+        border-color: var(--card-bg, rgba(40, 40, 40, 0.9)) transparent
+          transparent transparent;
+        z-index: 1;
+      }
+      .custom-status-bubble.visible {
+        opacity: 1;
+      }
+
+      #discord-status-container h2 {
+        margin-bottom: 5px;
+        margin-top: 15px;
+        border-bottom: none;
+        font-size: 18px;
+        color: var(--heading-color, #ffffff);
+      }
+      #discord-status-area {
+        font-size: 0.9em;
+        color: var(--body-text, #f0f0f0);
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding: 0;
+        background-color: transparent;
+        border: none;
+        min-height: 1.5em;
+      }
+      .activity-item {
+        margin: 0 0 5px 0;
+        padding: 5px 0px;
+        line-height: 1.4;
+        display: block;
+      }
+      .activity-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .status-online {
+        display: block;
+        margin-bottom: 5px;
+        color: #3ba55c;
+        font-weight: 600;
+      }
+      .status-offline {
+        display: block;
+        margin-bottom: 5px;
+        color: #ed4245;
+        font-style: italic;
+      }
+      #discord-status-area .loading-message,
+      #discord-status-area .error-message {
+        padding: 0;
+        text-align: left;
+        font-style: italic;
+        width: 100%;
+        color: var(--subtle-text, #cccccc);
+      }
+
+      .vehicle-image {
+        float: right;
+        max-width: 150px;
+        height: auto;
+        margin: 0 0 10px 15px;
+        border-radius: 4px;
+        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+      }
+
       @media (prefers-color-scheme: light) {
         body {
           color: #201f1e;
           background-color: #fff;
         }
-
         .fluent-card {
           background: rgba(255, 255, 255, 0.9);
           border-color: rgba(0, 0, 0, 0.1);
           box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
-
         .drag-handle {
           background-color: rgba(0, 0, 0, 0.05);
           border-bottom-color: rgba(0, 0, 0, 0.1);
@@ -488,14 +598,12 @@
         .drag-handle h1.handle-title {
           color: #1a1a1a;
         }
-
         .window-button {
           color: #201f1e;
         }
         .window-button:not(:disabled):hover {
           background-color: rgba(0, 0, 0, 0.1);
         }
-
         .fluent-card-content {
           color: #201f1e;
         }
@@ -524,12 +632,10 @@
         .scrolling-icons-track img {
           filter: none;
         }
-
         .links-section {
           border-top-color: rgba(0, 0, 0, 0.08);
           background-color: rgba(0, 0, 0, 0.05);
         }
-
         .fluent-button {
           background-color: #0078d4;
           border-color: #0078d4;
@@ -546,7 +652,6 @@
           border-color: #004c87;
           color: white;
         }
-
         .resize-handle {
           background: repeating-linear-gradient(
             -45deg,
@@ -558,20 +663,17 @@
           border-top-color: rgba(0, 0, 0, 0.1);
           border-left-color: rgba(0, 0, 0, 0.1);
         }
-
         #reopenAboutMeBtn {
           background-color: rgba(255, 255, 255, 0.7);
           color: #000;
           border-color: rgba(0, 0, 0, 0.1);
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
-
         #copyright-info {
           color: #ffffff;
           background-color: rgba(0, 0, 0, 0.5);
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
         }
-
         .projects-list li {
           border-bottom-color: rgba(0, 0, 0, 0.08);
         }
@@ -611,10 +713,35 @@
         .project-lang.other::before {
           color: #888888;
         }
-
         .loading-message,
         .error-message {
           color: #333;
+        }
+        #discord-status-area .loading-message,
+        #discord-status-area .error-message {
+          color: var(--subtle-text, #555);
+        }
+        .custom-status-bubble {
+          background-color: var(--card-bg, rgba(255, 255, 255, 0.9));
+          color: var(--subtle-text, #333);
+        }
+        .custom-status-bubble::before {
+          border-top-color: var(--card-bg, rgba(255, 255, 255, 0.9));
+        }
+        .custom-status-bubble::after {
+          border-top-color: var(--border-color, rgba(0, 0, 0, 0.1));
+        }
+        #discord-status-container h2 {
+          color: var(--heading-color, #1a1a1a);
+        }
+        #discord-status-area {
+          color: var(--body-text, #201f1e);
+        }
+        .status-online {
+          color: #2d9d4c;
+        }
+        .status-offline {
+          color: #d83c3e;
         }
       }
 
@@ -624,7 +751,6 @@
           --scroll-duration: 70s;
           --min-card-width: 320px;
           --min-card-height: 400px;
-
           --body-bg: #1c1c1c;
           --body-text: #f0f0f0;
           --heading-color: #ffffff;
@@ -632,43 +758,33 @@
           --link-color: #2899f5;
           --link-hover: #56b1f7;
           --border-color: rgba(255, 255, 255, 0.15);
-
           --card-bg: rgba(40, 40, 40, 0.85);
           --card-shadow: rgba(0, 0, 0, 0.4);
-
           --handle-bg: rgba(255, 255, 255, 0.08);
           --section-separator: rgba(255, 255, 255, 0.1);
-
           --button-bg: #2899f5;
           --button-text: black;
           --button-hover-bg: #56b1f7;
           --button-active-bg: #1a8ad8;
-
           --window-button-text: var(--body-text);
           --window-button-hover-bg: rgba(255, 255, 255, 0.15);
           --window-button-close-hover-bg: #e81123;
           --window-button-close-hover-text: white;
-
           --resize-handle-border: rgba(255, 255, 255, 0.2);
           --resize-handle-fill: rgba(255, 255, 255, 0.2);
-
           --reopen-button-bg: rgba(50, 50, 50, 0.7);
           --reopen-button-text: #fff;
           --reopen-button-shadow: var(--card-shadow);
-
           --copyright-bg: rgba(0, 0, 0, 0.7);
           --copyright-text: #cccccc;
-
           --project-lang-csharp: #d8a0df;
           --project-lang-cpp: #cccccc;
           --project-lang-java: #f1e05a;
           --project-lang-lua: #7e80d4;
           --project-lang-other: #aaaaaa;
-
           --bg-image-landscape: url("https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg");
           --bg-image-portrait: url("https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg");
         }
-
         @media (prefers-color-scheme: light) {
           :root {
             --body-bg: #fff;
@@ -678,28 +794,21 @@
             --link-color: #0078d4;
             --link-hover: #005a9e;
             --border-color: rgba(0, 0, 0, 0.1);
-
             --card-bg: rgba(255, 255, 255, 0.85);
             --card-shadow: rgba(0, 0, 0, 0.15);
-
             --handle-bg: rgba(0, 0, 0, 0.05);
             --section-separator: rgba(0, 0, 0, 0.08);
-
             --button-bg: #0078d4;
             --button-text: white;
             --button-hover-bg: #005a9e;
             --button-active-bg: #004c87;
-
             --resize-handle-border: rgba(0, 0, 0, 0.1);
             --resize-handle-fill: rgba(0, 0, 0, 0.1);
-
             --reopen-button-bg: rgba(255, 255, 255, 0.7);
             --reopen-button-text: #000;
             --reopen-button-shadow: var(--card-shadow);
-
             --copyright-bg: rgba(0, 0, 0, 0.5);
             --copyright-text: #ffffff;
-
             --project-lang-csharp: #9b4f96;
             --project-lang-cpp: #555555;
             --project-lang-java: #b07219;
@@ -707,11 +816,9 @@
             --project-lang-other: #888888;
           }
         }
-
         html {
           color-scheme: dark light;
         }
-
         body {
           background: var(--bg-image-landscape) no-repeat center center fixed;
           background-size: cover;
@@ -723,7 +830,6 @@
             background-image: var(--bg-image-portrait);
           }
         }
-
         .fluent-card {
           background: var(--card-bg);
           backdrop-filter: blur(15px);
@@ -731,7 +837,6 @@
           border-color: var(--border-color);
           box-shadow: 0 8px 30px var(--card-shadow);
         }
-
         .drag-handle {
           background-color: var(--handle-bg);
           border-bottom-color: var(--border-color);
@@ -742,7 +847,6 @@
         .drag-handle h1.handle-title {
           color: var(--heading-color);
         }
-
         .window-button {
           color: var(--window-button-text);
         }
@@ -753,7 +857,6 @@
           background-color: var(--window-button-close-hover-bg);
           color: var(--window-button-close-hover-text);
         }
-
         .fluent-card-content {
           color: var(--body-text);
         }
@@ -790,12 +893,10 @@
             filter: none;
           }
         }
-
         .links-section {
           border-top-color: var(--section-separator);
           background-color: var(--handle-bg);
         }
-
         .fluent-button {
           background-color: var(--button-bg);
           border-color: var(--button-bg);
@@ -812,7 +913,6 @@
           border-color: var(--button-active-bg);
           color: var(--button-text);
         }
-
         .resize-handle {
           background: repeating-linear-gradient(
             -45deg,
@@ -835,7 +935,6 @@
           background-color: var(--copyright-bg);
           text-shadow: none;
         }
-
         .projects-list li {
           border-bottom-color: var(--section-separator);
         }
@@ -879,66 +978,27 @@
         .error-message {
           color: var(--subtle-text);
         }
-      }
-
-      .vehicle-image {
-        float: right;
-        max-width: 150px;
-        height: auto;
-        margin: 0 0 10px 15px;
-        border-radius: 4px;
-        border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-      }
-
-      #discord-status-container h2 {
-        margin-bottom: 5px;
-        margin-top: 5px;
-        border-bottom: none;
-        font-size: 18px;
-      }
-
-      #discord-status-area {
-        font-size: 0.9em;
-        color: var(--subtle-text, #cccccc);
-        margin-top: 0;
-        margin-bottom: 20px;
-        padding: 8px 12px;
-        background-color: rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        min-height: 2.5em;
-        display: flex;
-        align-items: center;
-      }
-
-      @media (prefers-color-scheme: light) {
-        #discord-status-area {
-          background-color: rgba(0, 0, 0, 0.04);
-          border-color: rgba(0, 0, 0, 0.06);
+        #discord-status-container h2 {
+          color: var(--heading-color);
         }
-      }
-
-      #discord-status-area .loading-message,
-      #discord-status-area .error-message {
-        padding: 0;
-        text-align: left;
-        font-style: italic;
-        width: 100%;
-        color: var(--subtle-text, #cccccc);
-      }
-      @media (prefers-color-scheme: light) {
+        #discord-status-area {
+          color: var(--body-text);
+        }
         #discord-status-area .loading-message,
         #discord-status-area .error-message {
-          color: var(--subtle-text, #555);
+          color: var(--subtle-text);
         }
-      }
-
-      .status-online {
-        color: #78d47b;
-      }
-      .status-offline {
-        color: #a0a0a0;
-        font-style: italic;
+        .custom-status-bubble {
+          background-color: var(--card-bg);
+          color: var(--subtle-text);
+          border-color: var(--border-color);
+        }
+        .custom-status-bubble::after {
+          border-top-color: var(--border-color);
+        }
+        .custom-status-bubble::before {
+          border-top-color: var(--card-bg);
+        }
       }
     </style>
   </head>
@@ -947,341 +1007,348 @@
     <div id="copyright-info"></div>
 
     <script>
-      const windows = {};
-      let highestZ = 1;
-      let activeInteractionWindow = null;
+      var windows = {};
+      var highestZ = 1;
+      var activeInteractionWindow = null;
+      var discordStatusIntervalId = null;
 
-      const GITHUB_USERNAME = "megabytesme";
+      var GITHUB_USERNAME = "megabytesme";
+      var DISCORD_USER_ID = "374261881143296000";
+      var DISCORD_POLL_INTERVAL_MS = 30000;
 
-      const minWidth = 320;
-      const minHeight = 400;
+      var minWidth = 320;
+      var minHeight = 400;
 
-      class FluentWindow {
-        constructor(id, title, titleIconUrl, contentHtml, options = {}) {
-          this.id = id;
-          this.isDragging = false;
-          this.isResizing = false;
-          this.positionedWithTopLeft = false;
-          this.dragOffsetX = 0;
-          this.dragOffsetY = 0;
-          this.resizeInitialMouseX = 0;
-          this.resizeInitialMouseY = 0;
-          this.initialWidth = 0;
-          this.initialHeight = 0;
-          this.initialCardX_resize = 0;
-          this.initialCardY_resize = 0;
+      function FluentWindow(id, title, titleIconUrl, contentHtml, options) {
+        options = options || {};
+        this.id = id;
+        this.isDragging = false;
+        this.isResizing = false;
+        this.positionedWithTopLeft = false;
+        this.dragOffsetX = 0;
+        this.dragOffsetY = 0;
+        this.resizeInitialMouseX = 0;
+        this.resizeInitialMouseY = 0;
+        this.initialWidth = 0;
+        this.initialHeight = 0;
+        this.initialCardX_resize = 0;
+        this.initialCardY_resize = 0;
 
-          this.element = this._createWindowElement(
-            id,
-            title,
-            titleIconUrl,
-            options.footerHtml
-          );
-          this.contentContainer = this.element.querySelector(
-            ".fluent-card-content"
-          );
-          this.dragHandle = this.element.querySelector(".drag-handle");
-          this.resizeHandle = this.element.querySelector(".resize-handle");
-          this.closeButton = this.element.querySelector(".window-button.close");
+        this.element = this._createWindowElement(
+          id,
+          title,
+          titleIconUrl,
+          options.footerHtml
+        );
+        this.contentContainer = this.element.querySelector(
+          ".fluent-card-content"
+        );
+        this.dragHandle = this.element.querySelector(".drag-handle");
+        this.resizeHandle = this.element.querySelector(".resize-handle");
+        this.closeButton = this.element.querySelector(".window-button.close");
 
-          this.setContent(contentHtml);
-          this._attachEventListeners();
-          this._setInitialPosition(options.initialOffset);
-          this.bringToFront();
+        this.setContent(contentHtml);
+        this._attachEventListeners();
+        this._setInitialPosition(options.initialOffset);
+        this.bringToFront();
+      }
+
+      FluentWindow.prototype.setContent = function (html) {
+        if (this.contentContainer) {
+          this.contentContainer.innerHTML = html;
         }
+      };
 
-        setContent(html) {
-          if (this.contentContainer) {
-            this.contentContainer.innerHTML = html;
+      FluentWindow.prototype._createWindowElement = function (
+        id,
+        title,
+        titleIconUrl,
+        footerHtml
+      ) {
+        var card = document.createElement("div");
+        card.className = "fluent-card";
+        card.id = "window-" + id;
+        var footerSection = footerHtml
+          ? '<div class="links-section">' + footerHtml + "</div>"
+          : "";
+        card.innerHTML =
+          '<div class="drag-handle">' +
+          '<img src="' +
+          (titleIconUrl || "https://via.placeholder.com/20") +
+          '" alt="Window Icon" class="handle-pic">' +
+          '<h1 class="handle-title">' +
+          title +
+          "</h1>" +
+          '<div class="window-controls">' +
+          '<button class="window-button minimize" disabled aria-hidden="true">–</button>' +
+          '<button class="window-button maximize" disabled aria-hidden="true">▢</button>' +
+          '<button class="window-button close" aria-label="Close ' +
+          title +
+          '">✕</button>' +
+          "</div>" +
+          "</div>" +
+          '<div class="fluent-card-content"></div>' +
+          footerSection +
+          '<div class="resize-handle"></div>';
+        document.body.appendChild(card);
+        return card;
+      };
+
+      FluentWindow.prototype._setInitialPosition = function (offset) {
+        var self = this;
+        offset = offset || { x: 0, y: 0 };
+        requestAnimationFrame(function () {
+          if (!self.element) return;
+          if (self.element.style.left || self.element.style.top) {
+            return;
           }
-        }
 
-        _createWindowElement(id, title, titleIconUrl, footerHtml = "") {
-          const card = document.createElement("div");
-          card.className = "fluent-card";
-          card.id = `window-${id}`;
-          let footerSection = footerHtml
-            ? `<div class="links-section">${footerHtml}</div>`
-            : "";
-          card.innerHTML = `
-            <div class="drag-handle">
-                 <img src="${
-                   titleIconUrl || "https://via.placeholder.com/20"
-                 }" alt="Window Icon" class="handle-pic">
-                 <h1 class="handle-title">${title}</h1>
-                 <div class="window-controls">
-                     <button class="window-button minimize" disabled aria-hidden="true">–</button>
-                     <button class="window-button maximize" disabled aria-hidden="true">▢</button>
-                     <button class="window-button close" aria-label="Close ${title}">✕</button>
-                 </div>
-            </div>
-            <div class="fluent-card-content"></div>
-            ${footerSection}
-            <div class="resize-handle"></div>
-          `;
-          document.body.appendChild(card);
-          return card;
-        }
+          var cardWidth = self.element.offsetWidth;
+          var cardHeight = self.element.offsetHeight;
+          var viewportWidth = document.documentElement.clientWidth;
+          var viewportHeight = document.documentElement.clientHeight;
 
-        _setInitialPosition(offset = { x: 0, y: 0 }) {
-          requestAnimationFrame(() => {
-            if (this.element.style.left || this.element.style.top) {
-              return;
+          if (cardWidth <= 0 || cardHeight <= 0) {
+            console.warn(
+              "Window " +
+                self.id +
+                " has invalid dimensions, retrying positioning."
+            );
+            requestAnimationFrame(function () {
+              self._setInitialPosition(offset);
+            });
+            return;
+          }
+
+          var initialLeft =
+            viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
+          var initialTop =
+            viewportHeight > cardHeight ? (viewportHeight - cardHeight) / 2 : 0;
+
+          initialLeft += offset.x;
+          initialTop += offset.y;
+
+          initialLeft = Math.max(0, initialLeft);
+          initialTop = Math.max(0, initialTop);
+
+          if (initialLeft + cardWidth > viewportWidth) {
+            initialLeft = Math.max(0, viewportWidth - cardWidth);
+          }
+          if (initialTop + cardHeight > viewportHeight) {
+            initialTop = Math.max(0, viewportHeight - cardHeight);
+          }
+
+          self.element.style.left = initialLeft + "px";
+          self.element.style.top = initialTop + "px";
+          self.positionedWithTopLeft = true;
+        });
+      };
+
+      FluentWindow.prototype._attachEventListeners = function () {
+        this.dragHandle.addEventListener(
+          "pointerdown",
+          this._startDrag.bind(this)
+        );
+        this.resizeHandle.addEventListener(
+          "pointerdown",
+          this._startResize.bind(this)
+        );
+        this.element.addEventListener(
+          "pointerdown",
+          this.bringToFront.bind(this)
+        );
+        this.closeButton.addEventListener("click", this.destroy.bind(this));
+
+        var footer = this.element.querySelector(".links-section");
+        if (footer) {
+          var self = this;
+          footer.addEventListener("click", function (e) {
+            var target = e.target;
+            var classList = target && target.classList;
+            if (classList && classList.contains("view-projects-button")) {
+              e.stopPropagation();
+              createProjectsWindow();
+            } else if (classList && classList.contains("view-rigs-button")) {
+              e.stopPropagation();
+              createPcRigsWindow();
+            } else if (
+              classList &&
+              classList.contains("view-vehicles-button")
+            ) {
+              e.stopPropagation();
+              createVehiclesWindow();
+            } else if (classList && classList.contains("close-window-button")) {
+              e.stopPropagation();
+              self.destroy();
             }
-
-            const cardWidth = this.element.offsetWidth;
-            const cardHeight = this.element.offsetHeight;
-            const viewportWidth = document.documentElement.clientWidth;
-            const viewportHeight = document.documentElement.clientHeight;
-
-            if (cardWidth <= 0 || cardHeight <= 0) {
-              console.warn(
-                `Window ${this.id} has invalid dimensions, retrying positioning.`
-              );
-              requestAnimationFrame(() => this._setInitialPosition(offset));
-              return;
-            }
-
-            let initialLeft =
-              viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
-            let initialTop =
-              viewportHeight > cardHeight
-                ? (viewportHeight - cardHeight) / 2
-                : 0;
-
-            initialLeft += offset.x;
-            initialTop += offset.y;
-
-            initialLeft = Math.max(0, initialLeft);
-            initialTop = Math.max(0, initialTop);
-
-            if (initialLeft + cardWidth > viewportWidth) {
-              initialLeft = Math.max(0, viewportWidth - cardWidth);
-            }
-            if (initialTop + cardHeight > viewportHeight) {
-              initialTop = Math.max(0, viewportHeight - cardHeight);
-            }
-
-            this.element.style.left = `${initialLeft}px`;
-            this.element.style.top = `${initialTop}px`;
-            this.positionedWithTopLeft = true;
           });
         }
+      };
 
-        _attachEventListeners() {
-          this.dragHandle.addEventListener(
-            "pointerdown",
-            this._startDrag.bind(this)
-          );
-          this.resizeHandle.addEventListener(
-            "pointerdown",
-            this._startResize.bind(this)
-          );
-          this.element.addEventListener(
-            "pointerdown",
-            this.bringToFront.bind(this)
-          );
-          this.closeButton.addEventListener("click", this.destroy.bind(this));
+      FluentWindow.prototype.bringToFront = function () {
+        highestZ++;
+        this.element.style.zIndex = highestZ;
+      };
 
-          const footer = this.element.querySelector(".links-section");
-          if (footer) {
-            footer.addEventListener("click", (e) => {
-              if (
-                e.target &&
-                e.target.classList &&
-                e.target.classList.contains("view-projects-button")
-              ) {
-                e.stopPropagation();
-                createProjectsWindow();
-              } else if (
-                e.target &&
-                e.target.classList &&
-                e.target.classList.contains("view-rigs-button")
-              ) {
-                e.stopPropagation();
-                createPcRigsWindow();
-              } else if (
-                e.target &&
-                e.target.classList &&
-                e.target.classList.contains("view-vehicles-button")
-              ) {
-                e.stopPropagation();
-                createVehiclesWindow();
-              } else if (
-                e.target &&
-                e.target.classList &&
-                e.target.classList.contains("close-window-button")
-              ) {
-                e.stopPropagation();
-                this.destroy();
-              }
-            });
-          }
+      FluentWindow.prototype._switchToTopLeftPositioningIfNeeded = function () {
+        if (
+          !this.positionedWithTopLeft &&
+          !this.element.style.left &&
+          !this.element.style.top
+        ) {
+          this._setInitialPosition();
+        }
+      };
+
+      FluentWindow.prototype._startDrag = function (e) {
+        var target = e.target;
+        var closestControls = null;
+        if (target.closest)
+          closestControls = target.closest(".window-controls");
+        var closestHandle = null;
+        if (target.closest) closestHandle = target.closest(".drag-handle");
+
+        if (target === this.closeButton || closestControls) {
+          return;
+        }
+        if (target !== this.dragHandle && !closestHandle) {
+          return;
         }
 
-        bringToFront() {
-          highestZ++;
-          this.element.style.zIndex = highestZ;
-        }
+        if (this.isResizing) return;
 
-        _switchToTopLeftPositioningIfNeeded() {
-          if (
-            !this.positionedWithTopLeft &&
-            !this.element.style.left &&
-            !this.element.style.top
-          ) {
-            this._setInitialPosition();
-          }
-        }
+        this._switchToTopLeftPositioningIfNeeded();
+        this.bringToFront();
+        this.isDragging = true;
+        activeInteractionWindow = this;
+        this.dragHandle.style.cursor = "grabbing";
+        document.body.style.cursor = "grabbing";
 
-        _startDrag(e) {
-          if (
-            e.target === this.closeButton ||
-            (e.target.closest && e.target.closest(".window-controls"))
-          ) {
-            return;
-          }
-          if (
-            e.target !== this.dragHandle &&
-            !(e.target.closest && e.target.closest(".drag-handle"))
-          ) {
-            return;
-          }
+        var rect = this.element.getBoundingClientRect();
+        var startClientX = e.clientX;
+        var startClientY = e.clientY;
 
-          if (this.isResizing) return;
+        var currentLeft = parseFloat(this.element.style.left) || rect.left;
+        var currentTop = parseFloat(this.element.style.top) || rect.top;
 
-          this._switchToTopLeftPositioningIfNeeded();
-          this.bringToFront();
-          this.isDragging = true;
-          activeInteractionWindow = this;
-          this.dragHandle.style.cursor = "grabbing";
-          document.body.style.cursor = "grabbing";
+        this.dragOffsetX = startClientX - currentLeft;
+        this.dragOffsetY = startClientY - currentTop;
+      };
 
-          const rect = this.element.getBoundingClientRect();
-          const startClientX = e.clientX;
-          const startClientY = e.clientY;
+      FluentWindow.prototype._doDrag = function (e) {
+        if (!this.isDragging) return;
+        e.preventDefault();
 
-          const currentLeft = parseFloat(this.element.style.left) || rect.left;
-          const currentTop = parseFloat(this.element.style.top) || rect.top;
+        var currentMouseX = e.clientX;
+        var currentMouseY = e.clientY;
 
-          this.dragOffsetX = startClientX - currentLeft;
-          this.dragOffsetY = startClientY - currentTop;
-        }
+        var newCardX = currentMouseX - this.dragOffsetX;
+        var newCardY = currentMouseY - this.dragOffsetY;
 
-        _doDrag(e) {
-          if (!this.isDragging) return;
-          e.preventDefault();
+        var viewportWidth = document.documentElement.clientWidth;
+        var viewportHeight = document.documentElement.clientHeight;
+        var cardWidth = this.element.offsetWidth;
+        var cardHeight = this.element.offsetHeight;
 
-          const currentMouseX = e.clientX;
-          const currentMouseY = e.clientY;
+        newCardX = Math.max(0, Math.min(newCardX, viewportWidth - cardWidth));
+        newCardY = Math.max(0, Math.min(newCardY, viewportHeight - cardHeight));
 
-          let newCardX = currentMouseX - this.dragOffsetX;
-          let newCardY = currentMouseY - this.dragOffsetY;
+        this.element.style.left = newCardX + "px";
+        this.element.style.top = newCardY + "px";
+      };
 
-          const viewportWidth = document.documentElement.clientWidth;
-          const viewportHeight = document.documentElement.clientHeight;
-          const cardWidth = this.element.offsetWidth;
-          const cardHeight = this.element.offsetHeight;
-
-          if (newCardX < 0) newCardX = 0;
-          if (newCardY < 0) newCardY = 0;
-          if (newCardX > viewportWidth - cardWidth)
-            newCardX = viewportWidth - cardWidth;
-          if (newCardY > viewportHeight - cardHeight)
-            newCardY = viewportHeight - cardHeight;
-
-          this.element.style.left = `${newCardX}px`;
-          this.element.style.top = `${newCardY}px`;
-        }
-
-        _endDrag() {
-          if (this.isDragging) {
-            this.isDragging = false;
-            this.dragHandle.style.cursor = "grab";
-            if (activeInteractionWindow === this) {
-              activeInteractionWindow = null;
-              document.body.style.cursor = "default";
-            }
-          }
-        }
-
-        _startResize(e) {
-          if (e.target !== this.resizeHandle) {
-            return;
-          }
-
-          if (this.isDragging) return;
-
-          this._switchToTopLeftPositioningIfNeeded();
-          this.bringToFront();
-          this.isResizing = true;
-          activeInteractionWindow = this;
-          document.body.style.cursor = "nwse-resize";
-
-          this.initialWidth = this.element.offsetWidth;
-          this.initialHeight = this.element.offsetHeight;
-          this.initialCardX_resize = this.element.offsetLeft;
-          this.initialCardY_resize = this.element.offsetTop;
-
-          this.resizeInitialMouseX = e.clientX;
-          this.resizeInitialMouseY = e.clientY;
-        }
-
-        _doResize(e) {
-          if (!this.isResizing) return;
-          e.preventDefault();
-
-          const currentMouseX = e.clientX;
-          const currentMouseY = e.clientY;
-
-          let dx = currentMouseX - this.resizeInitialMouseX;
-          let dy = currentMouseY - this.resizeInitialMouseY;
-
-          let newWidth = this.initialWidth + dx;
-          let newHeight = this.initialHeight + dy;
-
-          newWidth = Math.max(minWidth, newWidth);
-          newHeight = Math.max(minHeight, newHeight);
-
-          const viewportWidth = document.documentElement.clientWidth;
-          const viewportHeight = document.documentElement.clientHeight;
-
-          if (this.initialCardX_resize + newWidth > viewportWidth) {
-            newWidth = viewportWidth - this.initialCardX_resize;
-            newWidth = Math.max(minWidth, newWidth);
-          }
-          if (this.initialCardY_resize + newHeight > viewportHeight) {
-            newHeight = viewportHeight - this.initialCardY_resize;
-            newHeight = Math.max(minHeight, newHeight);
-          }
-
-          this.element.style.width = `${newWidth}px`;
-          this.element.style.height = `${newHeight}px`;
-        }
-
-        _endResize() {
-          if (this.isResizing) {
-            this.isResizing = false;
-            if (activeInteractionWindow === this) {
-              activeInteractionWindow = null;
-              document.body.style.cursor = "default";
-            }
-          }
-        }
-
-        destroy() {
-          if (this.element && this.element.parentNode) {
-            this.element.remove();
-          }
-          delete windows[this.id];
+      FluentWindow.prototype._endDrag = function () {
+        if (this.isDragging) {
+          this.isDragging = false;
+          this.dragHandle.style.cursor = "grab";
           if (activeInteractionWindow === this) {
             activeInteractionWindow = null;
             document.body.style.cursor = "default";
           }
         }
-      }
+      };
 
-      document.addEventListener("pointermove", (e) => {
+      FluentWindow.prototype._startResize = function (e) {
+        if (e.target !== this.resizeHandle) {
+          return;
+        }
+        if (this.isDragging) return;
+
+        this._switchToTopLeftPositioningIfNeeded();
+        this.bringToFront();
+        this.isResizing = true;
+        activeInteractionWindow = this;
+        document.body.style.cursor = "nwse-resize";
+
+        this.initialWidth = this.element.offsetWidth;
+        this.initialHeight = this.element.offsetHeight;
+        this.initialCardX_resize = this.element.offsetLeft;
+        this.initialCardY_resize = this.element.offsetTop;
+
+        this.resizeInitialMouseX = e.clientX;
+        this.resizeInitialMouseY = e.clientY;
+      };
+
+      FluentWindow.prototype._doResize = function (e) {
+        if (!this.isResizing) return;
+        e.preventDefault();
+
+        var currentMouseX = e.clientX;
+        var currentMouseY = e.clientY;
+
+        var dx = currentMouseX - this.resizeInitialMouseX;
+        var dy = currentMouseY - this.resizeInitialMouseY;
+
+        var newWidth = this.initialWidth + dx;
+        var newHeight = this.initialHeight + dy;
+
+        newWidth = Math.max(minWidth, newWidth);
+        newHeight = Math.max(minHeight, newHeight);
+
+        var viewportWidth = document.documentElement.clientWidth;
+        var viewportHeight = document.documentElement.clientHeight;
+
+        if (this.initialCardX_resize + newWidth > viewportWidth) {
+          newWidth = viewportWidth - this.initialCardX_resize;
+        }
+        if (this.initialCardY_resize + newHeight > viewportHeight) {
+          newHeight = viewportHeight - this.initialCardY_resize;
+        }
+
+        newWidth = Math.max(minWidth, newWidth);
+        newHeight = Math.max(minHeight, newHeight);
+
+        this.element.style.width = newWidth + "px";
+        this.element.style.height = newHeight + "px";
+      };
+
+      FluentWindow.prototype._endResize = function () {
+        if (this.isResizing) {
+          this.isResizing = false;
+          if (activeInteractionWindow === this) {
+            activeInteractionWindow = null;
+            document.body.style.cursor = "default";
+          }
+        }
+      };
+
+      FluentWindow.prototype.destroy = function () {
+        if (this.id === "about-me" && discordStatusIntervalId !== null) {
+          clearInterval(discordStatusIntervalId);
+          discordStatusIntervalId = null;
+          console.log("Stopped Discord status polling interval.");
+        }
+        if (this.element && this.element.parentNode) {
+          this.element.remove();
+        }
+        delete windows[this.id];
+        if (activeInteractionWindow === this) {
+          activeInteractionWindow = null;
+          document.body.style.cursor = "default";
+        }
+      };
+
+      document.addEventListener("pointermove", function (e) {
         if (activeInteractionWindow) {
           if (
             activeInteractionWindow.isDragging ||
@@ -1296,25 +1363,19 @@
         }
       });
 
-      document.addEventListener("pointerup", () => {
+      document.addEventListener("pointerup", function () {
         if (activeInteractionWindow) {
           activeInteractionWindow._endDrag();
           activeInteractionWindow._endResize();
         }
       });
 
-      function createWindow(
-        id,
-        title,
-        titleIconUrl,
-        contentHtml,
-        options = {}
-      ) {
+      function createWindow(id, title, titleIconUrl, contentHtml, options) {
         if (windows[id]) {
           windows[id].bringToFront();
           return windows[id];
         }
-        const newWindow = new FluentWindow(
+        var newWindow = new FluentWindow(
           id,
           title,
           titleIconUrl,
@@ -1326,16 +1387,19 @@
       }
 
       async function fetchProjects(username) {
-        const apiUrl = `https://api.github.com/users/${username}/repos?sort=updated&per_page=20`;
+        var apiUrl =
+          "https://api.github.com/users/" +
+          username +
+          "/repos?sort=updated&per_page=20";
         try {
-          const response = await fetch(apiUrl);
+          var response = await fetch(apiUrl);
           if (!response.ok) {
             if (response.status === 403) {
               throw new Error("GitHub API rate limit exceeded.");
             }
-            throw new Error(`GitHub API error! status: ${response.status}`);
+            throw new Error("GitHub API error! status: " + response.status);
           }
-          const data = await response.json();
+          var data = await response.json();
           return data;
         } catch (error) {
           console.error("Error fetching projects:", error);
@@ -1359,7 +1423,6 @@
 
       function renderProjects(repos, containerElement) {
         if (!containerElement) return;
-
         containerElement.innerHTML = "";
 
         if (!repos || repos.length === 0) {
@@ -1368,37 +1431,49 @@
           return;
         }
 
-        const list = document.createElement("ul");
-        repos.forEach((repo) => {
-          const li = document.createElement("li");
-
-          const tags =
-            repo.topics && Array.isArray(repo.topics)
-              ? repo.topics.map((t) => `<span>${t}</span>`).join(" ")
+        var list = document.createElement("ul");
+        repos.forEach(function (repo) {
+          var li = document.createElement("li");
+          var topics = repo.topics;
+          var tags =
+            topics && Array.isArray(topics)
+              ? topics
+                  .map(function (t) {
+                    return "<span>" + t + "</span>";
+                  })
+                  .join(" ")
               : "";
-
-          const license = repo.license
-            ? `<span class="project-license">${repo.license.name}</span>`
+          var licenseName =
+            repo.license && repo.license.name ? repo.license.name : null;
+          var license = licenseName
+            ? '<span class="project-license">' + licenseName + "</span>"
             : "";
-
-          const lang = repo.language
-            ? `<span class="project-lang ${repo.language
-                .toLowerCase()
-                .replace(/[^a-z0-9]/g, "")}">${repo.language}</span>`
+          var lang = repo.language
+            ? '<span class="project-lang ' +
+              repo.language.toLowerCase().replace(/[^a-z0-9]/g, "") +
+              '">' +
+              repo.language +
+              "</span>"
             : '<span class="project-lang na">N/A</span>';
 
-          li.innerHTML = `<h3 class="project-title"><a href="${
-            repo.html_url
-          }" target="_blank" rel="noopener noreferrer">${
-            repo.name || "Unnamed Repo"
-          }</a> <span class="project-visibility">Public</span></h3>
-                          <p class="project-desc">${
-                            repo.description || "No description."
-                          }</p>
-                          <div class="project-tags">${tags}</div>
-                          <div class="project-meta">${lang}${license}<span class="project-date">Updated ${formatDate(
-            repo.updated_at
-          )}</span></div>`;
+          li.innerHTML =
+            '<h3 class="project-title"><a href="' +
+            repo.html_url +
+            '" target="_blank" rel="noopener noreferrer">' +
+            (repo.name || "Unnamed Repo") +
+            '</a> <span class="project-visibility">Public</span></h3>' +
+            '<p class="project-desc">' +
+            (repo.description || "No description.") +
+            "</p>" +
+            '<div class="project-tags">' +
+            tags +
+            "</div>" +
+            '<div class="project-meta">' +
+            lang +
+            license +
+            '<span class="project-date">Updated ' +
+            formatDate(repo.updated_at) +
+            "</span></div>";
           list.appendChild(li);
         });
         containerElement.appendChild(list);
@@ -1406,17 +1481,23 @@
 
       function displayError(error, containerElement) {
         if (!containerElement) return;
-        const errorMessage =
+        var errorMessage =
           error && error.message ? error.message : "Unknown error";
-        containerElement.innerHTML = `<p class="error-message">Error loading projects: ${errorMessage}</p>`;
+        containerElement.innerHTML =
+          '<p class="error-message">Error loading projects: ' +
+          errorMessage +
+          "</p>";
       }
 
-      const aboutMeContent = `
+      var aboutMeContent = `
         <div class="content-area">
-            <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
+            <div class="profile-header">
+                <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
+                <div id="custom-status-bubble" class="custom-status-bubble" style="display: none;"></div>
+            </div>
             <h1>MegaBytesMe (Ben)</h1>
             <div id="discord-status-container">
-                <h2>Current Status</h2>
+                <h2>Current Activity</h2>
                 <div id="discord-status-area">
                     <p class="loading-message">Loading Discord status...</p>
                 </div>
@@ -1433,19 +1514,20 @@
             </div></div>
         </div>
       `;
-      const aboutMeFooter = `
+      var aboutMeFooter = `
         <button class="fluent-button view-projects-button">View Projects</button>
         <button class="fluent-button view-rigs-button">View PC Rigs</button>
         <button class="fluent-button view-vehicles-button">View Vehicles</button>
       `;
 
-      const projectsInitialContent = `<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>`;
-      const projectsFooter = `
+      var projectsInitialContent =
+        '<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>';
+      var projectsFooter = `
         <button class="fluent-button close-window-button">Close GitHub Projects</button>
-        <a href="https://github.com/megabytesme" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
+        <a href="https://github.com/${GITHUB_USERNAME}" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
       `;
 
-      const pcRigsContent = `
+      var pcRigsContent = `
         <div class="content-area">
             <h1>My PC Rigs</h1>
             <h2>Main Desktop (2025)</h2>
@@ -1459,40 +1541,39 @@
             <p class="intro-text">Lightweight & low-power for light development and media on the go.</p>
         </div>
       `;
-      const pcRigsFooter = `<button class="fluent-button close-window-button">Close Rigs</button>`;
+      var pcRigsFooter =
+        '<button class="fluent-button close-window-button">Close Rigs</button>';
 
-      const vehiclesContent = `
+      var vehiclesContent = `
         <div class="content-area">
             <h1>My Vehicles</h1>
-
             <h2>Alfa Romeo 159 (Saloon)</h2>
             <img src="assets/images/alfaromeo159.jpg" alt="Red Alfa Romeo 159" class="vehicle-image">
             <ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>
             <p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>
-
             <h2>Chrysler Grand Voyager</h2>
             <img src="assets/images/chryslergrandvoyager.jpg" alt="Dark Blue Chrysler Grand Voyager" class="vehicle-image">
             <ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>
             <p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>
-
             <h2>MN MODEL MN128 (RC - Toy)</h2>
             <img src="assets/images/mnmodelmn128.jpg" alt="Silver MN Model MN128 Remote Control Car" class="vehicle-image">
             <ul><li>Motor: 540 (21T)</li><li>Transmission: 4WD Single-Speed</li><li>Color: Silver</li></ul>
             <p class="intro-text">My Remote-Controlled (RC) car. Modified with upgraded motor and bigger battery (2s LiPo).</p>
         </div>
       `;
-      const vehiclesFooter = `<button class="fluent-button close-window-button">Close Vehicles</button>`;
+      var vehiclesFooter =
+        '<button class="fluent-button close-window-button">Close Vehicles</button>';
 
       async function createProjectsWindow() {
-        const windowId = "projects";
+        var windowId = "projects";
         if (windows[windowId]) {
           windows[windowId].bringToFront();
           return;
         }
-        const existingWindowCount = Object.keys(windows).length;
-        const offsetX = 30 * existingWindowCount;
-        const offsetY = 30 * existingWindowCount;
-        const projectsWindow = createWindow(
+        var existingWindowCount = Object.keys(windows).length;
+        var offsetX = 30 * existingWindowCount;
+        var offsetY = 30 * existingWindowCount;
+        var projectsWindow = createWindow(
           windowId,
           "My Projects",
           "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg",
@@ -1502,13 +1583,13 @@
             initialOffset: { x: offsetX, y: offsetY },
           }
         );
-        const projectsListContainer = projectsWindow.element
+        var projectsListContainer = projectsWindow.element
           ? projectsWindow.element.querySelector(".projects-list")
           : null;
 
         if (projectsListContainer) {
           try {
-            const repos = await fetchProjects(GITHUB_USERNAME);
+            var repos = await fetchProjects(GITHUB_USERNAME);
             renderProjects(repos, projectsListContainer);
           } catch (error) {
             displayError(error, projectsListContainer);
@@ -1520,18 +1601,57 @@
         }
       }
 
+      async function pollAndUpdateDiscordStatus(userId) {
+        var result = await fetchDiscordStatus(userId);
+        var statusObject;
+
+        if (result.error) {
+          var errorMsgHtml =
+            '<p class="error-message">Could not load Discord status.</p>';
+          if (result.error === "not_supported") {
+            errorMsgHtml =
+              '<p class="error-message">Discord status not supported in this browser.</p>';
+          } else if (result.error === "not_found") {
+            errorMsgHtml =
+              '<p class="error-message">Discord user not found.</p>';
+          } else if (result.error === "fetch_failed") {
+            errorMsgHtml =
+              '<p class="error-message">Could not load status (Network/Security Issue).</p>';
+          }
+          console.warn("Discord status fetch failed: " + result.error);
+          statusObject = { mainHtml: errorMsgHtml, customStatus: null };
+        } else if (result.data) {
+          statusObject = parseDiscordStatus(result.data);
+        } else {
+          statusObject = {
+            mainHtml: '<p class="error-message">Unknown status error.</p>',
+            customStatus: null,
+          };
+        }
+
+        var aboutMeWindowExists = !!windows["about-me"];
+        if (aboutMeWindowExists) {
+          updateDiscordStatusUI(statusObject);
+        } else {
+          if (discordStatusIntervalId !== null) {
+            clearInterval(discordStatusIntervalId);
+            discordStatusIntervalId = null;
+            console.log(
+              "Stopped Discord status polling because About Me window is closed."
+            );
+          }
+        }
+      }
+
       function createAboutMeWindow() {
-        const windowId = "about-me";
-        const discordUserId = "374261881143296000";
+        var windowId = "about-me";
 
         if (windows[windowId]) {
           windows[windowId].bringToFront();
-          console.log("About Me window already exists. Bringing to front.");
           return;
         }
 
-        console.log("Creating About Me window...");
-        const aboutWindow = createWindow(
+        var aboutWindow = createWindow(
           windowId,
           "About Me - Ben",
           "https://avatars.githubusercontent.com/u/57240557?v=4",
@@ -1539,41 +1659,30 @@
           { footerHtml: aboutMeFooter }
         );
 
-        console.log("Fetching Discord status for user:", discordUserId);
-        fetchDiscordStatus(discordUserId)
-          .then((statusData) => {
-            let statusHtml;
-            if (statusData) {
-              console.log("Discord status data received:", statusData);
-              statusHtml = parseDiscordStatus(statusData);
-              console.log("Parsed status HTML:", statusHtml);
-            } else {
-              console.warn("Failed to fetch Discord status or user not found.");
-              statusHtml =
-                '<p class="error-message">Could not load Discord status.</p>';
-            }
-            updateDiscordStatusUI(statusHtml);
-          })
-          .catch((error) => {
-            console.error(
-              "Unhandled error during Discord status fetch/parse:",
-              error
+        pollAndUpdateDiscordStatus(DISCORD_USER_ID);
+
+        if (discordStatusIntervalId === null) {
+          if (!navigator.userAgent.includes("Edge/15.")) {
+            discordStatusIntervalId = setInterval(function () {
+              pollAndUpdateDiscordStatus(DISCORD_USER_ID);
+            }, DISCORD_POLL_INTERVAL_MS);
+            console.log(
+              "Started Discord status polling interval:",
+              discordStatusIntervalId
             );
-            updateDiscordStatusUI(
-              '<p class="error-message">Error displaying status.</p>'
-            );
-          });
+          }
+        }
       }
 
       function createPcRigsWindow() {
-        const windowId = "pc-rigs";
+        var windowId = "pc-rigs";
         if (windows[windowId]) {
           windows[windowId].bringToFront();
           return;
         }
-        const existingWindowCount = Object.keys(windows).length;
-        const offsetX = 30 * existingWindowCount;
-        const offsetY = 30 * existingWindowCount;
+        var existingWindowCount = Object.keys(windows).length;
+        var offsetX = 30 * existingWindowCount;
+        var offsetY = 30 * existingWindowCount;
         createWindow(
           windowId,
           "PC Rigs",
@@ -1587,14 +1696,14 @@
       }
 
       function createVehiclesWindow() {
-        const windowId = "vehicles";
+        var windowId = "vehicles";
         if (windows[windowId]) {
           windows[windowId].bringToFront();
           return;
         }
-        const existingWindowCount = Object.keys(windows).length;
-        const offsetX = 30 * existingWindowCount;
-        const offsetY = 30 * existingWindowCount;
+        var existingWindowCount = Object.keys(windows).length;
+        var offsetX = 30 * existingWindowCount;
+        var offsetY = 30 * existingWindowCount;
         createWindow(
           windowId,
           "My Vehicles",
@@ -1607,7 +1716,7 @@
         );
       }
 
-      const reopenBtn = document.getElementById("reopenAboutMeBtn");
+      var reopenBtn = document.getElementById("reopenAboutMeBtn");
       if (reopenBtn) {
         reopenBtn.addEventListener("click", createAboutMeWindow);
       }
@@ -1615,22 +1724,23 @@
       async function fetchSpotlightData() {
         const apiUrl = `https://megabytesme.ddns.net/api/spotlight-data`;
         try {
-          const response = await fetch(apiUrl);
+          var response = await fetch(apiUrl);
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error("Spotlight fetch error! Status: " + response.status);
+            throw new Error("HTTP error! status: " + response.status);
           }
-          const data = await response.json();
+          var data = await response.json();
           applySpotlightBackground(data);
         } catch (error) {
           console.error("Failed to fetch or apply Spotlight data:", error);
-          const copyrightDiv = document.getElementById("copyright-info");
+          var copyrightDiv = document.getElementById("copyright-info");
           if (copyrightDiv)
             copyrightDiv.textContent = "Error loading background info.";
         }
       }
 
       function applySpotlightBackground(cachedItems) {
-        const copyrightDiv = document.getElementById("copyright-info");
+        var copyrightDiv = document.getElementById("copyright-info");
         try {
           if (
             !cachedItems ||
@@ -1645,13 +1755,13 @@
             return;
           }
 
-          const randomIndex = Math.floor(Math.random() * cachedItems.length);
-          const selectedItem = cachedItems[randomIndex];
+          var randomIndex = Math.floor(Math.random() * cachedItems.length);
+          var selectedItem = cachedItems[randomIndex];
 
-          const landscapePath = selectedItem && selectedItem.landscapePath;
-          const portraitPath = selectedItem && selectedItem.portraitPath;
-          const copyrightText = (selectedItem && selectedItem.copyright) || "";
-          const title = (selectedItem && selectedItem.title) || "";
+          var landscapePath = selectedItem && selectedItem.landscapePath;
+          var portraitPath = selectedItem && selectedItem.portraitPath;
+          var copyrightText = (selectedItem && selectedItem.copyright) || "";
+          var title = (selectedItem && selectedItem.title) || "";
 
           if (!landscapePath || !portraitPath) {
             console.warn(
@@ -1663,7 +1773,7 @@
             return;
           }
 
-          const formatPath = (path) => {
+          var formatPath = function (path) {
             if (!path) return "";
             if (path.startsWith("http") || path.startsWith("/")) {
               return path;
@@ -1671,23 +1781,22 @@
             return `https://megabytesme.ddns.net/cached-images/${path}`;
           };
 
-          const fullLandscapeUrl = formatPath(landscapePath);
-          const fullPortraitUrl = formatPath(portraitPath);
+          var fullLandscapeUrl = formatPath(landscapePath);
+          var fullPortraitUrl = formatPath(portraitPath);
 
-          const setBackgroundDirectly = function () {
-            const isPortrait = window.matchMedia(
+          var setBackgroundDirectly = function () {
+            var isPortrait = window.matchMedia(
               "(orientation: portrait)"
             ).matches;
-            const imageUrl = isPortrait ? fullPortraitUrl : fullLandscapeUrl;
-
-            document.body.style.background = `url('${imageUrl}') no-repeat center center fixed`;
+            var imageUrl = isPortrait ? fullPortraitUrl : fullLandscapeUrl;
+            document.body.style.background =
+              'url("' + imageUrl + '") no-repeat center center fixed';
             document.body.style.backgroundSize = "cover";
-            console.log("Applied background:", imageUrl);
           };
 
           setBackgroundDirectly();
 
-          const mediaQuery = window.matchMedia("(orientation: portrait)");
+          var mediaQuery = window.matchMedia("(orientation: portrait)");
           if (mediaQuery.addEventListener) {
             mediaQuery.addEventListener("change", setBackgroundDirectly);
           } else if (mediaQuery.addListener) {
@@ -1695,7 +1804,7 @@
           }
 
           if (copyrightDiv) {
-            let displayText = copyrightText.trim();
+            var displayText = copyrightText.trim();
             if (
               title &&
               displayText &&
@@ -1723,129 +1832,159 @@
       }
 
       async function fetchDiscordStatus(userId) {
-        const apiUrl = `https://statusstream.many.win/users/${userId}`;
+        if (navigator.userAgent.includes("Edge/15.")) {
+          console.log(
+            "Edge 15 detected, skipping Discord status fetch due to TLS incompatibility."
+          );
+          return { error: "not_supported" };
+        }
 
+        var apiUrl = "https://statusstream.many.win/users/" + userId;
         try {
-          const response = await fetch(apiUrl);
+          var response = await fetch(apiUrl, { cache: "no-store" });
           if (!response.ok) {
             if (response.status === 404) {
-              console.warn(`StatusStream API: User ${userId} not found.`);
-              return null;
+              console.warn("StatusStream API: User " + userId + " not found.");
+              return { error: "not_found" };
             }
             throw new Error(
-              `StatusStream API error! status: ${response.status}`
+              "StatusStream API error! status: " + response.status
             );
           }
-          const data = await response.json();
-          if (!data || !data.statusstream) {
+          var data = await response.json();
+          var statusstream = data && data.statusstream;
+          if (!statusstream) {
             throw new Error(
               "Invalid data structure received from StatusStream API"
             );
           }
-          return data.statusstream;
+          return { data: statusstream };
         } catch (error) {
           console.error("Error fetching Discord status:", error);
-          return null;
+          var errorMsg = error && error.message;
+          if (errorMsg && errorMsg.toLowerCase().includes("failed to fetch")) {
+            return { error: "fetch_failed" };
+          }
+          return { error: "generic_error" };
         }
       }
 
       function parseDiscordStatus(statusData) {
+        var mainActivitiesHtml = "";
+        var customStatusText = null;
+        var presenceStatus =
+          statusData && statusData.presence ? statusData.presence : "offline";
+        var activities =
+          statusData && statusData.activities ? statusData.activities : [];
+
         if (
           !statusData ||
-          statusData.presence === "offline" ||
-          !statusData.activities ||
-          statusData.activities.length === 0
+          presenceStatus === "offline" ||
+          activities.length === 0
         ) {
-          return '<span class="status-offline">Offline / No specific activity</span>';
+          return {
+            mainHtml: '<span class="status-offline">Offline</span>',
+            customStatus: null,
+          };
         }
 
-        const activities = statusData.activities;
-        let displayActivity = null;
-        let customStatus = null;
+        for (var i = 0; i < activities.length; i++) {
+          var activity = activities[i];
+          var activityHtml = "";
+          var icon = "💡";
 
-        for (const activity of activities) {
           if (activity.type === 4 && activity.state) {
-            customStatus = activity.state;
-          } else if (
-            activity.type !== 4 &&
-            (activity.name || activity.details) &&
-            !displayActivity
-          ) {
-            displayActivity = activity;
+            customStatusText = activity.state;
+            continue;
           }
-        }
 
-        let statusHtml = "";
+          if (activity.type !== 4 && !activity.name && !activity.details) {
+            continue;
+          }
 
-        if (displayActivity) {
-          let icon = "💡";
-          let primaryText = "";
-          let secondaryText = "";
-          let tertiaryText = "";
-
-          if (
-            displayActivity.type === 2 &&
-            displayActivity.name === "Spotify"
-          ) {
-            icon = "🎧";
-            primaryText = displayActivity.details || "Unknown Song";
-            secondaryText = displayActivity.state
-              ? `by ${displayActivity.state}`
-              : "by Unknown Artist";
-            tertiaryText =
-              displayActivity.assets && displayActivity.assets.largeText
-                ? `(${displayActivity.assets.largeText})`
-                : ""; // Album in brackets
-          } else if (
-            displayActivity.applicationId === "383226320970055681" &&
-            displayActivity.assets &&
-            displayActivity.assets.largeText
-          ) {
-            icon = "💻";
-            primaryText = displayActivity.assets.largeText;
-            secondaryText = displayActivity.state || "";
+          var primaryText = "",
+            secondaryText = "",
             tertiaryText = "";
-          } else if (displayActivity.type === 0) {
+          var assets = activity.assets;
+          var largeText = assets && assets.largeText;
+          var state = activity.state;
+          var details = activity.details;
+          var name = activity.name;
+          var appId = activity.applicationId;
+
+          if (activity.type === 2 && name === "Spotify") {
+            icon = "🎧";
+            primaryText = details || "Unknown Song";
+            secondaryText = state ? "by " + state : "";
+            tertiaryText = largeText ? "(" + largeText + ")" : "";
+          } else if (appId === "383226320970055681" && largeText) {
+            icon = "💻";
+            primaryText = largeText;
+            secondaryText = state || "";
+          } else if (activity.type === 0) {
             icon = "🎮";
-            primaryText = `Playing ${displayActivity.name}`;
-            secondaryText = displayActivity.details || "";
-            tertiaryText = displayActivity.state || "";
-          } else if (displayActivity.type === 3) {
+            primaryText = "Playing " + name;
+            secondaryText = details || "";
+            tertiaryText = state || "";
+          } else if (activity.type === 3) {
             icon = "📺";
-            primaryText = `Watching ${displayActivity.name}`;
-            secondaryText = displayActivity.details || "";
-            tertiaryText = displayActivity.state || "";
+            primaryText = "Watching " + name;
+            secondaryText = details || "";
+            tertiaryText = state || "";
+          } else if (activity.type === 1) {
+            icon = "🎙️";
+            primaryText = "Streaming " + name;
+            secondaryText = details || "";
+            tertiaryText = state || "";
           } else {
             icon = "💡";
-            primaryText = displayActivity.name || "Unknown Activity";
-            secondaryText = displayActivity.details || "";
-            tertiaryText = displayActivity.state || "";
+            primaryText = name || "Activity";
+            secondaryText = details || "";
+            tertiaryText = state || "";
           }
 
-          statusHtml = `${icon} ${primaryText}`;
-          if (secondaryText) statusHtml += ` ${secondaryText}`;
-          if (tertiaryText) statusHtml += ` ${tertiaryText}`;
-        } else if (customStatus) {
-          statusHtml = `💬 ${customStatus}`;
-        } else {
-          statusHtml = `✨ Online`;
+          activityHtml = icon + " " + primaryText;
+          if (secondaryText) activityHtml += " " + secondaryText;
+          if (tertiaryText) activityHtml += " " + tertiaryText;
+
+          mainActivitiesHtml +=
+            '<p class="activity-item">' + activityHtml + "</p>";
         }
 
-        return `<span class="status-online">${statusHtml}</span>`;
+        if (mainActivitiesHtml === "") {
+          mainActivitiesHtml = '<p class="activity-item">✨ Currently Idle</p>';
+        }
+
+        mainActivitiesHtml =
+          '<span class="status-online">Online</span>' + mainActivitiesHtml;
+
+        return { mainHtml: mainActivitiesHtml, customStatus: customStatusText };
       }
 
-      function updateDiscordStatusUI(statusHtml) {
-        const statusElement = document.getElementById("discord-status-area");
-        if (statusElement) {
-          statusElement.innerHTML = statusHtml;
+      function updateDiscordStatusUI(statusResult) {
+        var statusAreaElement = document.getElementById("discord-status-area");
+        var bubbleElement = document.getElementById("custom-status-bubble");
+
+        if (!statusAreaElement || !bubbleElement) {
+          return;
+        }
+
+        statusAreaElement.innerHTML =
+          statusResult.mainHtml ||
+          '<p class="error-message">Error loading status.</p>';
+
+        if (statusResult.customStatus) {
+          bubbleElement.textContent = statusResult.customStatus;
+          bubbleElement.style.display = "";
+          bubbleElement.classList.add("visible");
         } else {
-          console.warn(
-            "Discord status area element not found when trying to update UI."
-          );
+          bubbleElement.textContent = "";
+          bubbleElement.style.display = "none";
+          bubbleElement.classList.remove("visible");
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", function () {
         fetchSpotlightData();
         createAboutMeWindow();
       });
