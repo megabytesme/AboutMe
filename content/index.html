@@ -1067,28 +1067,111 @@
     <div id="copyright-info"></div>
 
     <script>
+      var GITHUB_USERNAME = "megabytesme";
+      var DISCORD_USER_ID = "374261881143296000";
+      var LANYARD_RECONNECT_DELAY = 5000;
+      var LANYARD_MAX_WS_RETRIES = 3;
+      var LANYARD_POLL_INTERVAL_MS = 20000;
+      var LANYARD_MAX_POLL_FAILURES = 5;
+      var MIN_WINDOW_WIDTH = 320;
+      var MIN_WINDOW_HEIGHT = 400;
+      var SPOTLIGHT_API_URL = "https://megabytesme.ddns.net/api/spotlight-data";
+      var SPOTLIGHT_IMAGE_BASE = "https://megabytesme.ddns.net/cached-images/";
+      var FALLBACK_LANDSCAPE_IMG =
+        "https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg";
+      var FALLBACK_PORTRAIT_IMG =
+        "https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg";
+      var DEFAULT_WINDOW_ICON = "https://via.placeholder.com/20";
+      var GITHUB_ICON_URL =
+        "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg";
+      var PC_RIGS_ICON_URL =
+        "https://img.icons8.com/fluency/48/workstation.png";
+      var VEHICLES_ICON_URL = "https://img.icons8.com/fluency/48/car.png";
+      var PROFILE_PIC_URL =
+        "https://avatars.githubusercontent.com/u/57240557?v=4";
+
       var windows = {};
       var highestZ = 1;
       var activeInteractionWindow = null;
-
-      var GITHUB_USERNAME = "megabytesme";
-      var DISCORD_USER_ID = "374261881143296000";
-
       var lanyardSocket = null;
       var lanyardHeartbeatInterval = null;
       var lanyardReconnectTimeout = null;
-      var LANYARD_RECONNECT_DELAY = 5000;
       var lanyardWSRetryCount = 0;
-      var LANYARD_MAX_WS_RETRIES = 3;
-
       var lanyardPollIntervalId = null;
-      var LANYARD_POLL_INTERVAL_MS = 20000;
       var lanyardPollFailureCount = 0;
-      var LANYARD_MAX_POLL_FAILURES = 5;
       var lanyardUpdateMethod = null;
 
-      var minWidth = 320;
-      var minHeight = 400;
+      var aboutMeContent = `
+        <div class="content-area">
+            <div class="profile-header">
+                <img src="${PROFILE_PIC_URL}" alt="Profile Picture" class="profile-pic">
+                <div id="custom-status-bubble" class="custom-status-bubble" style="display: none;"></div>
+            </div>
+            <h1>MegaBytesMe (Ben)</h1>
+            <div id="discord-status-container">
+                <h2>Current Activity</h2>
+                <div id="discord-status-area">
+                    <p class="loading-message">Loading Discord status...</p>
+                </div>
+            </div>
+            <p class="intro-text">Hey! 👋🏻<br>I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.</p>
+            <p class="intro-text">I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.</p>
+            <h2>Technologies & Languages</h2><p>I primarily work with:</p>
+            <ul><li>C#</li><li>C++</li><li>Java</li><li>Lua</li><li>TypeScript</li></ul>
+            <p class="tech-details">I have also tinkered with technologies and concepts such as .NET, React, CMake, Docker, JBeam (BeamNG.drive's vehicle description language), and various game modding APIs including Fabric (Minecraft) alongside working with RGB SDKs (Primarily iCue). I also have worked with cloud services - Beyond AWS, I also have my own cloud instance too which I run containers on.</p>
+            <h2>Technologies I have worked with:</h2>
+            <div class="scrolling-icons-container"><div class="scrolling-icons-track">
+                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
+                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
+            </div></div>
+        </div>
+      `;
+      var aboutMeFooter = `
+        <button class="fluent-button view-projects-button">View Projects</button>
+        <button class="fluent-button view-rigs-button">View PC Rigs</button>
+        <button class="fluent-button view-vehicles-button">View Vehicles</button>
+      `;
+      var projectsInitialContent =
+        '<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>';
+      var projectsFooter = `
+        <button class="fluent-button close-window-button">Close GitHub Projects</button>
+        <a href="https://github.com/${GITHUB_USERNAME}" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
+      `;
+      var pcRigsContent = `
+        <div class="content-area">
+            <h1>My PC Rigs</h1>
+            <h2>Main Desktop (2025)</h2>
+            <ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>
+            <p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>
+            <h2>Surface Book 3 15" Laptop</h2>
+            <ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA Quadro RTX 3000 Mobile</li><li>RAM: 32GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
+            <p class="intro-text">Portable power for gaming and development on the go.</p>
+            <h2>Surface Pro X SQ1 LTE" Tablet</h2>
+            <ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomn Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
+            <p class="intro-text">Lightweight & low-power for light development and media on the go.</p>
+        </div>
+      `;
+      var pcRigsFooter =
+        '<button class="fluent-button close-window-button">Close Rigs</button>';
+      var vehiclesContent = `
+        <div class="content-area">
+            <h1>My Vehicles</h1>
+            <h2>Alfa Romeo 159 (Saloon)</h2>
+            <img src="assets/images/alfaromeo159.jpg" alt="Red Alfa Romeo 159" class="vehicle-image">
+            <ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>
+            <p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>
+            <h2>Chrysler Grand Voyager</h2>
+            <img src="assets/images/chryslergrandvoyager.jpg" alt="Dark Blue Chrysler Grand Voyager" class="vehicle-image">
+            <ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>
+            <p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>
+            <h2>MN MODEL MN128 (RC - Toy)</h2>
+            <img src="assets/images/mnmodelmn128.jpg" alt="Silver MN Model MN128 Remote Control Car" class="vehicle-image">
+            <ul><li>Motor: 540 (21T)</li><li>Transmission: 4WD Single-Speed</li><li>Color: Silver</li></ul>
+            <p class="intro-text">My Remote-Controlled (RC) car. Modified with upgraded motor and bigger battery (2s LiPo).</p>
+        </div>
+      `;
+      var vehiclesFooter =
+        '<button class="fluent-button close-window-button">Close Vehicles</button>';
 
       function FluentWindow(id, title, titleIconUrl, contentHtml, options) {
         options = options || {};
@@ -1145,7 +1228,7 @@
         card.innerHTML =
           '<div class="drag-handle">' +
           '<img src="' +
-          (titleIconUrl || "https://via.placeholder.com/20") +
+          (titleIconUrl || DEFAULT_WINDOW_ICON) +
           '" alt="Window Icon" class="handle-pic">' +
           '<h1 class="handle-title">' +
           title +
@@ -1439,8 +1522,8 @@
         var dy = currentMouseY - this.resizeInitialMouseY;
         var newWidth = this.initialWidth + dx;
         var newHeight = this.initialHeight + dy;
-        newWidth = Math.max(minWidth, newWidth);
-        newHeight = Math.max(minHeight, newHeight);
+        newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
+        newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
         var viewportWidth = document.documentElement.clientWidth;
         var viewportHeight = document.documentElement.clientHeight;
         if (this.initialCardX_resize + newWidth > viewportWidth) {
@@ -1449,8 +1532,8 @@
         if (this.initialCardY_resize + newHeight > viewportHeight) {
           newHeight = viewportHeight - this.initialCardY_resize;
         }
-        newWidth = Math.max(minWidth, newWidth);
-        newHeight = Math.max(minHeight, newHeight);
+        newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
+        newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
         this.element.style.width = newWidth + "px";
         this.element.style.height = newHeight + "px";
       };
@@ -1530,32 +1613,6 @@
           element.detachEvent("on" + eventName, callback);
         }
       }
-
-      addEvent(document, "DOMContentLoaded", function () {
-        var usePointer = !!window.PointerEvent;
-        var move = usePointer ? "pointermove" : "mousemove";
-        var up = usePointer ? "pointerup" : "mouseup";
-        addEvent(document, move, function (e) {
-          if (activeInteractionWindow) {
-            if (activeInteractionWindow.isDragging)
-              activeInteractionWindow._doDrag(e);
-            if (activeInteractionWindow.isResizing)
-              activeInteractionWindow._doResize(e);
-          }
-        });
-        addEvent(document, up, function (e) {
-          if (activeInteractionWindow) {
-            activeInteractionWindow._endDrag(e);
-            activeInteractionWindow._endResize(e);
-          }
-          if (!activeInteractionWindow) {
-            document.body.style.cursor = "default";
-          }
-        });
-        fetchSpotlightData();
-        createAboutMeWindow();
-      });
-
       function createWindow(id, title, titleIconUrl, contentHtml, options) {
         if (windows[id]) {
           windows[id].bringToFront();
@@ -1571,7 +1628,6 @@
         windows[id] = newWindow;
         return newWindow;
       }
-
       function makeRequest(url, callback) {
         try {
           var xhr = new XMLHttpRequest();
@@ -1606,20 +1662,6 @@
           callback(e, null);
         }
       }
-
-      function fetchProjects(username, callback) {
-        var apiUrl =
-          "https://api.github.com/users/" +
-          username +
-          "/repos?sort=updated&per_page=20";
-        makeRequest(apiUrl, function (error, data) {
-          if (error) {
-            console.error("Error fetching projects:", error);
-          }
-          callback(error, data);
-        });
-      }
-
       function formatDate(isoString) {
         if (!isoString) return "N/A";
         try {
@@ -1647,6 +1689,18 @@
         }
       }
 
+      function fetchProjects(username, callback) {
+        var apiUrl =
+          "https://api.github.com/users/" +
+          username +
+          "/repos?sort=updated&per_page=20";
+        makeRequest(apiUrl, function (error, data) {
+          if (error) {
+            console.error("Error fetching projects:", error);
+          }
+          callback(error, data);
+        });
+      }
       function renderProjects(repos, containerElement) {
         if (!containerElement) return;
         containerElement.innerHTML = "";
@@ -1655,7 +1709,6 @@
             '<p class="error-message">No public projects found or failed to load.</p>';
           return;
         }
-
         var list = document.createElement("ul");
         for (var i = 0; i < repos.length; i++) {
           var repo = repos[i];
@@ -1710,80 +1763,6 @@
           errorMessage +
           "</p>";
       }
-
-      var aboutMeContent = `
-        <div class="content-area">
-            <div class="profile-header">
-                <img src="https://avatars.githubusercontent.com/u/57240557?v=4" alt="Profile Picture" class="profile-pic">
-                <div id="custom-status-bubble" class="custom-status-bubble" style="display: none;"></div>
-            </div>
-            <h1>MegaBytesMe (Ben)</h1>
-            <div id="discord-status-container">
-                <h2>Current Activity</h2>
-                <div id="discord-status-area">
-                    <p class="loading-message">Loading Discord status...</p>
-                </div>
-            </div>
-            <p class="intro-text">Hey! 👋🏻<br>I'm Ben, a student and developer with a passion for trying out new areas of software development, from utilities, webapps and modding games to university projects and desktop applications.</p>
-            <p class="intro-text">I have a keen interest on unique platforms (ranging from Windows 10 Mobile to the Nintendo Wii U) - They hold a special place to me for some reason 😂. Beyond software development, I also have an interest in electronics, cars and DIY.</p>
-            <h2>Technologies & Languages</h2><p>I primarily work with:</p>
-            <ul><li>C#</li><li>C++</li><li>Java</li><li>Lua</li><li>TypeScript</li></ul>
-            <p class="tech-details">I have also tinkered with technologies and concepts such as .NET, React, CMake, Docker, JBeam (BeamNG.drive's vehicle description language), and various game modding APIs including Fabric (Minecraft) alongside working with RGB SDKs (Primarily iCue). I also have worked with cloud services - Beyond AWS, I also have my own cloud instance too which I run containers on.</p>
-            <h2>Technologies I have worked with:</h2>
-            <div class="scrolling-icons-container"><div class="scrolling-icons-track">
-                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
-                 <img src="https://edent.github.io/SuperTinyIcons/images/svg/visualstudiocode.svg" alt="Visual Studio Code logo"><img src="https://tech-stack-icons.com/assets/light/csharp.svg" alt="C# logo"><img src="https://tech-stack-icons.com/assets/light/c++.svg" alt="C++ logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/java.svg" alt="Java logo"><img src="https://tech-stack-icons.com/assets/light/lua.svg" alt="Lua logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/typescript.svg" alt="TypeScript logo"><img src="https://tech-stack-icons.com/assets/light/python.svg" alt="Python logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/react.svg" alt="React logo"><img src="https://tech-stack-icons.com/assets/light/html5.svg" alt="HTML5 logo"><img src="https://tech-stack-icons.com/assets/light/css3.svg" alt="CSS3 logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/microsoft.svg" alt="Microsoft logo"><img src="https://tech-stack-icons.com/assets/light/git.svg" alt="Git logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/gitlab.svg" alt="GitLab logo"><img src="https://tech-stack-icons.com/assets/light/github.svg" alt="GitHub logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/docker.svg" alt="Docker logo"><img src="https://tech-stack-icons.com/assets/light/aws.svg" alt="AWS logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/azure.svg" alt="Microsoft Azure logo"><img src="https://tech-stack-icons.com/assets/light/postgresql.svg" alt="PostgreSQL logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/terraform.svg" alt="Terraform logo"><img src="https://tech-stack-icons.com/assets/light/npm.svg" alt="NPM logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/slack.svg" alt="Slack logo"><img src="https://edent.github.io/SuperTinyIcons/images/svg/zoom.svg" alt="Zoom logo"><img src="https://tech-stack-icons.com/assets/light/onedrive.svg" alt="OneDrive logo">
-            </div></div>
-        </div>
-      `;
-      var aboutMeFooter = `
-        <button class="fluent-button view-projects-button">View Projects</button>
-        <button class="fluent-button view-rigs-button">View PC Rigs</button>
-        <button class="fluent-button view-vehicles-button">View Vehicles</button>
-      `;
-      var projectsInitialContent =
-        '<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>';
-      var projectsFooter = `
-        <button class="fluent-button close-window-button">Close GitHub Projects</button>
-        <a href="https://github.com/${GITHUB_USERNAME}" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>
-      `;
-
-      var pcRigsContent = `
-        <div class="content-area">
-            <h1>My PC Rigs</h1>
-            <h2>Main Desktop (2025)</h2>
-            <ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>
-            <p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>
-            <h2>Surface Book 3 15" Laptop</h2>
-            <ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA Quadro RTX 3000 Mobile</li><li>RAM: 32GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
-            <p class="intro-text">Portable power for gaming and development on the go.</p>
-            <h2>Surface Pro X SQ1 LTE" Tablet</h2>
-            <ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomn Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>
-            <p class="intro-text">Lightweight & low-power for light development and media on the go.</p>
-        </div>
-      `;
-      var pcRigsFooter =
-        '<button class="fluent-button close-window-button">Close Rigs</button>';
-
-      var vehiclesContent = `
-        <div class="content-area">
-            <h1>My Vehicles</h1>
-            <h2>Alfa Romeo 159 (Saloon)</h2>
-            <img src="assets/images/alfaromeo159.jpg" alt="Red Alfa Romeo 159" class="vehicle-image">
-            <ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>
-            <p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>
-            <h2>Chrysler Grand Voyager</h2>
-            <img src="assets/images/chryslergrandvoyager.jpg" alt="Dark Blue Chrysler Grand Voyager" class="vehicle-image">
-            <ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>
-            <p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>
-            <h2>MN MODEL MN128 (RC - Toy)</h2>
-            <img src="assets/images/mnmodelmn128.jpg" alt="Silver MN Model MN128 Remote Control Car" class="vehicle-image">
-            <ul><li>Motor: 540 (21T)</li><li>Transmission: 4WD Single-Speed</li><li>Color: Silver</li></ul>
-            <p class="intro-text">My Remote-Controlled (RC) car. Modified with upgraded motor and bigger battery (2s LiPo).</p>
-        </div>
-      `;
-      var vehiclesFooter =
-        '<button class="fluent-button close-window-button">Close Vehicles</button>';
 
       function connectLanyardSocket(userId) {
         lanyardUpdateMethod = "websocket";
@@ -1927,16 +1906,19 @@
         }
         if (lanyardWSRetryCount > LANYARD_MAX_WS_RETRIES) {
           console.error(
-            "Lanyard: Max WebSocket retries reached. Cannot use WebSockets."
+            "Lanyard: Max WebSocket retries reached. Switching to polling."
           );
           updateDiscordStatusUI({
             contentHtml:
-              '<p class="error-message">WebSocket Error: Could not connect.</p>',
+              '<p class="error-message">WebSocket Error. Falling back to polling...</p>',
             customStatus: null,
           });
           if (lanyardReconnectTimeout) {
             clearTimeout(lanyardReconnectTimeout);
             lanyardReconnectTimeout = null;
+          }
+          if (windows["about-me"]) {
+            startLanyardPolling(userId);
           }
         } else {
           scheduleLanyardReconnect(userId);
@@ -1989,7 +1971,6 @@
           }
         }, LANYARD_RECONNECT_DELAY);
       }
-
       function pollLanyardStatus(userId) {
         var apiUrl = "https://api.lanyard.rest/v1/users/" + userId;
         makeRequest(apiUrl, function (error, responseData) {
@@ -1999,7 +1980,7 @@
               "Lanyard poll failed (Attempt " + lanyardPollFailureCount + "):",
               error || "Invalid response"
             );
-            if (lanyardPollFailureCount > LANYARD_MAX_POLL_FAILURES) {
+            if (lanyardPollFailureCount >= LANYARD_MAX_POLL_FAILURES) {
               console.error(
                 "Lanyard: Max polling failures reached. Stopping polling."
               );
@@ -2031,7 +2012,7 @@
               "Lanyard poll: Success false or no data.",
               responseData
             );
-            if (lanyardPollFailureCount > LANYARD_MAX_POLL_FAILURES) {
+            if (lanyardPollFailureCount >= LANYARD_MAX_POLL_FAILURES) {
               stopLanyardPolling();
               updateDiscordStatusUI({
                 contentHtml:
@@ -2077,6 +2058,9 @@
           lanyardPollIntervalId = null;
           console.log("Stopped Lanyard polling.");
         }
+        if (lanyardUpdateMethod === "polling") {
+          lanyardUpdateMethod = null;
+        }
       }
       function stopLanyardUpdates() {
         if (lanyardUpdateMethod === "websocket") {
@@ -2085,12 +2069,14 @@
           stopLanyardPolling();
         }
         lanyardUpdateMethod = null;
-        updateDiscordStatusUI({
-          contentHtml: '<p class="error-message">Presence updates stopped.</p>',
-          customStatus: null,
-        });
+        if (document.getElementById("discord-status-area")) {
+          updateDiscordStatusUI({
+            contentHtml:
+              '<p class="error-message">Presence updates stopped.</p>',
+            customStatus: null,
+          });
+        }
       }
-
       function parseLanyardStatus(lanyardData) {
         var finalContentHtml = "";
         var customStatusText = null;
@@ -2182,7 +2168,6 @@
             var appId = activity.application_id;
             if (largeImage) {
               if (largeImage.indexOf("spotify:") === 0) {
-                /* skip */
               } else if (largeImage.indexOf("mp:") === 0) {
                 imageUrl =
                   "https://media.discordapp.net/" + largeImage.substring(3);
@@ -2397,7 +2382,7 @@
         var aboutWindow = createWindow(
           windowId,
           "About Me - Ben",
-          "https://avatars.githubusercontent.com/u/57240557?v=4",
+          PROFILE_PIC_URL,
           aboutMeContent,
           { footerHtml: aboutMeFooter }
         );
@@ -2425,7 +2410,7 @@
         var projectsWindow = createWindow(
           windowId,
           "My Projects",
-          "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg",
+          GITHUB_ICON_URL,
           projectsInitialContent,
           {
             footerHtml: projectsFooter,
@@ -2461,16 +2446,10 @@
         var existingWindowCount = Object.keys(windows).length;
         var offsetX = 30 * existingWindowCount;
         var offsetY = 30 * existingWindowCount;
-        createWindow(
-          windowId,
-          "PC Rigs",
-          "https://img.icons8.com/fluency/48/workstation.png",
-          pcRigsContent,
-          {
-            footerHtml: pcRigsFooter,
-            initialOffset: { x: offsetX, y: offsetY },
-          }
-        );
+        createWindow(windowId, "PC Rigs", PC_RIGS_ICON_URL, pcRigsContent, {
+          footerHtml: pcRigsFooter,
+          initialOffset: { x: offsetX, y: offsetY },
+        });
       }
       function createVehiclesWindow() {
         var windowId = "vehicles";
@@ -2484,7 +2463,7 @@
         createWindow(
           windowId,
           "My Vehicles",
-          "https://img.icons8.com/fluency/48/car.png",
+          VEHICLES_ICON_URL,
           vehiclesContent,
           {
             footerHtml: vehiclesFooter,
@@ -2493,19 +2472,13 @@
         );
       }
 
-      var reopenBtn = document.getElementById("reopenAboutMeBtn");
-      if (reopenBtn) {
-        addEvent(reopenBtn, "click", createAboutMeWindow);
-      }
-
       function fetchSpotlightData() {
-        var apiUrl = "https://megabytesme.ddns.net/api/spotlight-data";
-        makeRequest(apiUrl, function (error, data) {
-          if (error) {
-            console.error("Failed to fetch or apply Spotlight data:", error);
-            var copyrightDiv = document.getElementById("copyright-info");
-            if (copyrightDiv)
-              copyrightDiv.textContent = "Error loading background info.";
+        makeRequest(SPOTLIGHT_API_URL, function (error, data) {
+          if (error || !data || !Array.isArray(data) || data.length === 0) {
+            console.error(
+              "Failed to fetch or got invalid Spotlight data:",
+              error || "Invalid data"
+            );
             applyFallbackBackgroundStyles();
           } else {
             applySpotlightBackground(data);
@@ -2515,19 +2488,6 @@
       function applySpotlightBackground(cachedItems) {
         var copyrightDiv = document.getElementById("copyright-info");
         try {
-          if (
-            !cachedItems ||
-            !Array.isArray(cachedItems) ||
-            cachedItems.length === 0
-          ) {
-            console.warn(
-              "Received empty or invalid Spotlight data. Using fallback backgrounds."
-            );
-            if (copyrightDiv)
-              copyrightDiv.textContent = "Image information unavailable";
-            applyFallbackBackgroundStyles();
-            return;
-          }
           var randomIndex = Math.floor(Math.random() * cachedItems.length);
           var selectedItem = cachedItems[randomIndex];
           var landscapePath =
@@ -2536,9 +2496,10 @@
             selectedItem && selectedItem.portraitPathCompressed;
           var copyrightText = (selectedItem && selectedItem.copyright) || "";
           var title = (selectedItem && selectedItem.title) || "";
+
           if (!landscapePath || !portraitPath) {
             console.warn(
-              "Selected cached item missing image paths:",
+              "Selected cached item missing required image paths:",
               selectedItem
             );
             if (copyrightDiv)
@@ -2546,6 +2507,7 @@
             applyFallbackBackgroundStyles();
             return;
           }
+
           var formatPath = function (path) {
             if (!path) return "";
             if (
@@ -2556,8 +2518,9 @@
             ) {
               return path;
             }
-            return "https://megabytesme.ddns.net/cached-images/" + path;
+            return SPOTLIGHT_IMAGE_BASE + path;
           };
+
           var fullLandscapeUrl = formatPath(landscapePath);
           var fullPortraitUrl = formatPath(portraitPath);
           var setBackgroundBasedOnOrientation = function () {
@@ -2621,17 +2584,16 @@
           applyFallbackBackgroundStyles();
         }
       }
+
       function applyFallbackBackgroundStyles() {
         console.log("Applying fallback background images.");
-        var fallbackLandscape =
-          "https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg";
-        var fallbackPortrait =
-          "https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg";
         var setFallbackBackground = function () {
           var isPortrait =
             "matchMedia" in window &&
             window.matchMedia("(orientation: portrait)").matches;
-          var imageUrl = isPortrait ? fallbackPortrait : fallbackLandscape;
+          var imageUrl = isPortrait
+            ? FALLBACK_PORTRAIT_IMG
+            : FALLBACK_LANDSCAPE_IMG;
           document.body.style.backgroundImage = 'url("' + imageUrl + '")';
           document.body.style.backgroundRepeat = "no-repeat";
           document.body.style.backgroundPosition = "center center";
@@ -2640,11 +2602,11 @@
           if (document.documentElement.style.setProperty) {
             document.documentElement.style.setProperty(
               "--bg-image-landscape",
-              'url("' + fallbackLandscape + '")'
+              'url("' + FALLBACK_LANDSCAPE_IMG + '")'
             );
             document.documentElement.style.setProperty(
               "--bg-image-portrait",
-              'url("' + fallbackPortrait + '")'
+              'url("' + FALLBACK_PORTRAIT_IMG + '")'
             );
           }
         };
@@ -2657,8 +2619,36 @@
             mediaQuery.addListener(setFallbackBackground);
           }
         }
-        var copyrightDiv = document.getElementById("copyright-info");
-        if (copyrightDiv) copyrightDiv.textContent = "Default background";
+      }
+
+      addEvent(document, "DOMContentLoaded", function () {
+        var usePointer = !!window.PointerEvent;
+        var move = usePointer ? "pointermove" : "mousemove";
+        var up = usePointer ? "pointerup" : "mouseup";
+        addEvent(document, move, function (e) {
+          if (activeInteractionWindow) {
+            if (activeInteractionWindow.isDragging)
+              activeInteractionWindow._doDrag(e);
+            if (activeInteractionWindow.isResizing)
+              activeInteractionWindow._doResize(e);
+          }
+        });
+        addEvent(document, up, function (e) {
+          if (activeInteractionWindow) {
+            activeInteractionWindow._endDrag(e);
+            activeInteractionWindow._endResize(e);
+          }
+          if (!activeInteractionWindow) {
+            document.body.style.cursor = "default";
+          }
+        });
+        fetchSpotlightData();
+        createAboutMeWindow();
+      });
+
+      var reopenBtn = document.getElementById("reopenAboutMeBtn");
+      if (reopenBtn) {
+        addEvent(reopenBtn, "click", createAboutMeWindow);
       }
     </script>
   </body>
