@@ -539,27 +539,69 @@
         min-height: 1.5em;
       }
       .activity-item {
-        margin: 0 0 5px 0;
-        padding: 5px 0px;
-        line-height: 1.4;
-        display: block;
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        min-height: 40px;
       }
       .activity-item:last-child {
         margin-bottom: 0;
       }
+      .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        margin-right: 10px;
+        flex-shrink: 0;
+        object-fit: cover;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      .activity-icon.spotify-art {
+        border-radius: 4px;
+      }
+      .activity-text {
+        flex-grow: 1;
+        line-height: 1.4;
+      }
+      .activity-text strong {
+        font-weight: 600;
+        color: var(--heading-color, #ffffff);
+      }
+
+      .status-container {
+        margin-bottom: 10px;
+      }
+
+      .status-online,
+      .status-idle,
+      .status-dnd,
+      .status-offline {
+        display: inline-block;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
 
       .status-online {
-        display: block;
-        margin-bottom: 5px;
-        color: #3ba55c;
-        font-weight: 600;
+        color: #ffffff;
+        background-color: #3ba55c;
       }
       .status-offline {
-        display: block;
-        margin-bottom: 5px;
-        color: #ed4245;
+        color: #b9bbbe;
+        background-color: #747f8d;
         font-style: italic;
       }
+      .status-idle {
+        color: #ffffff;
+        background-color: #faa61a;
+        font-style: italic;
+      }
+      .status-dnd {
+        color: #ffffff;
+        background-color: #ed4245;
+      }
+
       #discord-status-area .loading-message,
       #discord-status-area .error-message {
         padding: 0;
@@ -737,11 +779,27 @@
         #discord-status-area {
           color: var(--body-text, #201f1e);
         }
+        .activity-icon {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        .activity-text strong {
+          color: var(--heading-color, #1a1a1a);
+        }
         .status-online {
-          color: #2d9d4c;
+          color: #ffffff;
+          background-color: #2d9d4c;
         }
         .status-offline {
-          color: #d83c3e;
+          color: #ffffff;
+          background-color: #747f8d;
+        }
+        .status-idle {
+          color: #000000;
+          background-color: #e69900;
+        }
+        .status-dnd {
+          color: #ffffff;
+          background-color: #d83c3e;
         }
       }
 
@@ -999,6 +1057,9 @@
         .custom-status-bubble::before {
           border-top-color: var(--card-bg);
         }
+        .activity-text strong {
+          color: var(--heading-color);
+        }
       }
     </style>
   </head>
@@ -1010,11 +1071,22 @@
       var windows = {};
       var highestZ = 1;
       var activeInteractionWindow = null;
-      var discordStatusIntervalId = null;
 
       var GITHUB_USERNAME = "megabytesme";
       var DISCORD_USER_ID = "374261881143296000";
-      var DISCORD_POLL_INTERVAL_MS = 30000;
+
+      var lanyardSocket = null;
+      var lanyardHeartbeatInterval = null;
+      var lanyardReconnectTimeout = null;
+      var LANYARD_RECONNECT_DELAY = 5000;
+      var lanyardWSRetryCount = 0;
+      var LANYARD_MAX_WS_RETRIES = 3;
+
+      var lanyardPollIntervalId = null;
+      var LANYARD_POLL_INTERVAL_MS = 20000;
+      var lanyardPollFailureCount = 0;
+      var LANYARD_MAX_POLL_FAILURES = 5;
+      var lanyardUpdateMethod = null;
 
       var minWidth = 320;
       var minHeight = 400;
@@ -1033,7 +1105,6 @@
         this.initialHeight = 0;
         this.initialCardX_resize = 0;
         this.initialCardY_resize = 0;
-
         this.element = this._createWindowElement(
           id,
           title,
@@ -1046,19 +1117,20 @@
         this.dragHandle = this.element.querySelector(".drag-handle");
         this.resizeHandle = this.element.querySelector(".resize-handle");
         this.closeButton = this.element.querySelector(".window-button.close");
-
         this.setContent(contentHtml);
         this._attachEventListeners();
         this._setInitialPosition(options.initialOffset);
         this.bringToFront();
       }
-
       FluentWindow.prototype.setContent = function (html) {
-        if (this.contentContainer) {
-          this.contentContainer.innerHTML = html;
+        try {
+          if (this.contentContainer) {
+            this.contentContainer.innerHTML = html;
+          }
+        } catch (e) {
+          console.error("Error setting window content:", e);
         }
       };
-
       FluentWindow.prototype._createWindowElement = function (
         id,
         title,
@@ -1093,103 +1165,128 @@
         document.body.appendChild(card);
         return card;
       };
-
       FluentWindow.prototype._setInitialPosition = function (offset) {
         var self = this;
         offset = offset || { x: 0, y: 0 };
-        requestAnimationFrame(function () {
-          if (!self.element) return;
-          if (self.element.style.left || self.element.style.top) {
-            return;
+        var reqAnimFrame =
+          window.requestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function (callback) {
+            window.setTimeout(callback, 1000 / 60);
+          };
+        reqAnimFrame(function () {
+          try {
+            if (!self.element) return;
+            if (self.element.style.left || self.element.style.top) {
+              return;
+            }
+            var cardWidth = self.element.offsetWidth;
+            var cardHeight = self.element.offsetHeight;
+            var viewportWidth = document.documentElement.clientWidth;
+            var viewportHeight = document.documentElement.clientHeight;
+            if (cardWidth <= 0 || cardHeight <= 0) {
+              console.warn(
+                "Window " +
+                  self.id +
+                  " has invalid dimensions (" +
+                  cardWidth +
+                  "x" +
+                  cardHeight +
+                  "), retrying positioning."
+              );
+              setTimeout(function () {
+                self._setInitialPosition(offset);
+              }, 50);
+              return;
+            }
+            var initialLeft =
+              viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
+            var initialTop =
+              viewportHeight > cardHeight
+                ? (viewportHeight - cardHeight) / 2
+                : 0;
+            initialLeft += offset.x;
+            initialTop += offset.y;
+            initialLeft = Math.max(0, initialLeft);
+            initialTop = Math.max(0, initialTop);
+            if (initialLeft + cardWidth > viewportWidth) {
+              initialLeft = Math.max(0, viewportWidth - cardWidth);
+            }
+            if (initialTop + cardHeight > viewportHeight) {
+              initialTop = Math.max(0, viewportHeight - cardHeight);
+            }
+            self.element.style.left = initialLeft + "px";
+            self.element.style.top = initialTop + "px";
+            self.positionedWithTopLeft = true;
+          } catch (e) {
+            console.error("Error setting initial position:", e);
           }
-
-          var cardWidth = self.element.offsetWidth;
-          var cardHeight = self.element.offsetHeight;
-          var viewportWidth = document.documentElement.clientWidth;
-          var viewportHeight = document.documentElement.clientHeight;
-
-          if (cardWidth <= 0 || cardHeight <= 0) {
-            console.warn(
-              "Window " +
-                self.id +
-                " has invalid dimensions, retrying positioning."
-            );
-            requestAnimationFrame(function () {
-              self._setInitialPosition(offset);
-            });
-            return;
-          }
-
-          var initialLeft =
-            viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
-          var initialTop =
-            viewportHeight > cardHeight ? (viewportHeight - cardHeight) / 2 : 0;
-
-          initialLeft += offset.x;
-          initialTop += offset.y;
-
-          initialLeft = Math.max(0, initialLeft);
-          initialTop = Math.max(0, initialTop);
-
-          if (initialLeft + cardWidth > viewportWidth) {
-            initialLeft = Math.max(0, viewportWidth - cardWidth);
-          }
-          if (initialTop + cardHeight > viewportHeight) {
-            initialTop = Math.max(0, viewportHeight - cardHeight);
-          }
-
-          self.element.style.left = initialLeft + "px";
-          self.element.style.top = initialTop + "px";
-          self.positionedWithTopLeft = true;
         });
       };
-
       FluentWindow.prototype._attachEventListeners = function () {
-        this.dragHandle.addEventListener(
-          "pointerdown",
-          this._startDrag.bind(this)
-        );
-        this.resizeHandle.addEventListener(
-          "pointerdown",
-          this._startResize.bind(this)
-        );
-        this.element.addEventListener(
-          "pointerdown",
-          this.bringToFront.bind(this)
-        );
-        this.closeButton.addEventListener("click", this.destroy.bind(this));
-
-        var footer = this.element.querySelector(".links-section");
-        if (footer) {
-          var self = this;
-          footer.addEventListener("click", function (e) {
-            var target = e.target;
-            var classList = target && target.classList;
-            if (classList && classList.contains("view-projects-button")) {
-              e.stopPropagation();
-              createProjectsWindow();
-            } else if (classList && classList.contains("view-rigs-button")) {
-              e.stopPropagation();
-              createPcRigsWindow();
-            } else if (
-              classList &&
-              classList.contains("view-vehicles-button")
-            ) {
-              e.stopPropagation();
-              createVehiclesWindow();
-            } else if (classList && classList.contains("close-window-button")) {
-              e.stopPropagation();
-              self.destroy();
-            }
-          });
+        try {
+          var usePointer = !!window.PointerEvent;
+          var down = usePointer ? "pointerdown" : "mousedown";
+          this._boundStartDrag = this._startDrag.bind(this);
+          this._boundStartResize = this._startResize.bind(this);
+          this._boundBringToFront = this.bringToFront.bind(this);
+          this._boundDestroy = this.destroy.bind(this);
+          this.dragHandle.addEventListener(down, this._boundStartDrag);
+          this.resizeHandle.addEventListener(down, this._boundStartResize);
+          this.element.addEventListener(down, this._boundBringToFront);
+          this.closeButton.addEventListener("click", this._boundDestroy);
+          var footer = this.element.querySelector(".links-section");
+          if (footer) {
+            var self = this;
+            this._boundFooterClick = function (e) {
+              e = e || window.event;
+              var target = e.target || window.event.srcElement;
+              var classList = target && target.classList;
+              if (!classList && target.className) {
+                classList = {
+                  contains: function (c) {
+                    return (
+                      (" " + target.className + " ").indexOf(" " + c + " ") > -1
+                    );
+                  },
+                };
+              }
+              var stopProp = function (evt) {
+                if (evt.stopPropagation) evt.stopPropagation();
+                else window.event.cancelBubble = true;
+              };
+              if (classList && classList.contains("view-projects-button")) {
+                stopProp(e);
+                createProjectsWindow();
+              } else if (classList && classList.contains("view-rigs-button")) {
+                stopProp(e);
+                createPcRigsWindow();
+              } else if (
+                classList &&
+                classList.contains("view-vehicles-button")
+              ) {
+                stopProp(e);
+                createVehiclesWindow();
+              } else if (
+                classList &&
+                classList.contains("close-window-button")
+              ) {
+                stopProp(e);
+                self.destroy();
+              }
+            };
+            footer.addEventListener("click", this._boundFooterClick);
+          }
+        } catch (e) {
+          console.error("Error attaching event listeners:", e);
         }
       };
-
       FluentWindow.prototype.bringToFront = function () {
         highestZ++;
         this.element.style.zIndex = highestZ;
       };
-
       FluentWindow.prototype._switchToTopLeftPositioningIfNeeded = function () {
         if (
           !this.positionedWithTopLeft &&
@@ -1199,65 +1296,80 @@
           this._setInitialPosition();
         }
       };
-
       FluentWindow.prototype._startDrag = function (e) {
-        var target = e.target;
-        var closestControls = null;
-        if (target.closest)
-          closestControls = target.closest(".window-controls");
-        var closestHandle = null;
-        if (target.closest) closestHandle = target.closest(".drag-handle");
-
-        if (target === this.closeButton || closestControls) {
-          return;
+        try {
+          e = e || window.event;
+          var target = e.target || e.srcElement;
+          var usePointer = !!window.PointerEvent;
+          var up = usePointer ? "pointerup" : "mouseup";
+          var move = usePointer ? "pointermove" : "mousemove";
+          var findParent = function (el, sel) {
+            while (el && el.parentNode && el.tagName !== "BODY") {
+              el = el.parentNode;
+              if (el.matches && el.matches(sel)) return el;
+              if (el.msMatchesSelector && el.msMatchesSelector(sel)) return el;
+            }
+            return null;
+          };
+          var controls = findParent(target, ".window-controls");
+          var handle = findParent(target, ".drag-handle");
+          if (target.nodeName === "BUTTON" || controls) {
+            return;
+          }
+          if (target !== this.dragHandle && !handle) {
+            return;
+          }
+          if (this.isResizing) return;
+          this._switchToTopLeftPositioningIfNeeded();
+          this.bringToFront();
+          this.isDragging = true;
+          activeInteractionWindow = this;
+          this.dragHandle.style.cursor = "grabbing";
+          document.body.style.cursor = "grabbing";
+          var rect = this.element.getBoundingClientRect();
+          var startClientX = e.clientX;
+          var startClientY = e.clientY;
+          var currentLeft = parseFloat(this.element.style.left) || rect.left;
+          var currentTop = parseFloat(this.element.style.top) || rect.top;
+          this.dragOffsetX = startClientX - currentLeft;
+          this.dragOffsetY = startClientY - currentTop;
+          this._boundDoDrag = this._doDrag.bind(this);
+          this._boundEndDrag = this._endDrag.bind(this);
+          document.addEventListener(move, this._boundDoDrag);
+          document.addEventListener(up, this._boundEndDrag);
+          if (usePointer && this.dragHandle.setPointerCapture) {
+            try {
+              this.dragHandle.setPointerCapture(e.pointerId);
+            } catch (pcErr) {}
+          }
+        } catch (err) {
+          console.error("Error starting drag:", err);
+          this._endDrag(e);
         }
-        if (target !== this.dragHandle && !closestHandle) {
-          return;
-        }
-
-        if (this.isResizing) return;
-
-        this._switchToTopLeftPositioningIfNeeded();
-        this.bringToFront();
-        this.isDragging = true;
-        activeInteractionWindow = this;
-        this.dragHandle.style.cursor = "grabbing";
-        document.body.style.cursor = "grabbing";
-
-        var rect = this.element.getBoundingClientRect();
-        var startClientX = e.clientX;
-        var startClientY = e.clientY;
-
-        var currentLeft = parseFloat(this.element.style.left) || rect.left;
-        var currentTop = parseFloat(this.element.style.top) || rect.top;
-
-        this.dragOffsetX = startClientX - currentLeft;
-        this.dragOffsetY = startClientY - currentTop;
       };
-
       FluentWindow.prototype._doDrag = function (e) {
         if (!this.isDragging) return;
-        e.preventDefault();
-
+        e = e || window.event;
+        if (e.preventDefault) e.preventDefault();
+        else e.returnValue = false;
         var currentMouseX = e.clientX;
         var currentMouseY = e.clientY;
-
         var newCardX = currentMouseX - this.dragOffsetX;
         var newCardY = currentMouseY - this.dragOffsetY;
-
         var viewportWidth = document.documentElement.clientWidth;
         var viewportHeight = document.documentElement.clientHeight;
         var cardWidth = this.element.offsetWidth;
         var cardHeight = this.element.offsetHeight;
-
         newCardX = Math.max(0, Math.min(newCardX, viewportWidth - cardWidth));
         newCardY = Math.max(0, Math.min(newCardY, viewportHeight - cardHeight));
-
         this.element.style.left = newCardX + "px";
         this.element.style.top = newCardY + "px";
       };
-
-      FluentWindow.prototype._endDrag = function () {
+      FluentWindow.prototype._endDrag = function (e) {
+        e = e || window.event;
+        var usePointer = !!window.PointerEvent;
+        var move = usePointer ? "pointermove" : "mousemove";
+        var up = usePointer ? "pointerup" : "mouseup";
         if (this.isDragging) {
           this.isDragging = false;
           this.dragHandle.style.cursor = "grab";
@@ -1265,109 +1377,184 @@
             activeInteractionWindow = null;
             document.body.style.cursor = "default";
           }
+          if (this._boundDoDrag)
+            document.removeEventListener(move, this._boundDoDrag);
+          if (this._boundEndDrag)
+            document.removeEventListener(up, this._boundEndDrag);
+          if (
+            usePointer &&
+            e &&
+            e.pointerId &&
+            this.dragHandle.releasePointerCapture
+          ) {
+            try {
+              this.dragHandle.releasePointerCapture(e.pointerId);
+            } catch (err) {}
+          }
         }
       };
-
       FluentWindow.prototype._startResize = function (e) {
-        if (e.target !== this.resizeHandle) {
-          return;
+        try {
+          e = e || window.event;
+          var target = e.target || e.srcElement;
+          var usePointer = !!window.PointerEvent;
+          var up = usePointer ? "pointerup" : "mouseup";
+          var move = usePointer ? "pointermove" : "mousemove";
+          if (target !== this.resizeHandle) {
+            return;
+          }
+          if (this.isDragging) return;
+          this._switchToTopLeftPositioningIfNeeded();
+          this.bringToFront();
+          this.isResizing = true;
+          activeInteractionWindow = this;
+          document.body.style.cursor = "nwse-resize";
+          this.initialWidth = this.element.offsetWidth;
+          this.initialHeight = this.element.offsetHeight;
+          this.initialCardX_resize = this.element.offsetLeft;
+          this.initialCardY_resize = this.element.offsetTop;
+          this.resizeInitialMouseX = e.clientX;
+          this.resizeInitialMouseY = e.clientY;
+          this._boundDoResize = this._doResize.bind(this);
+          this._boundEndResize = this._endResize.bind(this);
+          document.addEventListener(move, this._boundDoResize);
+          document.addEventListener(up, this._boundEndResize);
+          if (usePointer && this.resizeHandle.setPointerCapture) {
+            try {
+              this.resizeHandle.setPointerCapture(e.pointerId);
+            } catch (pcErr) {}
+          }
+        } catch (err) {
+          console.error("Error starting resize:", err);
+          this._endResize(e);
         }
-        if (this.isDragging) return;
-
-        this._switchToTopLeftPositioningIfNeeded();
-        this.bringToFront();
-        this.isResizing = true;
-        activeInteractionWindow = this;
-        document.body.style.cursor = "nwse-resize";
-
-        this.initialWidth = this.element.offsetWidth;
-        this.initialHeight = this.element.offsetHeight;
-        this.initialCardX_resize = this.element.offsetLeft;
-        this.initialCardY_resize = this.element.offsetTop;
-
-        this.resizeInitialMouseX = e.clientX;
-        this.resizeInitialMouseY = e.clientY;
       };
-
       FluentWindow.prototype._doResize = function (e) {
         if (!this.isResizing) return;
-        e.preventDefault();
-
+        e = e || window.event;
+        if (e.preventDefault) e.preventDefault();
+        else e.returnValue = false;
         var currentMouseX = e.clientX;
         var currentMouseY = e.clientY;
-
         var dx = currentMouseX - this.resizeInitialMouseX;
         var dy = currentMouseY - this.resizeInitialMouseY;
-
         var newWidth = this.initialWidth + dx;
         var newHeight = this.initialHeight + dy;
-
         newWidth = Math.max(minWidth, newWidth);
         newHeight = Math.max(minHeight, newHeight);
-
         var viewportWidth = document.documentElement.clientWidth;
         var viewportHeight = document.documentElement.clientHeight;
-
         if (this.initialCardX_resize + newWidth > viewportWidth) {
           newWidth = viewportWidth - this.initialCardX_resize;
         }
         if (this.initialCardY_resize + newHeight > viewportHeight) {
           newHeight = viewportHeight - this.initialCardY_resize;
         }
-
         newWidth = Math.max(minWidth, newWidth);
         newHeight = Math.max(minHeight, newHeight);
-
         this.element.style.width = newWidth + "px";
         this.element.style.height = newHeight + "px";
       };
-
-      FluentWindow.prototype._endResize = function () {
+      FluentWindow.prototype._endResize = function (e) {
+        e = e || window.event;
+        var usePointer = !!window.PointerEvent;
+        var move = usePointer ? "pointermove" : "mousemove";
+        var up = usePointer ? "pointerup" : "mouseup";
         if (this.isResizing) {
           this.isResizing = false;
           if (activeInteractionWindow === this) {
             activeInteractionWindow = null;
             document.body.style.cursor = "default";
           }
-        }
-      };
-
-      FluentWindow.prototype.destroy = function () {
-        if (this.id === "about-me" && discordStatusIntervalId !== null) {
-          clearInterval(discordStatusIntervalId);
-          discordStatusIntervalId = null;
-          console.log("Stopped Discord status polling interval.");
-        }
-        if (this.element && this.element.parentNode) {
-          this.element.remove();
-        }
-        delete windows[this.id];
-        if (activeInteractionWindow === this) {
-          activeInteractionWindow = null;
-          document.body.style.cursor = "default";
-        }
-      };
-
-      document.addEventListener("pointermove", function (e) {
-        if (activeInteractionWindow) {
+          if (this._boundDoResize)
+            document.removeEventListener(move, this._boundDoResize);
+          if (this._boundEndResize)
+            document.removeEventListener(up, this._boundEndResize);
           if (
-            activeInteractionWindow.isDragging ||
-            activeInteractionWindow.isResizing
+            usePointer &&
+            e &&
+            e.pointerId &&
+            this.resizeHandle.releasePointerCapture
           ) {
-            e.preventDefault();
+            try {
+              this.resizeHandle.releasePointerCapture(e.pointerId);
+            } catch (err) {}
           }
-          if (activeInteractionWindow.isDragging)
-            activeInteractionWindow._doDrag(e);
-          if (activeInteractionWindow.isResizing)
-            activeInteractionWindow._doResize(e);
         }
-      });
+      };
+      FluentWindow.prototype.destroy = function () {
+        try {
+          if (this.id === "about-me") {
+            console.log(
+              "Stopping Lanyard updates due to About Me window closure."
+            );
+            stopLanyardUpdates();
+          }
+          var usePointer = !!window.PointerEvent;
+          var down = usePointer ? "pointerdown" : "mousedown";
+          if (this._boundStartDrag)
+            this.dragHandle.removeEventListener(down, this._boundStartDrag);
+          if (this._boundStartResize)
+            this.resizeHandle.removeEventListener(down, this._boundStartResize);
+          if (this._boundBringToFront)
+            this.element.removeEventListener(down, this._boundBringToFront);
+          if (this._boundDestroy)
+            this.closeButton.removeEventListener("click", this._boundDestroy);
+          var footer = this.element.querySelector(".links-section");
+          if (footer && this._boundFooterClick) {
+            footer.removeEventListener("click", this._boundFooterClick);
+          }
+          if (this.element && this.element.parentNode) {
+            this.element.parentNode.removeChild(this.element);
+          }
+          delete windows[this.id];
+          if (activeInteractionWindow === this) {
+            activeInteractionWindow = null;
+            document.body.style.cursor = "default";
+          }
+        } catch (e) {
+          console.error("Error destroying window:", e);
+        }
+      };
 
-      document.addEventListener("pointerup", function () {
-        if (activeInteractionWindow) {
-          activeInteractionWindow._endDrag();
-          activeInteractionWindow._endResize();
+      function addEvent(element, eventName, callback) {
+        if (element.addEventListener) {
+          element.addEventListener(eventName, callback, false);
+        } else if (element.attachEvent) {
+          element.attachEvent("on" + eventName, callback);
         }
+      }
+      function removeEvent(element, eventName, callback) {
+        if (element.removeEventListener) {
+          element.removeEventListener(eventName, callback, false);
+        } else if (element.detachEvent) {
+          element.detachEvent("on" + eventName, callback);
+        }
+      }
+
+      addEvent(document, "DOMContentLoaded", function () {
+        var usePointer = !!window.PointerEvent;
+        var move = usePointer ? "pointermove" : "mousemove";
+        var up = usePointer ? "pointerup" : "mouseup";
+        addEvent(document, move, function (e) {
+          if (activeInteractionWindow) {
+            if (activeInteractionWindow.isDragging)
+              activeInteractionWindow._doDrag(e);
+            if (activeInteractionWindow.isResizing)
+              activeInteractionWindow._doResize(e);
+          }
+        });
+        addEvent(document, up, function (e) {
+          if (activeInteractionWindow) {
+            activeInteractionWindow._endDrag(e);
+            activeInteractionWindow._endResize(e);
+          }
+          if (!activeInteractionWindow) {
+            document.body.style.cursor = "default";
+          }
+        });
+        fetchSpotlightData();
+        createAboutMeWindow();
       });
 
       function createWindow(id, title, titleIconUrl, contentHtml, options) {
@@ -1386,35 +1573,75 @@
         return newWindow;
       }
 
-      async function fetchProjects(username) {
+      function makeRequest(url, callback) {
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open("GET", url, true);
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                  var data = JSON.parse(xhr.responseText);
+                  callback(null, data);
+                } catch (parseError) {
+                  console.error(
+                    "Error parsing JSON:",
+                    parseError,
+                    xhr.responseText
+                  );
+                  callback(new Error("Invalid JSON received"), null);
+                }
+              } else {
+                console.error("XHR failed:", xhr.status, xhr.statusText);
+                callback(new Error("Request failed: " + xhr.status), null);
+              }
+            }
+          };
+          xhr.onerror = function () {
+            console.error("XHR network error");
+            callback(new Error("Network error"), null);
+          };
+          xhr.send();
+        } catch (e) {
+          console.error("Error creating/sending XHR:", e);
+          callback(e, null);
+        }
+      }
+
+      function fetchProjects(username, callback) {
         var apiUrl =
           "https://api.github.com/users/" +
           username +
           "/repos?sort=updated&per_page=20";
-        try {
-          var response = await fetch(apiUrl);
-          if (!response.ok) {
-            if (response.status === 403) {
-              throw new Error("GitHub API rate limit exceeded.");
-            }
-            throw new Error("GitHub API error! status: " + response.status);
+        makeRequest(apiUrl, function (error, data) {
+          if (error) {
+            console.error("Error fetching projects:", error);
           }
-          var data = await response.json();
-          return data;
-        } catch (error) {
-          console.error("Error fetching projects:", error);
-          throw error;
-        }
+          callback(error, data);
+        });
       }
 
       function formatDate(isoString) {
         if (!isoString) return "N/A";
         try {
-          return new Date(isoString).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          });
+          var d = new Date(isoString);
+          var months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          return (
+            months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear()
+          );
         } catch (e) {
           console.error("Error formatting date:", e);
           return "Invalid Date";
@@ -1424,25 +1651,23 @@
       function renderProjects(repos, containerElement) {
         if (!containerElement) return;
         containerElement.innerHTML = "";
-
-        if (!repos || repos.length === 0) {
+        if (!repos || !Array.isArray(repos) || repos.length === 0) {
           containerElement.innerHTML =
             '<p class="error-message">No public projects found or failed to load.</p>';
           return;
         }
 
         var list = document.createElement("ul");
-        repos.forEach(function (repo) {
+        for (var i = 0; i < repos.length; i++) {
+          var repo = repos[i];
           var li = document.createElement("li");
           var topics = repo.topics;
-          var tags =
-            topics && Array.isArray(topics)
-              ? topics
-                  .map(function (t) {
-                    return "<span>" + t + "</span>";
-                  })
-                  .join(" ")
-              : "";
+          var tags = "";
+          if (topics && Array.isArray(topics)) {
+            for (var j = 0; j < topics.length; j++) {
+              tags += "<span>" + topics[j] + "</span> ";
+            }
+          }
           var licenseName =
             repo.license && repo.license.name ? repo.license.name : null;
           var license = licenseName
@@ -1455,10 +1680,9 @@
               repo.language +
               "</span>"
             : '<span class="project-lang na">N/A</span>';
-
           li.innerHTML =
             '<h3 class="project-title"><a href="' +
-            repo.html_url +
+            (repo.html_url || "#") +
             '" target="_blank" rel="noopener noreferrer">' +
             (repo.name || "Unnamed Repo") +
             '</a> <span class="project-visibility">Public</span></h3>' +
@@ -1466,7 +1690,7 @@
             (repo.description || "No description.") +
             "</p>" +
             '<div class="project-tags">' +
-            tags +
+            tags.trim() +
             "</div>" +
             '<div class="project-meta">' +
             lang +
@@ -1475,10 +1699,9 @@
             formatDate(repo.updated_at) +
             "</span></div>";
           list.appendChild(li);
-        });
+        }
         containerElement.appendChild(list);
       }
-
       function displayError(error, containerElement) {
         if (!containerElement) return;
         var errorMessage =
@@ -1519,7 +1742,6 @@
         <button class="fluent-button view-rigs-button">View PC Rigs</button>
         <button class="fluent-button view-vehicles-button">View Vehicles</button>
       `;
-
       var projectsInitialContent =
         '<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>';
       var projectsFooter = `
@@ -1564,7 +1786,635 @@
       var vehiclesFooter =
         '<button class="fluent-button close-window-button">Close Vehicles</button>';
 
-      async function createProjectsWindow() {
+      function connectLanyardSocket(userId) {
+        lanyardUpdateMethod = "websocket";
+        lanyardWSRetryCount = 0;
+        if (lanyardSocket && lanyardSocket.readyState === WebSocket.OPEN) {
+          console.log("Lanyard WebSocket already open.");
+          return;
+        }
+        if (lanyardReconnectTimeout) {
+          clearTimeout(lanyardReconnectTimeout);
+          lanyardReconnectTimeout = null;
+        }
+        if (lanyardHeartbeatInterval) {
+          clearInterval(lanyardHeartbeatInterval);
+          lanyardHeartbeatInterval = null;
+        }
+        console.log(
+          "Connecting to Lanyard WebSocket (Attempt " +
+            (lanyardWSRetryCount + 1) +
+            ")"
+        );
+        updateDiscordStatusUI({
+          contentHtml:
+            '<p class="loading-message">Connecting via WebSocket...</p>',
+          customStatus: null,
+        });
+        try {
+          lanyardSocket = new WebSocket("wss://api.lanyard.rest/socket");
+        } catch (err) {
+          console.error("Failed to create WebSocket:", err);
+          updateDiscordStatusUI({
+            contentHtml:
+              '<p class="error-message">WebSocket creation failed.</p>',
+            customStatus: null,
+          });
+          handleWebSocketFailure(userId, "Creation failed");
+          return;
+        }
+        lanyardSocket.onopen = function () {
+          console.log("Lanyard WebSocket connected successfully.");
+          lanyardWSRetryCount = 0;
+        };
+        lanyardSocket.onmessage = function (event) {
+          try {
+            if (!event.data) return;
+            var data = JSON.parse(event.data);
+            switch (data.op) {
+              case 1:
+                console.log("Lanyard: Received Hello");
+                var heartbeatIntervalMs = data.d.heartbeat_interval;
+                lanyardSocket.send(
+                  JSON.stringify({ op: 2, d: { subscribe_to_id: userId } })
+                );
+                console.log("Lanyard: Sent Initialize for user:", userId);
+                if (lanyardHeartbeatInterval)
+                  clearInterval(lanyardHeartbeatInterval);
+                lanyardHeartbeatInterval = setInterval(function () {
+                  try {
+                    if (
+                      lanyardSocket &&
+                      lanyardSocket.readyState === WebSocket.OPEN
+                    ) {
+                      lanyardSocket.send(JSON.stringify({ op: 3 }));
+                    } else {
+                      if (lanyardHeartbeatInterval)
+                        clearInterval(lanyardHeartbeatInterval);
+                      lanyardHeartbeatInterval = null;
+                    }
+                  } catch (hbError) {
+                    console.error("Error sending heartbeat:", hbError);
+                    if (lanyardHeartbeatInterval)
+                      clearInterval(lanyardHeartbeatInterval);
+                    lanyardHeartbeatInterval = null;
+                  }
+                }, heartbeatIntervalMs);
+                break;
+              case 0:
+                if (data.t === "INIT_STATE" || data.t === "PRESENCE_UPDATE") {
+                  var parsedStatus = parseLanyardStatus(data.d);
+                  updateDiscordStatusUI(parsedStatus);
+                }
+                break;
+              default:
+                console.log("Lanyard: Received unknown opcode:", data.op);
+            }
+          } catch (msgError) {
+            console.error(
+              "Error processing WebSocket message:",
+              msgError,
+              event.data
+            );
+          }
+        };
+        lanyardSocket.onerror = function (error) {
+          console.error("Lanyard WebSocket Error Event:", error);
+          handleWebSocketFailure(userId, "WebSocket onerror");
+        };
+        lanyardSocket.onclose = function (event) {
+          console.log("Lanyard WebSocket closed.", event.code, event.reason);
+          if (lanyardHeartbeatInterval) {
+            clearInterval(lanyardHeartbeatInterval);
+            lanyardHeartbeatInterval = null;
+          }
+          if (lanyardReconnectTimeout) {
+            clearTimeout(lanyardReconnectTimeout);
+            lanyardReconnectTimeout = null;
+          }
+          lanyardSocket = null;
+          if (
+            event.code !== 1000 &&
+            event.code !== 1005 &&
+            event.code !== 1001
+          ) {
+            handleWebSocketFailure(
+              userId,
+              "Unclean close (" + event.code + ")"
+            );
+          } else {
+            updateDiscordStatusUI({
+              contentHtml:
+                '<p class="error-message">Disconnected from presence.</p>',
+              customStatus: null,
+            });
+          }
+        };
+      }
+      function handleWebSocketFailure(userId, reason) {
+        lanyardWSRetryCount++;
+        console.log(
+          "WebSocket connection failed (" +
+            reason +
+            "). Retry count: " +
+            lanyardWSRetryCount
+        );
+        if (lanyardSocket) {
+          lanyardSocket = null;
+        }
+        if (lanyardHeartbeatInterval) {
+          clearInterval(lanyardHeartbeatInterval);
+          lanyardHeartbeatInterval = null;
+        }
+        if (lanyardWSRetryCount > LANYARD_MAX_WS_RETRIES) {
+          console.error(
+            "Lanyard: Max WebSocket retries reached. Cannot use WebSockets."
+          );
+          updateDiscordStatusUI({
+            contentHtml:
+              '<p class="error-message">WebSocket Error: Could not connect.</p>',
+            customStatus: null,
+          });
+          if (lanyardReconnectTimeout) {
+            clearTimeout(lanyardReconnectTimeout);
+            lanyardReconnectTimeout = null;
+          }
+        } else {
+          scheduleLanyardReconnect(userId);
+        }
+      }
+      function disconnectLanyardSocket() {
+        lanyardWSRetryCount = LANYARD_MAX_WS_RETRIES + 1;
+        if (lanyardReconnectTimeout) {
+          clearTimeout(lanyardReconnectTimeout);
+          lanyardReconnectTimeout = null;
+        }
+        if (lanyardHeartbeatInterval) {
+          clearInterval(lanyardHeartbeatInterval);
+          lanyardHeartbeatInterval = null;
+        }
+        if (lanyardSocket && lanyardSocket.readyState === WebSocket.OPEN) {
+          console.log("Lanyard: Closing WebSocket connection intentionally.");
+          try {
+            lanyardSocket.close(1000, "Client closed window");
+          } catch (e) {}
+        }
+        lanyardSocket = null;
+      }
+      function scheduleLanyardReconnect(userId) {
+        if (lanyardReconnectTimeout) {
+          clearTimeout(lanyardReconnectTimeout);
+        }
+        if (lanyardUpdateMethod !== "websocket") return;
+        var retryMsg =
+          "WebSocket connection lost. Retrying (" +
+          lanyardWSRetryCount +
+          "/" +
+          LANYARD_MAX_WS_RETRIES +
+          ")...";
+        updateDiscordStatusUI({
+          contentHtml: '<p class="error-message">' + retryMsg + "</p>",
+          customStatus: null,
+        });
+        console.log(
+          "Lanyard: Scheduling WebSocket reconnect in " +
+            LANYARD_RECONNECT_DELAY / 1000 +
+            " seconds..."
+        );
+        lanyardReconnectTimeout = setTimeout(function () {
+          if (
+            lanyardWSRetryCount <= LANYARD_MAX_WS_RETRIES &&
+            lanyardUpdateMethod === "websocket"
+          ) {
+            connectLanyardSocket(userId);
+          }
+        }, LANYARD_RECONNECT_DELAY);
+      }
+
+      function pollLanyardStatus(userId) {
+        var apiUrl = "https://api.lanyard.rest/v1/users/" + userId;
+        makeRequest(apiUrl, function (error, responseData) {
+          if (error || !responseData || !responseData.success) {
+            lanyardPollFailureCount++;
+            console.error(
+              "Lanyard poll failed (Attempt " + lanyardPollFailureCount + "):",
+              error || "Invalid response"
+            );
+            if (lanyardPollFailureCount > LANYARD_MAX_POLL_FAILURES) {
+              console.error(
+                "Lanyard: Max polling failures reached. Stopping polling."
+              );
+              updateDiscordStatusUI({
+                contentHtml:
+                  '<p class="error-message">Polling Error: Failed to fetch status repeatedly.</p>',
+                customStatus: null,
+              });
+              stopLanyardPolling();
+            } else {
+              var tempErrorHtml =
+                '<p class="error-message">Error fetching status... (Attempt ' +
+                lanyardPollFailureCount +
+                "/" +
+                LANYARD_MAX_POLL_FAILURES +
+                ")</p>";
+              updateDiscordStatusUI({
+                contentHtml: tempErrorHtml,
+                customStatus: null,
+              });
+            }
+          } else if (responseData.data) {
+            lanyardPollFailureCount = 0;
+            var parsedStatus = parseLanyardStatus(responseData.data);
+            updateDiscordStatusUI(parsedStatus);
+          } else {
+            lanyardPollFailureCount++;
+            console.error(
+              "Lanyard poll: Success false or no data.",
+              responseData
+            );
+            if (lanyardPollFailureCount > LANYARD_MAX_POLL_FAILURES) {
+              stopLanyardPolling();
+              updateDiscordStatusUI({
+                contentHtml:
+                  '<p class="error-message">Polling Error: Received invalid status data repeatedly.</p>',
+                customStatus: null,
+              });
+            } else {
+              updateDiscordStatusUI({
+                contentHtml:
+                  '<p class="error-message">Error fetching status... (Invalid data attempt ' +
+                  lanyardPollFailureCount +
+                  "/" +
+                  LANYARD_MAX_POLL_FAILURES +
+                  ")</p>",
+                customStatus: null,
+              });
+            }
+          }
+        });
+      }
+      function startLanyardPolling(userId) {
+        if (lanyardUpdateMethod === "polling") return;
+        console.log("Starting Lanyard polling.");
+        lanyardUpdateMethod = "polling";
+        lanyardPollFailureCount = 0;
+        disconnectLanyardSocket();
+        updateDiscordStatusUI({
+          contentHtml:
+            '<p class="loading-message">Fetching status (polling)...</p>',
+          customStatus: null,
+        });
+        pollLanyardStatus(userId);
+        if (lanyardPollIntervalId) clearInterval(lanyardPollIntervalId);
+        lanyardPollIntervalId = setInterval(function () {
+          if (lanyardPollIntervalId) {
+            pollLanyardStatus(userId);
+          }
+        }, LANYARD_POLL_INTERVAL_MS);
+      }
+      function stopLanyardPolling() {
+        if (lanyardPollIntervalId) {
+          clearInterval(lanyardPollIntervalId);
+          lanyardPollIntervalId = null;
+          console.log("Stopped Lanyard polling.");
+        }
+      }
+      function stopLanyardUpdates() {
+        if (lanyardUpdateMethod === "websocket") {
+          disconnectLanyardSocket();
+        } else if (lanyardUpdateMethod === "polling") {
+          stopLanyardPolling();
+        }
+        lanyardUpdateMethod = null;
+        updateDiscordStatusUI({
+          contentHtml: '<p class="error-message">Presence updates stopped.</p>',
+          customStatus: null,
+        });
+      }
+
+      function parseLanyardStatus(lanyardData) {
+        var finalContentHtml = "";
+        var customStatusText = null;
+        var customStatusEmoji = null;
+        if (!lanyardData || typeof lanyardData !== "object") {
+          console.warn("Invalid Lanyard data received:", lanyardData);
+          finalContentHtml =
+            '<p class="error-message">Invalid presence data received.</p>';
+          return { contentHtml: finalContentHtml, customStatus: null };
+        }
+        var presenceStatus = lanyardData.discord_status || "offline";
+        var activities = lanyardData.activities || [];
+        var statusText = "Offline";
+        var statusClass = "status-offline";
+        if (presenceStatus === "online") {
+          statusText = "Online";
+          statusClass = "status-online";
+        } else if (presenceStatus === "idle") {
+          statusText = "Idle";
+          statusClass = "status-idle";
+        } else if (presenceStatus === "dnd") {
+          statusText = "Do Not Disturb";
+          statusClass = "status-dnd";
+        }
+        var statusHtml =
+          '<div class="status-container"><span class="' +
+          statusClass +
+          '">' +
+          statusText +
+          "</span></div>";
+        finalContentHtml += statusHtml;
+        var customActivity = null;
+        for (var i = 0; i < activities.length; i++) {
+          if (activities[i].type === 4) {
+            customActivity = activities[i];
+            break;
+          }
+        }
+        if (customActivity) {
+          customStatusText = customActivity.state || null;
+          if (customActivity.emoji && customActivity.emoji.name) {
+            customStatusEmoji = customActivity.emoji.name;
+            if (customStatusText) {
+              customStatusText = customStatusEmoji + " " + customStatusText;
+            } else {
+              customStatusText = customStatusEmoji;
+            }
+          }
+        }
+        var activitiesHtml = "";
+        if (presenceStatus !== "offline") {
+          if (lanyardData.listening_to_spotify && lanyardData.spotify) {
+            var spotify = lanyardData.spotify;
+            var spotifyItemHtml = '<div class="activity-item spotify">';
+            if (spotify.album_art_url) {
+              spotifyItemHtml +=
+                '<img src="' +
+                spotify.album_art_url +
+                '" alt="' +
+                (spotify.album || "Album Art") +
+                '" class="activity-icon spotify-art">';
+            } else {
+              spotifyItemHtml += '<span class="activity-icon">🎵</span>';
+            }
+            spotifyItemHtml += '<span class="activity-text">';
+            spotifyItemHtml +=
+              "Listening to <strong>" +
+              (spotify.song || "Unknown Song") +
+              "</strong>";
+            if (spotify.artist) spotifyItemHtml += " by " + spotify.artist;
+            spotifyItemHtml += "</span></div>";
+            activitiesHtml += spotifyItemHtml;
+          }
+          for (var i = 0; i < activities.length; i++) {
+            var activity = activities[i];
+            if (activity.type === 4) continue;
+            if (activity.type === 2 && lanyardData.listening_to_spotify)
+              continue;
+            var activityItemHtml = "";
+            var icon = "💡";
+            var imageUrl = null;
+            var imageAlt = "";
+            var name = activity.name || "";
+            var details = activity.details || "";
+            var state = activity.state || "";
+            var assets = activity.assets;
+            var largeImage = assets && assets.large_image;
+            var largeText = (assets && assets.large_text) || name || "";
+            var appId = activity.application_id;
+            if (largeImage) {
+              if (largeImage.indexOf("spotify:") === 0) {
+                /* skip */
+              } else if (largeImage.indexOf("mp:") === 0) {
+                imageUrl =
+                  "https://media.discordapp.net/" + largeImage.substring(3);
+                imageAlt = largeText || name;
+              } else if (appId) {
+                imageUrl =
+                  "https://cdn.discordapp.com/app-assets/" +
+                  appId +
+                  "/" +
+                  largeImage +
+                  ".png";
+                imageAlt = largeText || name;
+              }
+            }
+            var textContent = "";
+            if (activity.type === 0) {
+              icon = "🎮";
+              textContent =
+                "Playing <strong>" +
+                name +
+                "</strong>" +
+                (details ? "<br>" + details : "") +
+                (state ? "<br>" + state : "");
+            } else if (activity.type === 1) {
+              icon = "🎙️";
+              textContent =
+                "Streaming <strong>" +
+                name +
+                "</strong>" +
+                (details ? "<br>" + details : "") +
+                (state ? "<br>" + state : "");
+            } else if (activity.type === 2) {
+              icon = "🎵";
+              textContent =
+                "Listening to <strong>" +
+                name +
+                "</strong>" +
+                (details ? "<br>" + details : "") +
+                (state ? " by " + state : "");
+            } else if (activity.type === 3) {
+              icon = "📺";
+              textContent =
+                "Watching <strong>" +
+                name +
+                "</strong>" +
+                (details ? "<br>" + details : "") +
+                (state ? "<br>" + state : "");
+            } else if (appId === "383226320970055681") {
+              icon = "💻";
+              textContent = "<strong>" + name + "</strong>";
+              if (details) textContent += "<br>" + details;
+              if (state) textContent += "<br>" + state;
+              if (largeText && textContent.indexOf(largeText) === -1)
+                textContent += "<br>" + largeText;
+            } else if (name === "Waze") {
+              icon = "🚗";
+              textContent = "Using <strong>" + name + "</strong>";
+            } else if (name) {
+              textContent =
+                icon +
+                " <strong>" +
+                name +
+                "</strong>" +
+                (details ? "<br>" + details : "") +
+                (state ? "<br>" + state : "");
+            }
+            if (textContent) {
+              activityItemHtml += '<div class="activity-item">';
+              if (imageUrl) {
+                activityItemHtml +=
+                  '<img src="' +
+                  imageUrl +
+                  '" alt="' +
+                  imageAlt +
+                  '" class="activity-icon" onerror="this.style.display=\'none\'">';
+              } else {
+                activityItemHtml +=
+                  '<span class="activity-icon" style="display: flex; align-items: center; justify-content: center; font-size: 1.5em;">' +
+                  icon +
+                  "</span>";
+              }
+              activityItemHtml +=
+                '<span class="activity-text">' + textContent + "</span>";
+              activityItemHtml += "</div>";
+              activitiesHtml += activityItemHtml;
+            }
+          }
+          if (activitiesHtml === "" && presenceStatus !== "offline") {
+            activitiesHtml =
+              '<div class="activity-item"><span class="activity-text">✨ Currently Idle</span></div>';
+          }
+        }
+        finalContentHtml += activitiesHtml;
+        return {
+          contentHtml: finalContentHtml,
+          customStatus: customStatusText,
+        };
+      }
+      function updateDiscordStatusUI(statusResult) {
+        var statusAreaElement = null;
+        try {
+          statusAreaElement = document.getElementById("discord-status-area");
+          var bubbleElement = document.getElementById("custom-status-bubble");
+
+          if (!statusAreaElement || !bubbleElement) {
+            console.error(
+              "updateDiscordStatusUI: Could not find statusArea or bubbleElement."
+            );
+            return;
+          }
+
+          if (statusResult && statusResult.contentHtml !== undefined) {
+            statusAreaElement.innerHTML = statusResult.contentHtml;
+          } else {
+            console.error(
+              "updateDiscordStatusUI called with invalid statusResult:",
+              statusResult
+            );
+            statusAreaElement.innerHTML =
+              '<p class="error-message">Error updating status display (Invalid data).</p>';
+          }
+
+          if (statusResult && statusResult.customStatus) {
+            bubbleElement.textContent = statusResult.customStatus;
+            bubbleElement.style.display = "";
+
+            var reqAnimFrame =
+              window.requestAnimationFrame ||
+              function (callback) {
+                window.setTimeout(callback, 16);
+              };
+
+            reqAnimFrame(function () {
+              try {
+                if (bubbleElement.classList) {
+                  bubbleElement.classList.add("visible");
+                } else {
+                  bubbleElement.className += " visible";
+                }
+              } catch (rafError) {
+                console.error(
+                  "Error adding visible class to bubbleElement:",
+                  rafError
+                );
+                bubbleElement.className += " visible";
+              }
+            });
+          } else {
+            bubbleElement.textContent = "";
+            if (bubbleElement.classList) {
+              bubbleElement.classList.remove("visible");
+            } else {
+              bubbleElement.className = bubbleElement.className.replace(
+                /\bvisible\b/g,
+                ""
+              );
+            }
+            bubbleElement.style.display = "none";
+          }
+        } catch (e) {
+          console.error("Error updating Discord status UI:", e);
+          try {
+            if (
+              statusAreaElement &&
+              !statusAreaElement.innerHTML.includes("UI Update Error")
+            ) {
+              statusAreaElement.innerHTML =
+                '<p class="error-message">UI Update Error: ' +
+                (e.message || "Unknown") +
+                "</p>";
+            } else if (!statusAreaElement) {
+              console.error(
+                "updateDiscordStatusUI: statusAreaElement is null."
+              );
+            } else {
+              console.error(
+                "updateDiscordStatusUI: statusAreaElement already has error message."
+              );
+            }
+          } catch (innerErr) {
+            console.error(
+              "Error updating statusAreaElement with error message:",
+              innerErr
+            );
+          }
+        }
+      }
+      function isModernBrowser() {
+        var ua = navigator.userAgent || navigator.vendor || window.opera || "";
+        var isEdgeChromium = ua.indexOf("Edg/") > -1;
+        var isModernChrome = ua.indexOf("Chrome/") > -1 && !isEdgeChromium;
+        var isModernFirefox = ua.indexOf("Firefox/") > -1;
+        var isModernSafari =
+          ua.indexOf("Safari/") > -1 &&
+          ua.indexOf("Chrome/") === -1 &&
+          ua.indexOf("Edg/") === -1;
+        var isEdgeHTML = ua.indexOf("Edge/") > -1;
+        if (isEdgeHTML) {
+          return false;
+        }
+        return (
+          isEdgeChromium || isModernChrome || isModernFirefox || isModernSafari
+        );
+      }
+
+      function createAboutMeWindow() {
+        var windowId = "about-me";
+        if (windows[windowId]) {
+          windows[windowId].bringToFront();
+          return;
+        }
+        var aboutWindow = createWindow(
+          windowId,
+          "About Me - Ben",
+          "https://avatars.githubusercontent.com/u/57240557?v=4",
+          aboutMeContent,
+          { footerHtml: aboutMeFooter }
+        );
+        if (window.WebSocket && isModernBrowser()) {
+          console.log("Modern browser detected, using WebSocket.");
+          connectLanyardSocket(DISCORD_USER_ID);
+        } else {
+          if (!window.WebSocket) {
+            console.log("WebSocket API not supported, using polling.");
+          } else {
+            console.log("Older browser detected, using polling.");
+          }
+          startLanyardPolling(DISCORD_USER_ID);
+        }
+      }
+      function createProjectsWindow() {
         var windowId = "projects";
         if (windows[windowId]) {
           windows[windowId].bringToFront();
@@ -1586,94 +2436,23 @@
         var projectsListContainer = projectsWindow.element
           ? projectsWindow.element.querySelector(".projects-list")
           : null;
-
         if (projectsListContainer) {
-          try {
-            var repos = await fetchProjects(GITHUB_USERNAME);
-            renderProjects(repos, projectsListContainer);
-          } catch (error) {
-            displayError(error, projectsListContainer);
-          }
+          fetchProjects(GITHUB_USERNAME, function (error, repos) {
+            if (error) {
+              displayError(error, projectsListContainer);
+            } else {
+              renderProjects(repos, projectsListContainer);
+            }
+          });
         } else {
-          console.error(
-            "Could not find .projects-list container in projects window."
-          );
-        }
-      }
-
-      async function pollAndUpdateDiscordStatus(userId) {
-        var result = await fetchDiscordStatus(userId);
-        var statusObject;
-
-        if (result.error) {
-          var errorMsgHtml =
-            '<p class="error-message">Could not load Discord status.</p>';
-          if (result.error === "not_supported") {
-            errorMsgHtml =
-              '<p class="error-message">Discord status not supported in this browser.</p>';
-          } else if (result.error === "not_found") {
-            errorMsgHtml =
-              '<p class="error-message">Discord user not found.</p>';
-          } else if (result.error === "fetch_failed") {
-            errorMsgHtml =
-              '<p class="error-message">Could not load status (Network/Security Issue).</p>';
-          }
-          console.warn("Discord status fetch failed: " + result.error);
-          statusObject = { mainHtml: errorMsgHtml, customStatus: null };
-        } else if (result.data) {
-          statusObject = parseDiscordStatus(result.data);
-        } else {
-          statusObject = {
-            mainHtml: '<p class="error-message">Unknown status error.</p>',
-            customStatus: null,
-          };
-        }
-
-        var aboutMeWindowExists = !!windows["about-me"];
-        if (aboutMeWindowExists) {
-          updateDiscordStatusUI(statusObject);
-        } else {
-          if (discordStatusIntervalId !== null) {
-            clearInterval(discordStatusIntervalId);
-            discordStatusIntervalId = null;
-            console.log(
-              "Stopped Discord status polling because About Me window is closed."
+          console.error("Could not find .projects-list container.");
+          if (projectsWindow.contentContainer) {
+            projectsWindow.setContent(
+              '<p class="error-message">Error: Could not initialize project list.</p>'
             );
           }
         }
       }
-
-      function createAboutMeWindow() {
-        var windowId = "about-me";
-
-        if (windows[windowId]) {
-          windows[windowId].bringToFront();
-          return;
-        }
-
-        var aboutWindow = createWindow(
-          windowId,
-          "About Me - Ben",
-          "https://avatars.githubusercontent.com/u/57240557?v=4",
-          aboutMeContent,
-          { footerHtml: aboutMeFooter }
-        );
-
-        pollAndUpdateDiscordStatus(DISCORD_USER_ID);
-
-        if (discordStatusIntervalId === null) {
-          if (!navigator.userAgent.includes("Edge/15.")) {
-            discordStatusIntervalId = setInterval(function () {
-              pollAndUpdateDiscordStatus(DISCORD_USER_ID);
-            }, DISCORD_POLL_INTERVAL_MS);
-            console.log(
-              "Started Discord status polling interval:",
-              discordStatusIntervalId
-            );
-          }
-        }
-      }
-
       function createPcRigsWindow() {
         var windowId = "pc-rigs";
         if (windows[windowId]) {
@@ -1694,7 +2473,6 @@
           }
         );
       }
-
       function createVehiclesWindow() {
         var windowId = "vehicles";
         if (windows[windowId]) {
@@ -1718,27 +2496,23 @@
 
       var reopenBtn = document.getElementById("reopenAboutMeBtn");
       if (reopenBtn) {
-        reopenBtn.addEventListener("click", createAboutMeWindow);
+        addEvent(reopenBtn, "click", createAboutMeWindow);
       }
 
-      async function fetchSpotlightData() {
-        const apiUrl = `https://megabytesme.ddns.net/api/spotlight-data`;
-        try {
-          var response = await fetch(apiUrl);
-          if (!response.ok) {
-            console.error("Spotlight fetch error! Status: " + response.status);
-            throw new Error("HTTP error! status: " + response.status);
+      function fetchSpotlightData() {
+        var apiUrl = "https://megabytesme.ddns.net/api/spotlight-data";
+        makeRequest(apiUrl, function (error, data) {
+          if (error) {
+            console.error("Failed to fetch or apply Spotlight data:", error);
+            var copyrightDiv = document.getElementById("copyright-info");
+            if (copyrightDiv)
+              copyrightDiv.textContent = "Error loading background info.";
+            applyFallbackBackgroundStyles();
+          } else {
+            applySpotlightBackground(data);
           }
-          var data = await response.json();
-          applySpotlightBackground(data);
-        } catch (error) {
-          console.error("Failed to fetch or apply Spotlight data:", error);
-          var copyrightDiv = document.getElementById("copyright-info");
-          if (copyrightDiv)
-            copyrightDiv.textContent = "Error loading background info.";
-        }
+        });
       }
-
       function applySpotlightBackground(cachedItems) {
         var copyrightDiv = document.getElementById("copyright-info");
         try {
@@ -1752,17 +2526,15 @@
             );
             if (copyrightDiv)
               copyrightDiv.textContent = "Image information unavailable";
+            applyFallbackBackgroundStyles();
             return;
           }
-
           var randomIndex = Math.floor(Math.random() * cachedItems.length);
           var selectedItem = cachedItems[randomIndex];
-
           var landscapePath = selectedItem && selectedItem.landscapePath;
           var portraitPath = selectedItem && selectedItem.portraitPath;
           var copyrightText = (selectedItem && selectedItem.copyright) || "";
           var title = (selectedItem && selectedItem.title) || "";
-
           if (!landscapePath || !portraitPath) {
             console.warn(
               "Selected cached item missing image paths:",
@@ -1770,45 +2542,62 @@
             );
             if (copyrightDiv)
               copyrightDiv.textContent = "Image information unavailable";
+            applyFallbackBackgroundStyles();
             return;
           }
-
           var formatPath = function (path) {
             if (!path) return "";
-            if (path.startsWith("http") || path.startsWith("/")) {
+            if (
+              path.indexOf("http://") === 0 ||
+              path.indexOf("https://") === 0 ||
+              path.indexOf("//") === 0 ||
+              path.indexOf("/") === 0
+            ) {
               return path;
             }
-            return `https://megabytesme.ddns.net/cached-images/${path}`;
+            return "https://megabytesme.ddns.net/cached-images/" + path;
           };
-
           var fullLandscapeUrl = formatPath(landscapePath);
           var fullPortraitUrl = formatPath(portraitPath);
-
-          var setBackgroundDirectly = function () {
-            var isPortrait = window.matchMedia(
-              "(orientation: portrait)"
-            ).matches;
+          var setBackgroundBasedOnOrientation = function () {
+            var isPortrait =
+              "matchMedia" in window &&
+              window.matchMedia("(orientation: portrait)").matches;
             var imageUrl = isPortrait ? fullPortraitUrl : fullLandscapeUrl;
-            document.body.style.background =
-              'url("' + imageUrl + '") no-repeat center center fixed';
+            document.body.style.backgroundImage = 'url("' + imageUrl + '")';
+            document.body.style.backgroundRepeat = "no-repeat";
+            document.body.style.backgroundPosition = "center center";
+            document.body.style.backgroundAttachment = "fixed";
             document.body.style.backgroundSize = "cover";
+            if (document.documentElement.style.setProperty) {
+              document.documentElement.style.setProperty(
+                "--bg-image-landscape",
+                'url("' + fullLandscapeUrl + '")'
+              );
+              document.documentElement.style.setProperty(
+                "--bg-image-portrait",
+                'url("' + fullPortraitUrl + '")'
+              );
+            }
           };
-
-          setBackgroundDirectly();
-
-          var mediaQuery = window.matchMedia("(orientation: portrait)");
-          if (mediaQuery.addEventListener) {
-            mediaQuery.addEventListener("change", setBackgroundDirectly);
-          } else if (mediaQuery.addListener) {
-            mediaQuery.addListener(setBackgroundDirectly);
+          setBackgroundBasedOnOrientation();
+          if ("matchMedia" in window) {
+            var mediaQuery = window.matchMedia("(orientation: portrait)");
+            if (mediaQuery.addEventListener) {
+              mediaQuery.addEventListener(
+                "change",
+                setBackgroundBasedOnOrientation
+              );
+            } else if (mediaQuery.addListener) {
+              mediaQuery.addListener(setBackgroundBasedOnOrientation);
+            }
           }
-
           if (copyrightDiv) {
-            var displayText = copyrightText.trim();
+            var displayText = copyrightText.replace(/^\s+|\s+$/g, "");
             if (
               title &&
               displayText &&
-              !displayText.toLowerCase().includes(title.toLowerCase())
+              displayText.toLowerCase().indexOf(title.toLowerCase()) === -1
             ) {
               displayText = title + " | " + displayText;
             } else if (title && !displayText) {
@@ -1828,166 +2617,48 @@
           if (copyrightDiv) {
             copyrightDiv.textContent = "Error displaying image info.";
           }
+          applyFallbackBackgroundStyles();
         }
       }
-
-      async function fetchDiscordStatus(userId) {
-        if (navigator.userAgent.includes("Edge/15.")) {
-          console.log(
-            "Edge 15 detected, skipping Discord status fetch due to TLS incompatibility."
-          );
-          return { error: "not_supported" };
-        }
-
-        var apiUrl = "https://statusstream.many.win/users/" + userId;
-        try {
-          var response = await fetch(apiUrl, { cache: "no-store" });
-          if (!response.ok) {
-            if (response.status === 404) {
-              console.warn("StatusStream API: User " + userId + " not found.");
-              return { error: "not_found" };
-            }
-            throw new Error(
-              "StatusStream API error! status: " + response.status
+      function applyFallbackBackgroundStyles() {
+        console.log("Applying fallback background images.");
+        var fallbackLandscape =
+          "https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg";
+        var fallbackPortrait =
+          "https://windows10spotlight.com/wp-content/uploads/2025/03/996ac5d452384af9ed57976915617a0d.jpg";
+        var setFallbackBackground = function () {
+          var isPortrait =
+            "matchMedia" in window &&
+            window.matchMedia("(orientation: portrait)").matches;
+          var imageUrl = isPortrait ? fallbackPortrait : fallbackLandscape;
+          document.body.style.backgroundImage = 'url("' + imageUrl + '")';
+          document.body.style.backgroundRepeat = "no-repeat";
+          document.body.style.backgroundPosition = "center center";
+          document.body.style.backgroundAttachment = "fixed";
+          document.body.style.backgroundSize = "cover";
+          if (document.documentElement.style.setProperty) {
+            document.documentElement.style.setProperty(
+              "--bg-image-landscape",
+              'url("' + fallbackLandscape + '")'
+            );
+            document.documentElement.style.setProperty(
+              "--bg-image-portrait",
+              'url("' + fallbackPortrait + '")'
             );
           }
-          var data = await response.json();
-          var statusstream = data && data.statusstream;
-          if (!statusstream) {
-            throw new Error(
-              "Invalid data structure received from StatusStream API"
-            );
+        };
+        setFallbackBackground();
+        if ("matchMedia" in window) {
+          var mediaQuery = window.matchMedia("(orientation: portrait)");
+          if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener("change", setFallbackBackground);
+          } else if (mediaQuery.addListener) {
+            mediaQuery.addListener(setFallbackBackground);
           }
-          return { data: statusstream };
-        } catch (error) {
-          console.error("Error fetching Discord status:", error);
-          var errorMsg = error && error.message;
-          if (errorMsg && errorMsg.toLowerCase().includes("failed to fetch")) {
-            return { error: "fetch_failed" };
-          }
-          return { error: "generic_error" };
         }
+        var copyrightDiv = document.getElementById("copyright-info");
+        if (copyrightDiv) copyrightDiv.textContent = "Default background";
       }
-
-      function parseDiscordStatus(statusData) {
-        var mainActivitiesHtml = "";
-        var customStatusText = null;
-        var presenceStatus =
-          statusData && statusData.presence ? statusData.presence : "offline";
-        var activities =
-          statusData && statusData.activities ? statusData.activities : [];
-
-        if (
-          !statusData ||
-          presenceStatus === "offline" ||
-          activities.length === 0
-        ) {
-          return {
-            mainHtml: '<span class="status-offline">Offline</span>',
-            customStatus: null,
-          };
-        }
-
-        for (var i = 0; i < activities.length; i++) {
-          var activity = activities[i];
-          var activityHtml = "";
-          var icon = "💡";
-
-          if (activity.type === 4 && activity.state) {
-            customStatusText = activity.state;
-            continue;
-          }
-
-          if (activity.type !== 4 && !activity.name && !activity.details) {
-            continue;
-          }
-
-          var primaryText = "",
-            secondaryText = "",
-            tertiaryText = "";
-          var assets = activity.assets;
-          var largeText = assets && assets.largeText;
-          var state = activity.state;
-          var details = activity.details;
-          var name = activity.name;
-          var appId = activity.applicationId;
-
-          if (activity.type === 2 && name === "Spotify") {
-            icon = "🎧";
-            primaryText = details || "Unknown Song";
-            secondaryText = state ? "by " + state : "";
-            tertiaryText = largeText ? "(" + largeText + ")" : "";
-          } else if (appId === "383226320970055681" && largeText) {
-            icon = "💻";
-            primaryText = largeText;
-            secondaryText = state || "";
-          } else if (activity.type === 0) {
-            icon = "🎮";
-            primaryText = "Playing " + name;
-            secondaryText = details || "";
-            tertiaryText = state || "";
-          } else if (activity.type === 3) {
-            icon = "📺";
-            primaryText = "Watching " + name;
-            secondaryText = details || "";
-            tertiaryText = state || "";
-          } else if (activity.type === 1) {
-            icon = "🎙️";
-            primaryText = "Streaming " + name;
-            secondaryText = details || "";
-            tertiaryText = state || "";
-          } else {
-            icon = "💡";
-            primaryText = name || "Activity";
-            secondaryText = details || "";
-            tertiaryText = state || "";
-          }
-
-          activityHtml = icon + " " + primaryText;
-          if (secondaryText) activityHtml += " " + secondaryText;
-          if (tertiaryText) activityHtml += " " + tertiaryText;
-
-          mainActivitiesHtml +=
-            '<p class="activity-item">' + activityHtml + "</p>";
-        }
-
-        if (mainActivitiesHtml === "") {
-          mainActivitiesHtml = '<p class="activity-item">✨ Currently Idle</p>';
-        }
-
-        mainActivitiesHtml =
-          '<span class="status-online">Online</span>' + mainActivitiesHtml;
-
-        return { mainHtml: mainActivitiesHtml, customStatus: customStatusText };
-      }
-
-      function updateDiscordStatusUI(statusResult) {
-        var statusAreaElement = document.getElementById("discord-status-area");
-        var bubbleElement = document.getElementById("custom-status-bubble");
-
-        if (!statusAreaElement || !bubbleElement) {
-          return;
-        }
-
-        statusAreaElement.innerHTML =
-          statusResult.mainHtml ||
-          '<p class="error-message">Error loading status.</p>';
-
-        if (statusResult.customStatus) {
-          bubbleElement.textContent = statusResult.customStatus;
-          bubbleElement.style.display = "";
-          bubbleElement.classList.add("visible");
-        } else {
-          bubbleElement.textContent = "";
-          bubbleElement.style.display = "none";
-          bubbleElement.classList.remove("visible");
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", function () {
-        fetchSpotlightData();
-        createAboutMeWindow();
-      });
     </script>
   </body>
 </html>
