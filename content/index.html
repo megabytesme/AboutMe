@@ -56,7 +56,7 @@
         display: flex;
         flex-direction: column;
         cursor: default;
-        z-index: 1;
+        z-index: 2;
       }
 
       .drag-handle {
@@ -68,8 +68,11 @@
         -webkit-user-select: none;
         -ms-user-select: none;
         touch-action: none;
+        display: -webkit-flex;
         display: flex;
+        -webkit-align-items: center;
         align-items: center;
+        -webkit-flex-shrink: 0;
         flex-shrink: 0;
         position: relative;
         z-index: 20;
@@ -78,6 +81,7 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
+        -webkit-flex-shrink: 0;
         flex-shrink: 0;
         border: 1px solid rgba(255, 255, 255, 0.15);
         margin-right: 10px;
@@ -88,6 +92,7 @@
         font-weight: 600;
         line-height: 1.4;
         color: #ffffff;
+        -webkit-flex-grow: 1;
         flex-grow: 1;
         pointer-events: none;
         white-space: nowrap;
@@ -97,8 +102,11 @@
       }
 
       .window-controls {
+        display: -webkit-flex;
         display: flex;
+        -webkit-align-items: center;
         align-items: center;
+        -webkit-flex-shrink: 0;
         flex-shrink: 0;
         margin-left: auto;
       }
@@ -133,7 +141,8 @@
       .window-button:not(:disabled):hover {
         background-color: rgba(255, 255, 255, 0.15);
       }
-      .window-button.close:not(:disabled):hover {
+      .window-button.close:not(:disabled):hover,
+      .window-button.minimize:not(:disabled):hover {
         background-color: #e81123;
         color: white;
       }
@@ -324,31 +333,16 @@
         touch-action: none;
       }
 
-      #reopenAboutMeBtn {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        padding: 8px 15px;
-        background-color: rgba(50, 50, 50, 0.7);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 4px;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-        font-size: 14px;
-      }
-
       #copyright-info {
         position: fixed;
-        bottom: 5px;
+        bottom: 45px;
         right: 10px;
         font-size: 10px;
         color: #cccccc;
         background-color: rgba(0, 0, 0, 0.7);
         padding: 2px 6px;
         border-radius: 3px;
-        z-index: 0;
+        z-index: 1;
         text-shadow: none;
         max-width: 40%;
         text-align: right;
@@ -620,6 +614,92 @@
         border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
       }
 
+      #taskbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 40px;
+        background: rgba(30, 30, 30, 0.8);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1001;
+        padding: 5px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+      }
+
+      .taskbar-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8px;
+        margin: 0 3px;
+        height: 30px;
+        width: 40px;
+        background-color: rgba(60, 60, 60, 0.8);
+        color: #f0f0f0;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .taskbar-button:hover {
+        background-color: rgba(80, 80, 80, 0.9);
+      }
+      .taskbar-button img {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        border-radius: 3px;
+        flex-shrink: 0;
+        vertical-align: middle;
+      }
+      .taskbar-button span {
+        display: none;
+      }
+      .taskbar-button.active {
+        background-color: rgba(85, 85, 85, 0.9);
+      }
+      .taskbar-button.active::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 2px;
+        background-color: var(--link-color, #2899f5);
+        border-radius: 1px;
+      }
+
+      .fluent-card.maximized {
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: calc(100% - 40px) !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        transition: none !important;
+      }
+
+      .fluent-card.maximized .drag-handle {
+        cursor: default;
+      }
+
+      .fluent-card.maximized .resize-handle {
+        display: none;
+      }
+
       @media (prefers-color-scheme: light) {
         body {
           color: #201f1e;
@@ -645,6 +725,11 @@
         }
         .window-button:not(:disabled):hover {
           background-color: rgba(0, 0, 0, 0.1);
+        }
+        .window-button.close:not(:disabled):hover,
+        .window-button.minimize:not(:disabled):hover {
+          background-color: #da454b;
+          color: white;
         }
         .fluent-card-content {
           color: #201f1e;
@@ -704,12 +789,6 @@
           );
           border-top-color: rgba(0, 0, 0, 0.1);
           border-left-color: rgba(0, 0, 0, 0.1);
-        }
-        #reopenAboutMeBtn {
-          background-color: rgba(255, 255, 255, 0.7);
-          color: #000;
-          border-color: rgba(0, 0, 0, 0.1);
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
         }
         #copyright-info {
           color: #ffffff;
@@ -801,6 +880,24 @@
           color: #ffffff;
           background-color: #d83c3e;
         }
+        #taskbar {
+          background: rgba(245, 245, 245, 0.8);
+          border-top-color: rgba(0, 0, 0, 0.1);
+        }
+        .taskbar-button {
+          background-color: rgba(220, 220, 220, 0.8);
+          color: #201f1e;
+          border-color: rgba(0, 0, 0, 0.1);
+        }
+        .taskbar-button:hover {
+          background-color: rgba(200, 200, 200, 0.9);
+        }
+        .taskbar-button.active {
+          background-color: rgba(205, 205, 205, 0.9);
+        }
+        .taskbar-button.active::after {
+          background-color: var(--link-color, #0078d4);
+        }
       }
 
       @supports (--foo: bar) and
@@ -830,9 +927,6 @@
           --window-button-close-hover-text: white;
           --resize-handle-border: rgba(255, 255, 255, 0.2);
           --resize-handle-fill: rgba(255, 255, 255, 0.2);
-          --reopen-button-bg: rgba(50, 50, 50, 0.7);
-          --reopen-button-text: #fff;
-          --reopen-button-shadow: var(--card-shadow);
           --copyright-bg: rgba(0, 0, 0, 0.7);
           --copyright-text: #cccccc;
           --project-lang-csharp: #d8a0df;
@@ -842,6 +936,13 @@
           --project-lang-other: #aaaaaa;
           --bg-image-landscape: none;
           --bg-image-portrait: none;
+          --taskbar-bg: rgba(30, 30, 30, 0.8);
+          --taskbar-button-bg: rgba(60, 60, 60, 0.8);
+          --taskbar-button-hover-bg: rgba(80, 80, 80, 0.9);
+          --taskbar-button-active-bg: rgba(85, 85, 85, 0.9);
+          --taskbar-button-text: var(--body-text);
+          --taskbar-button-border: var(--border-color);
+          --taskbar-height: 40px;
         }
         @media (prefers-color-scheme: light) {
           :root {
@@ -862,9 +963,6 @@
             --button-active-bg: #004c87;
             --resize-handle-border: rgba(0, 0, 0, 0.1);
             --resize-handle-fill: rgba(0, 0, 0, 0.1);
-            --reopen-button-bg: rgba(255, 255, 255, 0.7);
-            --reopen-button-text: #000;
-            --reopen-button-shadow: var(--card-shadow);
             --copyright-bg: rgba(0, 0, 0, 0.5);
             --copyright-text: #ffffff;
             --project-lang-csharp: #9b4f96;
@@ -872,6 +970,13 @@
             --project-lang-java: #b07219;
             --project-lang-lua: #2c2d72;
             --project-lang-other: #888888;
+            --taskbar-bg: rgba(245, 245, 245, 0.8);
+            --taskbar-button-bg: rgba(220, 220, 220, 0.8);
+            --taskbar-button-hover-bg: rgba(200, 200, 200, 0.9);
+            --taskbar-button-active-bg: rgba(205, 205, 205, 0.9);
+            --taskbar-button-text: var(--body-text);
+            --taskbar-button-border: var(--border-color);
+            --window-button-close-hover-bg: #da454b;
           }
         }
         html {
@@ -898,12 +1003,30 @@
         .drag-handle {
           background-color: var(--handle-bg);
           border-bottom-color: var(--border-color);
+          display: -webkit-flex;
+          display: flex;
+          -webkit-align-items: center;
+          align-items: center;
+          -webkit-flex-shrink: 0;
+          flex-shrink: 0;
         }
         .drag-handle img.handle-pic {
           border-color: var(--border-color);
+          -webkit-flex-shrink: 0;
+          flex-shrink: 0;
         }
         .drag-handle h1.handle-title {
           color: var(--heading-color);
+          -webkit-flex-grow: 1;
+          flex-grow: 1;
+        }
+        .window-controls {
+          display: -webkit-flex;
+          display: flex;
+          -webkit-align-items: center;
+          align-items: center;
+          -webkit-flex-shrink: 0;
+          flex-shrink: 0;
         }
         .window-button {
           color: var(--window-button-text);
@@ -911,7 +1034,8 @@
         .window-button:not(:disabled):hover {
           background-color: var(--window-button-hover-bg);
         }
-        .window-button.close:not(:disabled):hover {
+        .window-button.close:not(:disabled):hover,
+        .window-button.minimize:not(:disabled):hover {
           background-color: var(--window-button-close-hover-bg);
           color: var(--window-button-close-hover-text);
         }
@@ -944,7 +1068,6 @@
           animation-duration: var(--scroll-duration);
         }
         .scrolling-icons-track img {
-          filter: brightness(0.9);
         }
         @media (prefers-color-scheme: light) {
           .scrolling-icons-track img {
@@ -981,12 +1104,6 @@
           );
           border-top-color: var(--resize-handle-border);
           border-left-color: var(--resize-handle-border);
-        }
-        #reopenAboutMeBtn {
-          background-color: var(--reopen-button-bg);
-          color: var(--reopen-button-text);
-          border-color: var(--border-color);
-          box-shadow: 0 2px 5px var(--reopen-button-shadow);
         }
         #copyright-info {
           color: var(--copyright-text);
@@ -1060,12 +1177,81 @@
         .activity-text strong {
           color: var(--heading-color);
         }
+        #taskbar {
+          background: var(--taskbar-bg);
+          border-top-color: var(--border-color);
+        }
+        .taskbar-button {
+          background-color: var(--taskbar-button-bg);
+          color: var(--taskbar-button-text);
+          border-color: var(--taskbar-button-border);
+        }
+        .taskbar-button:hover {
+          background-color: var(--taskbar-button-hover-bg);
+        }
+        .taskbar-button.active {
+          background-color: var(--taskbar-button-active-bg);
+        }
+        .taskbar-button.active::after {
+          background-color: var(--link-color);
+        }
+        @media (prefers-color-scheme: light) {
+          .taskbar-button.active {
+            background-color: var(--taskbar-button-active-bg);
+          }
+          .taskbar-button.active::after {
+            background-color: var(--link-color);
+          }
+        }
+
+        .fluent-card.maximized {
+          height: calc(100% - var(--taskbar-height, 40px)) !important;
+        }
       }
     </style>
   </head>
   <body>
-    <button id="reopenAboutMeBtn">About Me</button>
     <div id="copyright-info"></div>
+    <div id="taskbar">
+      <button
+        class="taskbar-button"
+        data-window-id="about-me"
+        aria-label="About Me - Ben"
+      >
+        <img
+          src="https://avatars.githubusercontent.com/u/57240557?v=4"
+          alt=""
+        />
+        <span>About Me - Ben</span>
+      </button>
+      <button
+        class="taskbar-button"
+        data-window-id="projects"
+        aria-label="My Projects"
+      >
+        <img
+          src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/github.svg"
+          alt=""
+        />
+        <span>My Projects</span>
+      </button>
+      <button
+        class="taskbar-button"
+        data-window-id="pc-rigs"
+        aria-label="PC Rigs"
+      >
+        <img src="https://img.icons8.com/fluency/48/workstation.png" alt="" />
+        <span>PC Rigs</span>
+      </button>
+      <button
+        class="taskbar-button"
+        data-window-id="vehicles"
+        aria-label="My Vehicles"
+      >
+        <img src="https://img.icons8.com/fluency/48/car.png" alt="" />
+        <span>My Vehicles</span>
+      </button>
+    </div>
 
     <script>
       var GITHUB_USERNAME = "megabytesme";
@@ -1117,6 +1303,8 @@
       var lanyardPollIntervalId = null;
       var lanyardPollFailureCount = 0;
       var lanyardUpdateMethod = null;
+      var taskbar = null;
+      var taskbarHeight = 0;
 
       var aboutMeContent =
         '<div class="content-area">' +
@@ -1151,7 +1339,7 @@
       var projectsInitialContent =
         '<div class="projects-list"><p class="loading-message">Loading GitHub projects...</p></div>';
       var projectsFooter =
-        '<button class="fluent-button close-window-button">Close GitHub Projects</button>' +
+        '<button class="fluent-button close-window-button">Close</button>' +
         '<a href="https://github.com/' +
         GITHUB_USERNAME +
         '" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>';
@@ -1169,7 +1357,7 @@
         '<p class="intro-text">Lightweight & low-power for light development and media on the go.</p>' +
         "</div>";
       var pcRigsFooter =
-        '<button class="fluent-button close-window-button">Close Rigs</button>';
+        '<button class="fluent-button close-window-button">Close</button>';
       var vehiclesContent =
         '<div class="content-area">' +
         "<h1>My Vehicles</h1>" +
@@ -1187,11 +1375,13 @@
         '<p class="intro-text">My Remote-Controlled (RC) car. Modified with upgraded motor and bigger battery (2s LiPo).</p>' +
         "</div>";
       var vehiclesFooter =
-        '<button class="fluent-button close-window-button">Close Vehicles</button>';
+        '<button class="fluent-button close-window-button">Close</button>';
 
       function FluentWindow(id, title, titleIconUrl, contentHtml, options) {
         options = options || {};
         this.id = id;
+        this.title = title;
+        this.titleIconUrl = titleIconUrl || DEFAULT_WINDOW_ICON;
         this.isDragging = false;
         this.isResizing = false;
         this.positionedWithTopLeft = false;
@@ -1203,6 +1393,9 @@
         this.initialHeight = 0;
         this.initialCardX_resize = 0;
         this.initialCardY_resize = 0;
+        this.isMaximized = false;
+        this.previousState = { top: "", left: "", width: "", height: "" };
+
         this.element = this._createWindowElement(
           id,
           title,
@@ -1215,11 +1408,24 @@
         this.dragHandle = this.element.querySelector(".drag-handle");
         this.resizeHandle = this.element.querySelector(".resize-handle");
         this.closeButton = this.element.querySelector(".window-button.close");
+        this.minimizeButton = this.element.querySelector(
+          ".window-button.minimize"
+        );
+        this.maximizeButton = this.element.querySelector(
+          ".window-button.maximize"
+        );
+
         this.setContent(contentHtml);
         this._attachEventListeners();
         this._setInitialPosition(options.initialOffset);
         this.bringToFront();
+        var isMobile = window.innerWidth < 768;
+        if (isMobile && options.fullscreenMobile) {
+          this.toggleMaximize();
+        }
+        updateTaskbarVisibility();
       }
+
       FluentWindow.prototype.setContent = function (html) {
         try {
           if (this.contentContainer) {
@@ -1229,6 +1435,7 @@
           console.error("Error setting window content:", e);
         }
       };
+
       FluentWindow.prototype._createWindowElement = function (
         id,
         title,
@@ -1238,95 +1445,102 @@
         var card = document.createElement("div");
         card.className = "fluent-card";
         card.id = "window-" + id;
+        card.style.minWidth = MIN_WINDOW_WIDTH + "px";
+        card.style.minHeight = MIN_WINDOW_HEIGHT + "px";
+        card.style.display = "flex";
+
         var footerSection = footerHtml
           ? '<div class="links-section">' + footerHtml + "</div>"
           : "";
         card.innerHTML =
           '<div class="drag-handle">' +
           '<img src="' +
-          (titleIconUrl || DEFAULT_WINDOW_ICON) +
-          '" alt="Window Icon" class="handle-pic">' +
+          titleIconUrl +
+          '" alt="" class="handle-pic">' +
           '<h1 class="handle-title">' +
           title +
           "</h1>" +
           '<div class="window-controls">' +
-          '<button class="window-button minimize" disabled aria-hidden="true">–</button>' +
-          '<button class="window-button maximize" disabled aria-hidden="true">▢</button>' +
+          '<button class="window-button minimize" aria-label="Minimize ' +
+          title +
+          '">–</button>' +
+          '<button class="window-button maximize" aria-label="Maximize ' +
+          title +
+          '">▢</button>' +
           '<button class="window-button close" aria-label="Close ' +
           title +
-          '">✕</button>' +
+          '">×</button>' +
           "</div>" +
           "</div>" +
           '<div class="fluent-card-content"></div>' +
           footerSection +
           '<div class="resize-handle"></div>';
-        document.body.appendChild(card);
+        try {
+          document.body.appendChild(card);
+        } catch (e) {
+          console.error("Error appending window element: " + e.message);
+        }
         return card;
       };
+
       FluentWindow.prototype._setInitialPosition = function (offset) {
         var self = this;
         offset = offset || { x: 0, y: 0 };
         var reqAnimFrame =
           window.requestAnimationFrame ||
-          window.mozRequestAnimationFrame ||
-          window.webkitRequestAnimationFrame ||
-          window.msRequestAnimationFrame ||
           function (callback) {
-            window.setTimeout(callback, 1000 / 60);
+            window.setTimeout(callback, 32);
           };
         reqAnimFrame(function () {
           try {
             if (!self.element) return;
-            if (self.element.style.left || self.element.style.top) {
-              return;
-            }
-            var cardWidth = self.element.offsetWidth;
-            var cardHeight = self.element.offsetHeight;
+            var cardWidth =
+              self.element.offsetWidth ||
+              parseInt(self.element.style.width) ||
+              MIN_WINDOW_WIDTH;
+            var cardHeight =
+              self.element.offsetHeight ||
+              parseInt(self.element.style.height) ||
+              MIN_WINDOW_HEIGHT;
             var viewportWidth = document.documentElement.clientWidth;
-            var viewportHeight = document.documentElement.clientHeight;
-            if (cardWidth <= 0 || cardHeight <= 0) {
-              console.warn(
-                "Window " +
-                  self.id +
-                  " has invalid dimensions (" +
-                  cardWidth +
-                  "x" +
-                  cardHeight +
-                  "), retrying positioning."
-              );
-              setTimeout(function () {
-                self._setInitialPosition(offset);
-              }, 50);
-              return;
+            var availableHeight = window.innerHeight - taskbarHeight;
+
+            if (!self.positionedWithTopLeft) {
+              var initialLeft =
+                viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
+              var initialTop =
+                availableHeight > cardHeight
+                  ? (availableHeight - cardHeight) / 2
+                  : 0;
+              initialLeft += offset.x;
+              initialTop += offset.y;
+              initialLeft = Math.max(0, initialLeft);
+              initialTop = Math.max(0, initialTop);
+              if (initialLeft + cardWidth > viewportWidth) {
+                initialLeft = Math.max(0, viewportWidth - cardWidth);
+              }
+              if (initialTop + cardHeight > availableHeight) {
+                initialTop = Math.max(0, availableHeight - cardHeight);
+              }
+              self.element.style.left = initialLeft + "px";
+              self.element.style.top = initialTop + "px";
+              self.positionedWithTopLeft = true;
             }
-            var initialLeft =
-              viewportWidth > cardWidth ? (viewportWidth - cardWidth) / 2 : 0;
-            var initialTop =
-              viewportHeight > cardHeight
-                ? (viewportHeight - cardHeight) / 2
-                : 0;
-            initialLeft += offset.x;
-            initialTop += offset.y;
-            initialLeft = Math.max(0, initialLeft);
-            initialTop = Math.max(0, initialTop);
-            if (initialLeft + cardWidth > viewportWidth) {
-              initialLeft = Math.max(0, viewportWidth - cardWidth);
-            }
-            if (initialTop + cardHeight > viewportHeight) {
-              initialTop = Math.max(0, viewportHeight - cardHeight);
-            }
-            self.element.style.left = initialLeft + "px";
-            self.element.style.top = initialTop + "px";
-            self.positionedWithTopLeft = true;
             _updateContentHeight(self);
           } catch (e) {
             console.error("Error setting initial position:", e);
           }
         });
       };
+
       function _updateContentHeight(windowInstance) {
         try {
-          if (!windowInstance || !windowInstance.element) return;
+          if (
+            !windowInstance ||
+            !windowInstance.element ||
+            windowInstance.element.style.display === "none"
+          )
+            return;
           var card = windowInstance.element;
           var handle = windowInstance.dragHandle;
           var footer = card.querySelector(".links-section");
@@ -1337,10 +1551,18 @@
           var cardHeight = card.offsetHeight;
           var handleHeight = handle.offsetHeight;
           var footerHeight = footer ? footer.offsetHeight : 0;
+
+          handleHeight = typeof handleHeight === "number" ? handleHeight : 0;
+          footerHeight = typeof footerHeight === "number" ? footerHeight : 0;
+          cardHeight = typeof cardHeight === "number" ? cardHeight : 0;
+
           var contentHeight = cardHeight - handleHeight - footerHeight;
 
-          if (contentHeight > 0) {
+          if (contentHeight > 10) {
             content.style.height = contentHeight + "px";
+          } else if (cardHeight > handleHeight + footerHeight) {
+            content.style.height =
+              cardHeight - handleHeight - footerHeight + "px";
           } else {
             content.style.height = "100px";
           }
@@ -1348,24 +1570,82 @@
           console.error("Error updating content height", e);
         }
       }
+
+      FluentWindow.prototype.toggleMaximize = function () {
+        if (this.isMaximized) {
+          if (this.element.classList) {
+            this.element.classList.remove("maximized");
+          } else {
+            this.element.className = this.element.className.replace(
+              /\bmaximized\b/g,
+              ""
+            );
+          }
+          this.element.style.left = this.previousState.left;
+          this.element.style.top = this.previousState.top;
+          this.element.style.width = this.previousState.width;
+          this.element.style.height = this.previousState.height;
+
+          this.maximizeButton.innerHTML = "▢";
+          this.maximizeButton.setAttribute(
+            "aria-label",
+            "Maximize " + this.title
+          );
+          this.dragHandle.style.cursor = "grab";
+          this.resizeHandle.style.display = "";
+          this.isMaximized = false;
+        } else {
+          this.previousState.left = this.element.style.left;
+          this.previousState.top = this.element.style.top;
+          this.previousState.width = this.element.style.width;
+          this.previousState.height = this.element.style.height;
+
+          if (this.element.classList) {
+            this.element.classList.add("maximized");
+          } else {
+            this.element.className += " maximized";
+          }
+          var availableHeight = window.innerHeight - taskbarHeight;
+          this.element.style.left = "0px";
+          this.element.style.top = "0px";
+          this.element.style.width = "100%";
+          this.element.style.height = availableHeight + "px";
+
+          this.maximizeButton.innerHTML = "❐";
+          this.maximizeButton.setAttribute(
+            "aria-label",
+            "Restore " + this.title
+          );
+          this.dragHandle.style.cursor = "default";
+          this.isMaximized = true;
+        }
+
+        var self = this;
+        setTimeout(function () {
+          _updateContentHeight(self);
+        }, 50);
+      };
+
       FluentWindow.prototype._attachEventListeners = function () {
         try {
           var supportsTouch =
             "ontouchstart" in window ||
             (window.navigator && window.navigator.msMaxTouchPoints > 0);
           var down = supportsTouch ? "touchstart" : "mousedown";
-          var up = supportsTouch ? "touchend" : "mouseup";
-          var move = supportsTouch ? "touchmove" : "mousemove";
 
           this._boundStartDrag = this._startDrag.bind(this);
           this._boundStartResize = this._startResize.bind(this);
           this._boundBringToFront = this.bringToFront.bind(this);
           this._boundDestroy = this.destroy.bind(this);
+          this._boundToggleMaximize = this.toggleMaximize.bind(this);
 
           addEvent(this.dragHandle, down, this._boundStartDrag);
           addEvent(this.resizeHandle, down, this._boundStartResize);
           addEvent(this.element, down, this._boundBringToFront);
           addEvent(this.closeButton, "click", this._boundDestroy);
+          addEvent(this.minimizeButton, "click", this._boundDestroy);
+          addEvent(this.maximizeButton, "click", this._boundToggleMaximize);
+          addEvent(this.dragHandle, "dblclick", this._boundToggleMaximize);
 
           var footer = this.element.querySelector(".links-section");
           if (footer) {
@@ -1395,20 +1675,33 @@
               }
             };
             addEvent(footer, "click", this._boundFooterClick);
-          } else {
-            console.error(
-              "ERROR: Footer element (.links-section) not found for window: " +
-                this.id
-            );
           }
         } catch (e) {
           console.error("Error attaching event listeners:", e);
         }
       };
+
       FluentWindow.prototype.bringToFront = function () {
         highestZ++;
         this.element.style.zIndex = highestZ;
+
+        var buttons = taskbar
+          ? taskbar.querySelectorAll(".taskbar-button")
+          : [];
+        for (var i = 0; i < buttons.length; i++) {
+          var btn = buttons[i];
+          var winId = btn.getAttribute("data-window-id");
+          if (winId === this.id) {
+            if (btn.classList) btn.classList.add("active");
+            else if (btn.className.indexOf(" active") === -1)
+              btn.className += " active";
+          } else {
+            if (btn.classList) btn.classList.remove("active");
+            else btn.className = btn.className.replace(/\bactive\b/g, "");
+          }
+        }
       };
+
       FluentWindow.prototype._switchToTopLeftPositioningIfNeeded = function () {
         if (
           !this.positionedWithTopLeft &&
@@ -1418,7 +1711,9 @@
           this._setInitialPosition();
         }
       };
+
       FluentWindow.prototype._startDrag = function (e) {
+        if (this.isMaximized) return;
         try {
           e = e || window.event;
           var target = e.target || e.srcElement;
@@ -1440,12 +1735,22 @@
           var controls = findParent(target, "window-controls");
           var handle = findParent(target, "drag-handle");
 
-          if (target.nodeName === "BUTTON" || controls) {
+          if (
+            target.nodeName === "BUTTON" &&
+            findParent(target, "window-controls")
+          ) {
             return;
           }
+
           if (target !== this.dragHandle && !handle) {
-            return;
+            if (
+              !findParent(target, "handle-title") &&
+              !findParent(target, "handle-pic")
+            ) {
+              return;
+            }
           }
+
           if (this.isResizing) {
             return;
           }
@@ -1487,7 +1792,7 @@
         }
       };
       FluentWindow.prototype._doDrag = function (e) {
-        if (!this.isDragging) return;
+        if (!this.isDragging || this.isMaximized) return;
 
         var isTouchEvent = e.type.indexOf("touch") === 0;
         if (isTouchEvent && (!e.touches || e.touches.length === 0)) {
@@ -1498,34 +1803,21 @@
         var currentMouseX = currentEvent.clientX;
         var currentMouseY = currentEvent.clientY;
 
-        try {
-          var contentRect = this.contentContainer.getBoundingClientRect();
-          if (
-            currentMouseX >= contentRect.left &&
-            currentMouseX <= contentRect.right &&
-            currentMouseY >= contentRect.top &&
-            currentMouseY <= contentRect.bottom
-          ) {
-            return;
-          }
-        } catch (contentRectErr) {
-          console.error(
-            "Error getting content rect in _doDrag: " +
-              (contentRectErr.message || contentRectErr)
-          );
-        }
-
         if (e.preventDefault) e.preventDefault();
         else e.returnValue = false;
 
         var newCardX = currentMouseX - this.dragOffsetX;
         var newCardY = currentMouseY - this.dragOffsetY;
         var viewportWidth = document.documentElement.clientWidth;
-        var viewportHeight = document.documentElement.clientHeight;
+        var availableHeight = window.innerHeight - taskbarHeight;
         var cardWidth = this.element.offsetWidth;
         var cardHeight = this.element.offsetHeight;
         newCardX = Math.max(0, Math.min(newCardX, viewportWidth - cardWidth));
-        newCardY = Math.max(0, Math.min(newCardY, viewportHeight - cardHeight));
+
+        newCardY = Math.max(
+          0,
+          Math.min(newCardY, availableHeight - cardHeight)
+        );
         this.element.style.left = newCardX + "px";
         this.element.style.top = newCardY + "px";
       };
@@ -1538,7 +1830,10 @@
 
         this.isDragging = false;
 
-        this.dragHandle.style.cursor = "grab";
+        if (!this.isMaximized) {
+          this.dragHandle.style.cursor = "grab";
+        }
+
         if (activeInteractionWindow === this) {
           activeInteractionWindow = null;
           document.body.style.cursor = "default";
@@ -1553,6 +1848,7 @@
         this._boundEndDrag = null;
       };
       FluentWindow.prototype._startResize = function (e) {
+        if (this.isMaximized) return;
         try {
           e = e || window.event;
           var target = e.target || e.srcElement;
@@ -1594,7 +1890,7 @@
         }
       };
       FluentWindow.prototype._doResize = function (e) {
-        if (!this.isResizing) return;
+        if (!this.isResizing || this.isMaximized) return;
         e = e || window.event;
 
         var isTouchEvent = e.type.indexOf("touch") === 0;
@@ -1613,25 +1909,27 @@
 
         var newWidth = this.initialWidth + dx;
         var newHeight = this.initialHeight + dy;
+
         newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
         newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
+
         var viewportWidth = document.documentElement.clientWidth;
-        var viewportHeight = document.documentElement.clientHeight;
+        var availableHeight = window.innerHeight - taskbarHeight;
+
         if (this.initialCardX_resize + newWidth > viewportWidth) {
           newWidth = viewportWidth - this.initialCardX_resize;
         }
-        if (this.initialCardY_resize + newHeight > viewportHeight) {
-          newHeight = viewportHeight - this.initialCardY_resize;
+        if (this.initialCardY_resize + newHeight > availableHeight) {
+          newHeight = availableHeight - this.initialCardY_resize;
         }
+
         newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
         newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
 
         this.element.style.width = newWidth + "px";
         this.element.style.height = newHeight + "px";
 
-        if (typeof _updateContentHeight === "function") {
-          _updateContentHeight(this);
-        }
+        _updateContentHeight(this);
       };
       FluentWindow.prototype._endResize = function (e) {
         if (!this.isResizing) return;
@@ -1656,12 +1954,10 @@
           this._boundEndResize = null;
         }
       };
+
       FluentWindow.prototype.destroy = function () {
         try {
           if (this.id === "about-me") {
-            console.log(
-              "Stopping Lanyard updates due to About Me window closure."
-            );
             stopLanyardUpdates();
           }
           var supportsTouch =
@@ -1677,11 +1973,22 @@
             removeEvent(this.element, down, this._boundBringToFront);
           if (this._boundDestroy)
             removeEvent(this.closeButton, "click", this._boundDestroy);
+          if (this._boundDestroy)
+            removeEvent(this.minimizeButton, "click", this._boundDestroy);
+          if (this._boundToggleMaximize)
+            removeEvent(
+              this.maximizeButton,
+              "click",
+              this._boundToggleMaximize
+            );
+          if (this._boundToggleMaximize)
+            removeEvent(this.dragHandle, "dblclick", this._boundToggleMaximize);
 
           var footer = this.element.querySelector(".links-section");
           if (footer && this._boundFooterClick) {
             removeEvent(footer, "click", this._boundFooterClick);
           }
+
           if (this.element && this.element.parentNode) {
             this.element.parentNode.removeChild(this.element);
           }
@@ -1690,6 +1997,7 @@
             activeInteractionWindow = null;
             document.body.style.cursor = "default";
           }
+          updateTaskbarVisibility();
         } catch (e) {
           console.error("Error destroying window:", e);
         }
@@ -1711,11 +2019,25 @@
           element.detachEvent("on" + eventName, callback);
         }
       }
+
+      function updateTaskbarVisibility() {
+        if (!taskbar) return;
+
+        taskbar.style.display = "flex";
+        taskbarHeight = taskbar.offsetHeight || 40;
+
+        var copyrightDiv = document.getElementById("copyright-info");
+        if (copyrightDiv) {
+          copyrightDiv.style.bottom = "45px";
+        }
+      }
+
       function createWindow(id, title, titleIconUrl, contentHtml, options) {
         if (windows[id]) {
           windows[id].bringToFront();
           return windows[id];
         }
+
         var newWindow = null;
         try {
           newWindow = new FluentWindow(
@@ -1796,9 +2118,7 @@
 
       function fetchProjects(username, callback) {
         var apiUrl =
-          "https://api.github.com/users/" +
-          username +
-          "/repos?sort=updated&per_page=20";
+          "https://api.github.com/users/" + username + "/repos?sort=updated";
         makeRequest(apiUrl, function (error, data) {
           if (error) {
             console.error("Error fetching projects:", error);
@@ -1870,10 +2190,12 @@
       }
 
       function connectLanyardSocket(userId) {
+        var aboutWindow = windows["about-me"];
+        if (!aboutWindow) return;
+
         lanyardUpdateMethod = "websocket";
         lanyardWSRetryCount = 0;
         if (lanyardSocket && lanyardSocket.readyState === WebSocket.OPEN) {
-          console.log("Lanyard WebSocket already open.");
           return;
         }
         if (lanyardReconnectTimeout) {
@@ -1884,11 +2206,7 @@
           clearInterval(lanyardHeartbeatInterval);
           lanyardHeartbeatInterval = null;
         }
-        console.log(
-          "Connecting to Lanyard WebSocket (Attempt " +
-            (lanyardWSRetryCount + 1) +
-            ")"
-        );
+
         updateDiscordStatusUI({
           contentHtml:
             '<p class="loading-message">Connecting via WebSocket...</p>',
@@ -1907,7 +2225,6 @@
           return;
         }
         lanyardSocket.onopen = function () {
-          console.log("Lanyard WebSocket connected successfully.");
           lanyardWSRetryCount = 0;
         };
         lanyardSocket.onmessage = function (event) {
@@ -1916,12 +2233,11 @@
             var data = JSON.parse(event.data);
             switch (data.op) {
               case 1:
-                console.log("Lanyard: Received Hello");
                 var heartbeatIntervalMs = data.d.heartbeat_interval;
                 lanyardSocket.send(
                   JSON.stringify({ op: 2, d: { subscribe_to_id: userId } })
                 );
-                console.log("Lanyard: Sent Initialize for user:", userId);
+
                 if (lanyardHeartbeatInterval)
                   clearInterval(lanyardHeartbeatInterval);
                 lanyardHeartbeatInterval = setInterval(function () {
@@ -1946,12 +2262,13 @@
                 break;
               case 0:
                 if (data.t === "INIT_STATE" || data.t === "PRESENCE_UPDATE") {
-                  var parsedStatus = parseLanyardStatus(data.d);
-                  updateDiscordStatusUI(parsedStatus);
+                  var currentAboutWindow = windows["about-me"];
+                  if (currentAboutWindow) {
+                    var parsedStatus = parseLanyardStatus(data.d);
+                    updateDiscordStatusUI(parsedStatus);
+                  }
                 }
                 break;
-              default:
-                console.log("Lanyard: Received unknown opcode:", data.op);
             }
           } catch (msgError) {
             console.error(
@@ -1966,7 +2283,6 @@
           handleWebSocketFailure(userId, "WebSocket onerror");
         };
         lanyardSocket.onclose = function (event) {
-          console.log("Lanyard WebSocket closed.", event.code, event.reason);
           if (lanyardHeartbeatInterval) {
             clearInterval(lanyardHeartbeatInterval);
             lanyardHeartbeatInterval = null;
@@ -1986,7 +2302,8 @@
               "Unclean close (" + event.code + ")"
             );
           } else {
-            if (windows["about-me"]) {
+            var currentAboutWindow = windows["about-me"];
+            if (currentAboutWindow) {
               updateDiscordStatusUI({
                 contentHtml:
                   '<p class="error-message">Disconnected from presence.</p>',
@@ -1998,12 +2315,6 @@
       }
       function handleWebSocketFailure(userId, reason) {
         lanyardWSRetryCount++;
-        console.log(
-          "WebSocket connection failed (" +
-            reason +
-            "). Retry count: " +
-            lanyardWSRetryCount
-        );
         if (lanyardSocket) {
           lanyardSocket = null;
         }
@@ -2024,7 +2335,8 @@
             clearTimeout(lanyardReconnectTimeout);
             lanyardReconnectTimeout = null;
           }
-          if (windows["about-me"]) {
+          var aboutWindow = windows["about-me"];
+          if (aboutWindow) {
             startLanyardPolling(userId);
           }
         } else {
@@ -2042,7 +2354,6 @@
           lanyardHeartbeatInterval = null;
         }
         if (lanyardSocket && lanyardSocket.readyState === WebSocket.OPEN) {
-          console.log("Lanyard: Closing WebSocket connection intentionally.");
           try {
             lanyardSocket.close(1000, "Client closed window");
           } catch (e) {}
@@ -2064,22 +2375,25 @@
           contentHtml: '<p class="error-message">' + retryMsg + "</p>",
           customStatus: null,
         });
-        console.log(
-          "Lanyard: Scheduling WebSocket reconnect in " +
-            LANYARD_RECONNECT_DELAY / 1000 +
-            " seconds..."
-        );
+
         lanyardReconnectTimeout = setTimeout(function () {
+          var aboutWindow = windows["about-me"];
           if (
             lanyardWSRetryCount <= LANYARD_MAX_WS_RETRIES &&
             lanyardUpdateMethod === "websocket" &&
-            windows["about-me"]
+            aboutWindow
           ) {
             connectLanyardSocket(userId);
           }
         }, LANYARD_RECONNECT_DELAY);
       }
       function pollLanyardStatus(userId) {
+        var aboutWindow = windows["about-me"];
+        if (!aboutWindow || lanyardUpdateMethod !== "polling") {
+          stopLanyardPolling();
+          return;
+        }
+
         var apiUrl = LANYARD_API_PROXY_BASE + userId;
         makeRequest(apiUrl, function (error, responseData) {
           if (!windows["about-me"] || lanyardUpdateMethod !== "polling") {
@@ -2146,8 +2460,10 @@
         });
       }
       function startLanyardPolling(userId) {
+        var aboutWindow = windows["about-me"];
+        if (!aboutWindow) return;
         if (lanyardUpdateMethod === "polling") return;
-        console.log("Starting Lanyard polling.");
+
         lanyardUpdateMethod = "polling";
         lanyardPollFailureCount = 0;
         disconnectLanyardSocket();
@@ -2159,9 +2475,10 @@
         pollLanyardStatus(userId);
         if (lanyardPollIntervalId) clearInterval(lanyardPollIntervalId);
         lanyardPollIntervalId = setInterval(function () {
+          var currentAboutWindow = windows["about-me"];
           if (
             lanyardPollIntervalId &&
-            windows["about-me"] &&
+            currentAboutWindow &&
             lanyardUpdateMethod === "polling"
           ) {
             pollLanyardStatus(userId);
@@ -2174,7 +2491,6 @@
         if (lanyardPollIntervalId) {
           clearInterval(lanyardPollIntervalId);
           lanyardPollIntervalId = null;
-          console.log("Stopped Lanyard polling.");
         }
         if (lanyardUpdateMethod === "polling") {
           lanyardUpdateMethod = null;
@@ -2187,7 +2503,9 @@
           stopLanyardPolling();
         }
         lanyardUpdateMethod = null;
-        if (document.getElementById("discord-status-area")) {
+        var statusArea = document.getElementById("discord-status-area");
+        var aboutWin = windows["about-me"];
+        if (statusArea && aboutWin) {
           updateDiscordStatusUI({
             contentHtml:
               '<p class="error-message">Presence updates stopped.</p>',
@@ -2200,7 +2518,6 @@
         var customStatusText = null;
         var customStatusEmoji = null;
         if (!lanyardData || typeof lanyardData !== "object") {
-          console.warn("Invalid Lanyard data received:", lanyardData);
           finalContentHtml =
             '<p class="error-message">Invalid presence data received.</p>';
           return { contentHtml: finalContentHtml, customStatus: null };
@@ -2387,12 +2704,17 @@
       function updateDiscordStatusUI(statusResult) {
         var statusAreaElement = null;
         try {
+          var aboutWindow = windows["about-me"];
+          if (!aboutWindow) {
+            return;
+          }
+
           statusAreaElement = document.getElementById("discord-status-area");
           var bubbleElement = document.getElementById("custom-status-bubble");
 
           if (!statusAreaElement || !bubbleElement) {
             console.error(
-              "updateDiscordStatusUI: Could not find statusArea or bubbleElement."
+              "updateDiscordStatusUI: Could not find statusArea or bubbleElement in active window."
             );
             return;
           }
@@ -2420,35 +2742,45 @@
 
             reqAnimFrame(function () {
               try {
-                if (bubbleElement.classList) {
-                  bubbleElement.classList.add("visible");
-                } else {
-                  bubbleElement.className += " visible";
+                var currentBubble = document.getElementById(
+                  "custom-status-bubble"
+                );
+                if (currentBubble) {
+                  if (currentBubble.classList) {
+                    currentBubble.classList.add("visible");
+                  } else {
+                    currentBubble.className += " visible";
+                  }
                 }
               } catch (rafError) {
                 console.error(
                   "Error adding visible class to bubbleElement:",
                   rafError
                 );
-                bubbleElement.className += " visible";
+                var fallbackBubble = document.getElementById(
+                  "custom-status-bubble"
+                );
+                if (fallbackBubble) fallbackBubble.className += " visible";
               }
             });
           } else {
             bubbleElement.textContent = "";
-            if (bubbleElement.classList) {
+            if (bubbleElement && bubbleElement.classList) {
               bubbleElement.classList.remove("visible");
-            } else {
+            } else if (bubbleElement) {
               bubbleElement.className = bubbleElement.className.replace(
                 /\bvisible\b/g,
                 ""
               );
             }
-            bubbleElement.style.display = "none";
+            if (bubbleElement) bubbleElement.style.display = "none";
           }
         } catch (e) {
           console.error("Error updating Discord status UI:", e);
           try {
+            var aboutWin = windows["about-me"];
             if (
+              aboutWin &&
               statusAreaElement &&
               statusAreaElement.innerHTML.indexOf("UI Update Error") === -1
             ) {
@@ -2456,145 +2788,95 @@
                 '<p class="error-message">UI Update Error: ' +
                 (e.message || "Unknown") +
                 "</p>";
-            } else if (!statusAreaElement) {
-              console.error(
-                "updateDiscordStatusUI: statusAreaElement is null."
-              );
-            } else {
-              console.error(
-                "updateDiscordStatusUI: statusAreaElement already has error message."
-              );
             }
           } catch (innerErr) {
-            console.error(
-              "Error updating statusAreaElement with error message:",
-              innerErr
-            );
+            console.error("Error displaying UI update error:", innerErr);
           }
         }
       }
 
       function createAboutMeWindow() {
         var windowId = "about-me";
-        if (windows[windowId]) {
-          windows[windowId].bringToFront();
-          return;
-        }
-        var aboutWindow = createWindow(
+        var win = createWindow(
           windowId,
           "About Me - Ben",
           PROFILE_PIC_URL,
           aboutMeContent,
-          { footerHtml: aboutMeFooter }
+          { footerHtml: aboutMeFooter, fullscreenMobile: true }
         );
-        if (!aboutWindow) return;
-        if (window.WebSocket) {
-          console.log("Using WebSocket.");
-          connectLanyardSocket(DISCORD_USER_ID);
-        } else {
-          if (!window.WebSocket) {
-            console.log("WebSocket API not supported, using polling.");
-          } else {
-            console.log("Older browser detected, using polling.");
+        if (win) {
+          if (
+            lanyardUpdateMethod !== "websocket" &&
+            lanyardUpdateMethod !== "polling"
+          ) {
+            if (window.WebSocket) {
+              connectLanyardSocket(DISCORD_USER_ID);
+            } else {
+              startLanyardPolling(DISCORD_USER_ID);
+            }
           }
-          startLanyardPolling(DISCORD_USER_ID);
         }
+        return win;
       }
       function createProjectsWindow() {
         var windowId = "projects";
-        if (windows[windowId]) {
-          windows[windowId].bringToFront();
-          return;
-        }
-        var existingWindowCount = 0;
-        for (var k in windows) {
-          if (windows.hasOwnProperty(k)) existingWindowCount++;
-        }
-        var offsetX = 30 * existingWindowCount;
-        var offsetY = 30 * existingWindowCount;
-        var projectsWindow = createWindow(
+        var win = createWindow(
           windowId,
           "My Projects",
           GITHUB_ICON_URL,
           projectsInitialContent,
-          {
-            footerHtml: projectsFooter,
-            initialOffset: { x: offsetX, y: offsetY },
-          }
+          { footerHtml: projectsFooter }
         );
-        if (!projectsWindow || !projectsWindow.element) return;
-
-        var projectsListContainer =
-          projectsWindow.element.querySelector(".projects-list");
-        if (!projectsListContainer) {
-          var children = projectsWindow.element.getElementsByTagName("div");
-          for (var i = 0; i < children.length; i++) {
-            if (
-              (" " + children[i].className + " ").indexOf(" projects-list ") >
-              -1
-            ) {
-              projectsListContainer = children[i];
-              break;
-            }
+        if (win) {
+          var projectsListContainer =
+            win.element.querySelector(".projects-list");
+          if (
+            projectsListContainer &&
+            projectsListContainer.querySelector(".loading-message")
+          ) {
+            fetchProjects(GITHUB_USERNAME, function (error, repos) {
+              var currentWin = windows[windowId];
+              if (currentWin) {
+                var currentContainer =
+                  currentWin.element.querySelector(".projects-list");
+                if (currentContainer) {
+                  if (error) {
+                    displayError(error, currentContainer);
+                  } else {
+                    renderProjects(repos, currentContainer);
+                  }
+                }
+              }
+            });
+          } else if (!projectsListContainer) {
+            console.error("Could not find .projects-list for " + windowId);
           }
         }
-
-        if (projectsListContainer) {
-          fetchProjects(GITHUB_USERNAME, function (error, repos) {
-            if (error) {
-              displayError(error, projectsListContainer);
-            } else {
-              renderProjects(repos, projectsListContainer);
-            }
-          });
-        } else {
-          console.error("Could not find .projects-list container.");
-          if (projectsWindow.contentContainer) {
-            projectsWindow.setContent(
-              '<p class="error-message">Error: Could not initialize project list.</p>'
-            );
-          }
-        }
+        return win;
       }
       function createPcRigsWindow() {
         var windowId = "pc-rigs";
-        if (windows[windowId]) {
-          windows[windowId].bringToFront();
-          return;
-        }
-        var existingWindowCount = 0;
-        for (var k in windows) {
-          if (windows.hasOwnProperty(k)) existingWindowCount++;
-        }
-        var offsetX = 30 * existingWindowCount;
-        var offsetY = 30 * existingWindowCount;
-        createWindow(windowId, "PC Rigs", PC_RIGS_ICON_URL, pcRigsContent, {
-          footerHtml: pcRigsFooter,
-          initialOffset: { x: offsetX, y: offsetY },
-        });
+        var win = createWindow(
+          windowId,
+          "PC Rigs",
+          PC_RIGS_ICON_URL,
+          pcRigsContent,
+          {
+            footerHtml: pcRigsFooter,
+          }
+        );
+        return win;
       }
       function createVehiclesWindow() {
         var windowId = "vehicles";
-        if (windows[windowId]) {
-          windows[windowId].bringToFront();
-          return;
-        }
-        var existingWindowCount = 0;
-        for (var k in windows) {
-          if (windows.hasOwnProperty(k)) existingWindowCount++;
-        }
-        var offsetX = 30 * existingWindowCount;
-        var offsetY = 30 * existingWindowCount;
-        createWindow(
+        var win = createWindow(
           windowId,
           "My Vehicles",
           VEHICLES_ICON_URL,
           vehiclesContent,
-          {
-            footerHtml: vehiclesFooter,
-            initialOffset: { x: offsetX, y: offsetY },
-          }
+          { footerHtml: vehiclesFooter }
         );
+        return win;
       }
 
       function fetchSpotlightData() {
@@ -2710,7 +2992,6 @@
         }
       }
       function applyFallbackBackgroundStyles() {
-        console.log("Applying fallback background images.");
         var setFallbackBackground = function () {
           var isPortrait =
             "matchMedia" in window &&
@@ -2746,6 +3027,39 @@
       }
 
       addEvent(document, "DOMContentLoaded", function () {
+        taskbar = document.getElementById("taskbar");
+        if (taskbar) {
+          taskbarHeight = taskbar.offsetHeight || 40;
+          updateTaskbarVisibility();
+
+          var buttons = taskbar.querySelectorAll(".taskbar-button");
+          for (var i = 0; i < buttons.length; i++) {
+            addEvent(buttons[i], "click", function (e) {
+              var button = e.currentTarget || this;
+              var windowId = button.getAttribute("data-window-id");
+              if (!windowId) return;
+
+              switch (windowId) {
+                case "about-me":
+                  createAboutMeWindow();
+                  break;
+                case "projects":
+                  createProjectsWindow();
+                  break;
+                case "pc-rigs":
+                  createPcRigsWindow();
+                  break;
+                case "vehicles":
+                  createVehiclesWindow();
+                  break;
+              }
+            });
+          }
+        } else {
+          console.error("Taskbar element not found!");
+          taskbarHeight = 0;
+        }
+
         var supportsTouch =
           "ontouchstart" in window ||
           (window.navigator && window.navigator.msMaxTouchPoints > 0);
@@ -2762,22 +3076,58 @@
         });
         addEvent(document, up, function (e) {
           if (activeInteractionWindow) {
-            activeInteractionWindow._endDrag(e);
-            activeInteractionWindow._endResize(e);
+            if (activeInteractionWindow.isDragging)
+              activeInteractionWindow._endDrag(e);
+            if (activeInteractionWindow.isResizing)
+              activeInteractionWindow._endResize(e);
           }
           if (!activeInteractionWindow) {
             document.body.style.cursor = "default";
           }
         });
 
+        addEvent(window, "resize", function () {
+          var currentTaskbarHeight =
+            taskbar && taskbar.style.display !== "none"
+              ? taskbar.offsetHeight || 40
+              : 0;
+          var availableHeight = window.innerHeight - currentTaskbarHeight;
+          for (var winId in windows) {
+            if (windows.hasOwnProperty(winId) && windows[winId].isMaximized) {
+              windows[winId].element.style.height = availableHeight + "px";
+              _updateContentHeight(windows[winId]);
+            } else if (windows.hasOwnProperty(winId)) {
+              _updateContentHeight(windows[winId]);
+              var win = windows[winId];
+              var winRect = win.element.getBoundingClientRect();
+              var viewportWidth = document.documentElement.clientWidth;
+
+              if (winRect.right > viewportWidth) {
+                win.element.style.left =
+                  Math.max(0, viewportWidth - winRect.width) + "px";
+              }
+              if (winRect.bottom > availableHeight) {
+                win.element.style.top =
+                  Math.max(0, availableHeight - winRect.height) + "px";
+              }
+              if (winRect.left < 0) {
+                win.element.style.left = "0px";
+              }
+              if (winRect.top < 0) {
+                win.element.style.top = "0px";
+              }
+            }
+          }
+
+          if (taskbar && taskbar.offsetHeight !== taskbarHeight) {
+            taskbarHeight =
+              taskbar.style.display !== "none" ? taskbar.offsetHeight || 40 : 0;
+          }
+        });
+
         fetchSpotlightData();
         createAboutMeWindow();
       });
-
-      var reopenBtn = document.getElementById("reopenAboutMeBtn");
-      if (reopenBtn) {
-        addEvent(reopenBtn, "click", createAboutMeWindow);
-      }
     </script>
   </body>
 </html>
