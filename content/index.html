@@ -141,6 +141,7 @@
       .fluent-card-content {
         padding: 0;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         flex-grow: 1;
         position: relative;
         z-index: 1;
@@ -1075,8 +1076,8 @@
       var LANYARD_MAX_POLL_FAILURES = 5;
       var MIN_WINDOW_WIDTH = 320;
       var MIN_WINDOW_HEIGHT = 400;
-      var SPOTLIGHT_API_URL = "https://megabytesme.ddns.net/api/spotlight-data";
-      var SPOTLIGHT_IMAGE_BASE = "https://megabytesme.ddns.net/cached-images/";
+      var SPOTLIGHT_API_URL = "http://megabytesme.ddns.net/api/spotlight-data";
+      var SPOTLIGHT_IMAGE_BASE = "http://megabytesme.ddns.net/cached-images/";
       var FALLBACK_LANDSCAPE_IMG =
         "https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg";
       var FALLBACK_PORTRAIT_IMG =
@@ -1301,29 +1302,44 @@
             self.element.style.left = initialLeft + "px";
             self.element.style.top = initialTop + "px";
             self.positionedWithTopLeft = true;
+            _updateContentHeight(self);
           } catch (e) {
             console.error("Error setting initial position:", e);
           }
         });
       };
+      function _updateContentHeight(windowInstance) {
+        try {
+          if (!windowInstance || !windowInstance.element) return;
+          var card = windowInstance.element;
+          var handle = windowInstance.dragHandle;
+          var footer = card.querySelector(".links-section");
+          var content = windowInstance.contentContainer;
+
+          if (!handle || !content) return;
+
+          var cardHeight = card.offsetHeight;
+          var handleHeight = handle.offsetHeight;
+          var footerHeight = footer ? footer.offsetHeight : 0;
+          var contentHeight = cardHeight - handleHeight - footerHeight;
+
+          if (contentHeight > 0) {
+            content.style.height = contentHeight + "px";
+          } else {
+            content.style.height = "100px";
+          }
+        } catch (e) {
+          console.error("Error updating content height", e);
+        }
+      }
       FluentWindow.prototype._attachEventListeners = function () {
         try {
-          var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-          var down = usePointer
-            ? window.PointerEvent
-              ? "pointerdown"
-              : "MSPointerDown"
-            : "mousedown";
-          var up = usePointer
-            ? window.PointerEvent
-              ? "pointerup"
-              : "MSPointerUp"
-            : "mouseup";
-          var move = usePointer
-            ? window.PointerEvent
-              ? "pointermove"
-              : "MSPointerMove"
-            : "mousemove";
+          var supportsTouch =
+            "ontouchstart" in window ||
+            (window.navigator && window.navigator.msMaxTouchPoints > 0);
+          var down = supportsTouch ? "touchstart" : "mousedown";
+          var up = supportsTouch ? "touchend" : "mouseup";
+          var move = supportsTouch ? "touchmove" : "mousemove";
 
           this._boundStartDrag = this._startDrag.bind(this);
           this._boundStartResize = this._startResize.bind(this);
@@ -1341,41 +1357,33 @@
             this._boundFooterClick = function (e) {
               e = e || window.event;
               var target = e.target || window.event.srcElement;
-              var classList = target && target.classList;
-              if (!classList && target.className) {
-                classList = {
-                  contains: function (c) {
-                    return (
-                      (" " + target.className + " ").indexOf(" " + c + " ") > -1
-                    );
-                  },
-                };
-              }
+              var targetClassName = target.className || "";
+              var classNameStr = " " + targetClassName + " ";
               var stopProp = function (evt) {
                 if (evt.stopPropagation) evt.stopPropagation();
-                else window.event.cancelBubble = true;
+                else if (window.event) window.event.cancelBubble = true;
               };
-              if (classList && classList.contains("view-projects-button")) {
+
+              if (classNameStr.indexOf(" view-projects-button ") > -1) {
                 stopProp(e);
                 createProjectsWindow();
-              } else if (classList && classList.contains("view-rigs-button")) {
+              } else if (classNameStr.indexOf(" view-rigs-button ") > -1) {
                 stopProp(e);
                 createPcRigsWindow();
-              } else if (
-                classList &&
-                classList.contains("view-vehicles-button")
-              ) {
+              } else if (classNameStr.indexOf(" view-vehicles-button ") > -1) {
                 stopProp(e);
                 createVehiclesWindow();
-              } else if (
-                classList &&
-                classList.contains("close-window-button")
-              ) {
+              } else if (classNameStr.indexOf(" close-window-button ") > -1) {
                 stopProp(e);
                 self.destroy();
               }
             };
             addEvent(footer, "click", this._boundFooterClick);
+          } else {
+            console.error(
+              "ERROR: Footer element (.links-section) not found for window: " +
+                this.id
+            );
           }
         } catch (e) {
           console.error("Error attaching event listeners:", e);
@@ -1398,79 +1406,102 @@
         try {
           e = e || window.event;
           var target = e.target || e.srcElement;
-          var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-          var up = usePointer
-            ? window.PointerEvent
-              ? "pointerup"
-              : "MSPointerUp"
-            : "mouseup";
-          var move = usePointer
-            ? window.PointerEvent
-              ? "pointermove"
-              : "MSPointerMove"
-            : "mousemove";
+          var isTouchEvent = e.type.indexOf("touch") === 0;
+          var currentEvent = isTouchEvent ? e.touches[0] : e;
+
           var findParent = function (el, sel) {
             while (el && el.parentNode && el.tagName !== "BODY") {
               el = el.parentNode;
-              if (el.matches && el.matches(sel)) return el;
-              if (el.msMatchesSelector && el.msMatchesSelector(sel)) return el;
+              if (
+                (" " + (el.className || "") + " ").indexOf(" " + sel + " ") > -1
+              ) {
+                return el;
+              }
             }
             return null;
           };
-          var controls = findParent(target, ".window-controls");
-          var handle = findParent(target, ".drag-handle");
+
+          var controls = findParent(target, "window-controls");
+          var handle = findParent(target, "drag-handle");
+
           if (target.nodeName === "BUTTON" || controls) {
             return;
           }
           if (target !== this.dragHandle && !handle) {
             return;
           }
-          if (this.isResizing) return;
+          if (this.isResizing) {
+            return;
+          }
+
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
           this.isDragging = true;
           activeInteractionWindow = this;
-          this.dragHandle.style.cursor = "grabbing";
-          document.body.style.cursor = "grabbing";
+
           var rect = this.element.getBoundingClientRect();
-          var startClientX = e.clientX;
-          var startClientY = e.clientY;
+          var startClientX = currentEvent.clientX;
+          var startClientY = currentEvent.clientY;
           var currentLeft = parseFloat(this.element.style.left) || rect.left;
           var currentTop = parseFloat(this.element.style.top) || rect.top;
           this.dragOffsetX = startClientX - currentLeft;
           this.dragOffsetY = startClientY - currentTop;
+
           this._boundDoDrag = this._doDrag.bind(this);
           this._boundEndDrag = this._endDrag.bind(this);
-          addEvent(document, move, this._boundDoDrag);
-          addEvent(document, up, this._boundEndDrag);
 
-          var pointerId =
-            e.pointerId || (e.getPointerId ? e.getPointerId() : null);
-          if (usePointer && pointerId && this.dragHandle.setPointerCapture) {
-            try {
-              this.dragHandle.setPointerCapture(pointerId);
-            } catch (pcErr) {}
-          } else if (
-            usePointer &&
-            pointerId &&
-            this.dragHandle.msSetPointerCapture
-          ) {
-            try {
-              this.dragHandle.msSetPointerCapture(pointerId);
-            } catch (pcErr) {}
+          var moveEventName = isTouchEvent ? "touchmove" : "mousemove";
+          var endEventName = isTouchEvent ? "touchend" : "mouseup";
+
+          addEvent(document, moveEventName, this._boundDoDrag);
+          addEvent(document, endEventName, this._boundEndDrag);
+
+          this.dragHandle.style.cursor = "grabbing";
+          document.body.style.cursor = "grabbing";
+
+          if (!isTouchEvent && e.preventDefault) {
+            e.preventDefault();
+          } else if (!isTouchEvent) {
+            e.returnValue = false;
           }
         } catch (err) {
-          console.error("Error starting drag:", err);
-          this._endDrag(e);
+          console.error("Error starting drag: " + (err.message || err));
+          this.isDragging = false;
+          activeInteractionWindow = null;
         }
       };
       FluentWindow.prototype._doDrag = function (e) {
         if (!this.isDragging) return;
-        e = e || window.event;
+
+        var isTouchEvent = e.type.indexOf("touch") === 0;
+        if (isTouchEvent && (!e.touches || e.touches.length === 0)) {
+          return;
+        }
+        var currentEvent = isTouchEvent ? e.touches[0] : e;
+
+        var currentMouseX = currentEvent.clientX;
+        var currentMouseY = currentEvent.clientY;
+
+        try {
+          var contentRect = this.contentContainer.getBoundingClientRect();
+          if (
+            currentMouseX >= contentRect.left &&
+            currentMouseX <= contentRect.right &&
+            currentMouseY >= contentRect.top &&
+            currentMouseY <= contentRect.bottom
+          ) {
+            return;
+          }
+        } catch (contentRectErr) {
+          console.error(
+            "Error getting content rect in _doDrag: " +
+              (contentRectErr.message || contentRectErr)
+          );
+        }
+
         if (e.preventDefault) e.preventDefault();
         else e.returnValue = false;
-        var currentMouseX = e.clientX;
-        var currentMouseY = e.clientY;
+
         var newCardX = currentMouseX - this.dragOffsetX;
         var newCardY = currentMouseY - this.dragOffsetY;
         var viewportWidth = document.documentElement.clientWidth;
@@ -1483,113 +1514,87 @@
         this.element.style.top = newCardY + "px";
       };
       FluentWindow.prototype._endDrag = function (e) {
-        e = e || window.event;
-        var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-        var move = usePointer
-          ? window.PointerEvent
-            ? "pointermove"
-            : "MSPointerMove"
-          : "mousemove";
-        var up = usePointer
-          ? window.PointerEvent
-            ? "pointerup"
-            : "MSPointerUp"
-          : "mouseup";
-        if (this.isDragging) {
-          this.isDragging = false;
-          this.dragHandle.style.cursor = "grab";
-          if (activeInteractionWindow === this) {
-            activeInteractionWindow = null;
-            document.body.style.cursor = "default";
-          }
-          if (this._boundDoDrag) removeEvent(document, move, this._boundDoDrag);
-          if (this._boundEndDrag) removeEvent(document, up, this._boundEndDrag);
+        if (!this.isDragging) return;
 
-          var pointerId =
-            e.pointerId || (e.getPointerId ? e.getPointerId() : null);
-          if (
-            usePointer &&
-            pointerId &&
-            this.dragHandle.releasePointerCapture
-          ) {
-            try {
-              this.dragHandle.releasePointerCapture(pointerId);
-            } catch (err) {}
-          } else if (
-            usePointer &&
-            pointerId &&
-            this.dragHandle.msReleasePointerCapture
-          ) {
-            try {
-              this.dragHandle.msReleasePointerCapture(pointerId);
-            } catch (err) {}
-          }
+        var isTouchEvent = e.type.indexOf("touch") === 0;
+        var moveEventName = isTouchEvent ? "touchmove" : "mousemove";
+        var endEventName = isTouchEvent ? "touchend" : "mouseup";
+
+        this.isDragging = false;
+
+        this.dragHandle.style.cursor = "grab";
+        if (activeInteractionWindow === this) {
+          activeInteractionWindow = null;
+          document.body.style.cursor = "default";
         }
+
+        if (this._boundDoDrag)
+          removeEvent(document, moveEventName, this._boundDoDrag);
+        if (this._boundEndDrag)
+          removeEvent(document, endEventName, this._boundEndDrag);
+
+        this._boundDoDrag = null;
+        this._boundEndDrag = null;
       };
       FluentWindow.prototype._startResize = function (e) {
         try {
           e = e || window.event;
           var target = e.target || e.srcElement;
-          var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-          var up = usePointer
-            ? window.PointerEvent
-              ? "pointerup"
-              : "MSPointerUp"
-            : "mouseup";
-          var move = usePointer
-            ? window.PointerEvent
-              ? "pointermove"
-              : "MSPointerMove"
-            : "mousemove";
+          var isTouchEvent = e.type.indexOf("touch") === 0;
+          var currentEvent = isTouchEvent ? e.touches[0] : e;
+
           if (target !== this.resizeHandle) {
             return;
           }
-          if (this.isDragging) return;
+          if (this.isDragging) {
+            return;
+          }
+
           this._switchToTopLeftPositioningIfNeeded();
           this.bringToFront();
           this.isResizing = true;
           activeInteractionWindow = this;
           document.body.style.cursor = "nwse-resize";
+
           this.initialWidth = this.element.offsetWidth;
           this.initialHeight = this.element.offsetHeight;
           this.initialCardX_resize = this.element.offsetLeft;
           this.initialCardY_resize = this.element.offsetTop;
-          this.resizeInitialMouseX = e.clientX;
-          this.resizeInitialMouseY = e.clientY;
+
+          this.resizeInitialMouseX = currentEvent.clientX;
+          this.resizeInitialMouseY = currentEvent.clientY;
+
           this._boundDoResize = this._doResize.bind(this);
           this._boundEndResize = this._endResize.bind(this);
-          addEvent(document, move, this._boundDoResize);
-          addEvent(document, up, this._boundEndResize);
 
-          var pointerId =
-            e.pointerId || (e.getPointerId ? e.getPointerId() : null);
-          if (usePointer && pointerId && this.resizeHandle.setPointerCapture) {
-            try {
-              this.resizeHandle.setPointerCapture(pointerId);
-            } catch (pcErr) {}
-          } else if (
-            usePointer &&
-            pointerId &&
-            this.resizeHandle.msSetPointerCapture
-          ) {
-            try {
-              this.resizeHandle.msSetPointerCapture(pointerId);
-            } catch (pcErr) {}
-          }
+          var moveEventName = isTouchEvent ? "touchmove" : "mousemove";
+          var endEventName = isTouchEvent ? "touchend" : "mouseup";
+
+          addEvent(document, moveEventName, this._boundDoResize);
+          addEvent(document, endEventName, this._boundEndResize);
         } catch (err) {
-          console.error("Error starting resize:", err);
+          console.error("Error starting resize: " + (err.message || err));
           this._endResize(e);
         }
       };
       FluentWindow.prototype._doResize = function (e) {
         if (!this.isResizing) return;
         e = e || window.event;
-        if (e.preventDefault) e.preventDefault();
-        else e.returnValue = false;
-        var currentMouseX = e.clientX;
-        var currentMouseY = e.clientY;
+
+        var isTouchEvent = e.type.indexOf("touch") === 0;
+        if (isTouchEvent && (!e.touches || e.touches.length === 0)) {
+          return;
+        }
+        var currentEvent = isTouchEvent ? e.touches[0] : e;
+
+        var currentMouseX = currentEvent.clientX;
+        var currentMouseY = currentEvent.clientY;
         var dx = currentMouseX - this.resizeInitialMouseX;
         var dy = currentMouseY - this.resizeInitialMouseY;
+
+        if (e.preventDefault) e.preventDefault();
+        else e.returnValue = false;
+
         var newWidth = this.initialWidth + dx;
         var newHeight = this.initialHeight + dy;
         newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
@@ -1604,22 +1609,22 @@
         }
         newWidth = Math.max(MIN_WINDOW_WIDTH, newWidth);
         newHeight = Math.max(MIN_WINDOW_HEIGHT, newHeight);
+
         this.element.style.width = newWidth + "px";
         this.element.style.height = newHeight + "px";
+
+        if (typeof _updateContentHeight === "function") {
+          _updateContentHeight(this);
+        }
       };
       FluentWindow.prototype._endResize = function (e) {
+        if (!this.isResizing) return;
+
         e = e || window.event;
-        var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-        var move = usePointer
-          ? window.PointerEvent
-            ? "pointermove"
-            : "MSPointerMove"
-          : "mousemove";
-        var up = usePointer
-          ? window.PointerEvent
-            ? "pointerup"
-            : "MSPointerUp"
-          : "mouseup";
+        var isTouchEvent = e.type.indexOf("touch") === 0;
+        var moveEventName = isTouchEvent ? "touchmove" : "mousemove";
+        var endEventName = isTouchEvent ? "touchend" : "mouseup";
+
         if (this.isResizing) {
           this.isResizing = false;
           if (activeInteractionWindow === this) {
@@ -1627,29 +1632,12 @@
             document.body.style.cursor = "default";
           }
           if (this._boundDoResize)
-            removeEvent(document, move, this._boundDoResize);
+            removeEvent(document, moveEventName, this._boundDoResize);
           if (this._boundEndResize)
-            removeEvent(document, up, this._boundEndResize);
+            removeEvent(document, endEventName, this._boundEndResize);
 
-          var pointerId =
-            e.pointerId || (e.getPointerId ? e.getPointerId() : null);
-          if (
-            usePointer &&
-            pointerId &&
-            this.resizeHandle.releasePointerCapture
-          ) {
-            try {
-              this.resizeHandle.releasePointerCapture(pointerId);
-            } catch (err) {}
-          } else if (
-            usePointer &&
-            pointerId &&
-            this.resizeHandle.msReleasePointerCapture
-          ) {
-            try {
-              this.resizeHandle.msReleasePointerCapture(pointerId);
-            } catch (err) {}
-          }
+          this._boundDoResize = null;
+          this._boundEndResize = null;
         }
       };
       FluentWindow.prototype.destroy = function () {
@@ -1660,12 +1648,11 @@
             );
             stopLanyardUpdates();
           }
-          var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-          var down = usePointer
-            ? window.PointerEvent
-              ? "pointerdown"
-              : "MSPointerDown"
-            : "mousedown";
+          var supportsTouch =
+            "ontouchstart" in window ||
+            (window.navigator && window.navigator.msMaxTouchPoints > 0);
+          var down = supportsTouch ? "touchstart" : "mousedown";
+
           if (this._boundStartDrag)
             removeEvent(this.dragHandle, down, this._boundStartDrag);
           if (this._boundStartResize)
@@ -1674,6 +1661,7 @@
             removeEvent(this.element, down, this._boundBringToFront);
           if (this._boundDestroy)
             removeEvent(this.closeButton, "click", this._boundDestroy);
+
           var footer = this.element.querySelector(".links-section");
           if (footer && this._boundFooterClick) {
             removeEvent(footer, "click", this._boundFooterClick);
@@ -1692,6 +1680,7 @@
       };
 
       function addEvent(element, eventName, callback) {
+        if (!element) return;
         if (element.addEventListener) {
           element.addEventListener(eventName, callback, false);
         } else if (element.attachEvent) {
@@ -1699,6 +1688,7 @@
         }
       }
       function removeEvent(element, eventName, callback) {
+        if (!element) return;
         if (element.removeEventListener) {
           element.removeEventListener(eventName, callback, false);
         } else if (element.detachEvent) {
@@ -1710,14 +1700,21 @@
           windows[id].bringToFront();
           return windows[id];
         }
-        var newWindow = new FluentWindow(
-          id,
-          title,
-          titleIconUrl,
-          contentHtml,
-          options
-        );
-        windows[id] = newWindow;
+        var newWindow = null;
+        try {
+          newWindow = new FluentWindow(
+            id,
+            title,
+            titleIconUrl,
+            contentHtml,
+            options
+          );
+          windows[id] = newWindow;
+        } catch (createErr) {
+          console.error("Error creating window '" + id + "':", createErr);
+          alert("Failed to create window: " + (createErr.message || createErr));
+          return null;
+        }
         return newWindow;
       }
       function makeRequest(url, callback) {
@@ -2437,7 +2434,7 @@
           try {
             if (
               statusAreaElement &&
-              !statusAreaElement.innerHTML.includes("UI Update Error")
+              statusAreaElement.innerHTML.indexOf("UI Update Error") === -1
             ) {
               statusAreaElement.innerHTML =
                 '<p class="error-message">UI Update Error: ' +
@@ -2495,6 +2492,7 @@
           aboutMeContent,
           { footerHtml: aboutMeFooter }
         );
+        if (!aboutWindow) return;
         if (window.WebSocket && isModernBrowser()) {
           console.log("Modern browser detected, using WebSocket.");
           connectLanyardSocket(DISCORD_USER_ID);
@@ -2513,7 +2511,10 @@
           windows[windowId].bringToFront();
           return;
         }
-        var existingWindowCount = Object.keys(windows).length;
+        var existingWindowCount = 0;
+        for (var k in windows) {
+          if (windows.hasOwnProperty(k)) existingWindowCount++;
+        }
         var offsetX = 30 * existingWindowCount;
         var offsetY = 30 * existingWindowCount;
         var projectsWindow = createWindow(
@@ -2526,9 +2527,23 @@
             initialOffset: { x: offsetX, y: offsetY },
           }
         );
-        var projectsListContainer = projectsWindow.element
-          ? projectsWindow.element.querySelector(".projects-list")
-          : null;
+        if (!projectsWindow || !projectsWindow.element) return;
+
+        var projectsListContainer =
+          projectsWindow.element.querySelector(".projects-list");
+        if (!projectsListContainer) {
+          var children = projectsWindow.element.getElementsByTagName("div");
+          for (var i = 0; i < children.length; i++) {
+            if (
+              (" " + children[i].className + " ").indexOf(" projects-list ") >
+              -1
+            ) {
+              projectsListContainer = children[i];
+              break;
+            }
+          }
+        }
+
         if (projectsListContainer) {
           fetchProjects(GITHUB_USERNAME, function (error, repos) {
             if (error) {
@@ -2552,7 +2567,10 @@
           windows[windowId].bringToFront();
           return;
         }
-        var existingWindowCount = Object.keys(windows).length;
+        var existingWindowCount = 0;
+        for (var k in windows) {
+          if (windows.hasOwnProperty(k)) existingWindowCount++;
+        }
         var offsetX = 30 * existingWindowCount;
         var offsetY = 30 * existingWindowCount;
         createWindow(windowId, "PC Rigs", PC_RIGS_ICON_URL, pcRigsContent, {
@@ -2566,7 +2584,10 @@
           windows[windowId].bringToFront();
           return;
         }
-        var existingWindowCount = Object.keys(windows).length;
+        var existingWindowCount = 0;
+        for (var k in windows) {
+          if (windows.hasOwnProperty(k)) existingWindowCount++;
+        }
         var offsetX = 30 * existingWindowCount;
         var offsetY = 30 * existingWindowCount;
         createWindow(
@@ -2583,8 +2604,9 @@
 
       function fetchSpotlightData() {
         makeRequest(SPOTLIGHT_API_URL, function (error, data) {
+          alert(SPOTLIGHT_API_URL);
           if (error || !data || !Array.isArray(data) || data.length === 0) {
-            console.error(
+            alert(
               "Failed to fetch or got invalid Spotlight data:",
               error || "Invalid data"
             );
@@ -2730,17 +2752,11 @@
       }
 
       addEvent(document, "DOMContentLoaded", function () {
-        var usePointer = !!window.PointerEvent || !!window.MSPointerEvent;
-        var move = usePointer
-          ? window.PointerEvent
-            ? "pointermove"
-            : "MSPointerMove"
-          : "mousemove";
-        var up = usePointer
-          ? window.PointerEvent
-            ? "pointerup"
-            : "MSPointerUp"
-          : "mouseup";
+        var supportsTouch =
+          "ontouchstart" in window ||
+          (window.navigator && window.navigator.msMaxTouchPoints > 0);
+        var move = supportsTouch ? "touchmove" : "mousemove";
+        var up = supportsTouch ? "touchend" : "mouseup";
 
         addEvent(document, move, function (e) {
           if (activeInteractionWindow) {
