@@ -1076,8 +1076,12 @@
       var LANYARD_MAX_POLL_FAILURES = 5;
       var MIN_WINDOW_WIDTH = 320;
       var MIN_WINDOW_HEIGHT = 400;
-      var SPOTLIGHT_API_URL = "http://megabytesme.ddns.net/api/spotlight-data";
-      var SPOTLIGHT_IMAGE_BASE = "http://megabytesme.ddns.net/cached-images/";
+      var SPOTLIGHT_API_HOST_PATH = "megabytesme.ddns.net/api/spotlight-data";
+      var SPOTLIGHT_IMAGE_HOST_PATH = "megabytesme.ddns.net/cached-images/";
+      var LANYARD_API_PROXY_HOST_PATH =
+        "megabytesme.ddns.net/lanyard-api/v1/users/";
+      var LANYARD_WS_PROXY_HOST_PATH = "megabytesme.ddns.net/lanyard-ws/";
+
       var FALLBACK_LANDSCAPE_IMG =
         "https://windows10spotlight.com/wp-content/uploads/2025/03/862c9b0ab32209d19a329e88d67af1e9.jpg";
       var FALLBACK_PORTRAIT_IMG =
@@ -1090,6 +1094,18 @@
       var VEHICLES_ICON_URL = "https://img.icons8.com/fluency/48/car.png";
       var PROFILE_PIC_URL =
         "https://avatars.githubusercontent.com/u/57240557?v=4";
+
+      var pageProtocol = window.location.protocol;
+      var SPOTLIGHT_API_URL = pageProtocol + "//" + SPOTLIGHT_API_HOST_PATH;
+      var SPOTLIGHT_IMAGE_BASE =
+        pageProtocol + "//" + SPOTLIGHT_IMAGE_HOST_PATH;
+
+      var LANYARD_API_PROXY_BASE =
+        pageProtocol + "//" + LANYARD_API_PROXY_HOST_PATH;
+
+      var lanyardWsProxyProtocol = pageProtocol === "https:" ? "wss:" : "ws:";
+      var LANYARD_WS_PROXY_URL =
+        lanyardWsProxyProtocol + "//" + LANYARD_WS_PROXY_HOST_PATH;
 
       var windows = {};
       var highestZ = 1;
@@ -1879,7 +1895,7 @@
           customStatus: null,
         });
         try {
-          lanyardSocket = new WebSocket("wss://api.lanyard.rest/socket");
+          lanyardSocket = new WebSocket(LANYARD_WS_PROXY_URL);
         } catch (err) {
           console.error("Failed to create WebSocket:", err);
           updateDiscordStatusUI({
@@ -2064,7 +2080,7 @@
         }, LANYARD_RECONNECT_DELAY);
       }
       function pollLanyardStatus(userId) {
-        var apiUrl = "https://api.lanyard.rest/v1/users/" + userId;
+        var apiUrl = LANYARD_API_PROXY_BASE + userId;
         makeRequest(apiUrl, function (error, responseData) {
           if (!windows["about-me"] || lanyardUpdateMethod !== "polling") {
             stopLanyardPolling();
@@ -2457,27 +2473,6 @@
           }
         }
       }
-      function isModernBrowser() {
-        var ua = navigator.userAgent || navigator.vendor || window.opera || "";
-        var isEdgeChromium = ua.indexOf("Edg/") > -1;
-        var isModernChrome = ua.indexOf("Chrome/") > -1 && !isEdgeChromium;
-        var isModernFirefox = ua.indexOf("Firefox/") > -1;
-        var isModernSafari =
-          ua.indexOf("Safari/") > -1 &&
-          ua.indexOf("Chrome/") === -1 &&
-          ua.indexOf("Edg/") === -1;
-        var isEdgeHTML = ua.indexOf("Edge/") > -1;
-        if (isEdgeHTML) {
-          return true;
-        }
-        var isIE = ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1;
-        if (isIE) {
-          return true;
-        }
-        return (
-          isEdgeChromium || isModernChrome || isModernFirefox || isModernSafari
-        );
-      }
 
       function createAboutMeWindow() {
         var windowId = "about-me";
@@ -2493,8 +2488,8 @@
           { footerHtml: aboutMeFooter }
         );
         if (!aboutWindow) return;
-        if (window.WebSocket && isModernBrowser()) {
-          console.log("Modern browser detected, using WebSocket.");
+        if (window.WebSocket) {
+          console.log("Using WebSocket.");
           connectLanyardSocket(DISCORD_USER_ID);
         } else {
           if (!window.WebSocket) {
@@ -2604,9 +2599,8 @@
 
       function fetchSpotlightData() {
         makeRequest(SPOTLIGHT_API_URL, function (error, data) {
-          alert(SPOTLIGHT_API_URL);
           if (error || !data || !Array.isArray(data) || data.length === 0) {
-            alert(
+            console.log(
               "Failed to fetch or got invalid Spotlight data:",
               error || "Invalid data"
             );
