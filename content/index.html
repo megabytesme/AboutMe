@@ -605,7 +605,7 @@
         color: var(--subtle-text, #cccccc);
       }
 
-      .vehicle-image {
+      .content-image {
         float: right;
         max-width: 150px;
         height: auto;
@@ -1243,7 +1243,7 @@
         data-window-id="pc-rigs"
         aria-label="PC Rigs"
       >
-        <img src="https://img.icons8.com/fluency/48/workstation.png" alt="" />
+        <p>🖥️</p>
         <span>PC Rigs</span>
       </button>
       <button
@@ -1251,8 +1251,16 @@
         data-window-id="vehicles"
         aria-label="My Vehicles"
       >
-        <img src="https://img.icons8.com/fluency/48/car.png" alt="" />
+        <p>🚗</p>
         <span>My Vehicles</span>
+      </button>
+      <button
+        class="taskbar-button"
+        data-window-id="devices"
+        aria-label="My Devices"
+      >
+        <p>📱</p>
+        <span>My Devices</span>
       </button>
     </div>
 
@@ -1278,9 +1286,9 @@
       var DEFAULT_WINDOW_ICON = "https://via.placeholder.com/20";
       var GITHUB_ICON_URL =
         "https://git-scm.com/images/logos/downloads/Git-Icon-White.svg";
-      var PC_RIGS_ICON_URL =
-        "https://img.icons8.com/fluency/48/workstation.png";
-      var VEHICLES_ICON_URL = "https://img.icons8.com/fluency/48/car.png";
+      var PC_RIGS_ICON = "🖥️";
+      var VEHICLES_ICON = "🚗";
+      var DEVICES_ICON = "📱";
       var PROFILE_PIC_URL =
         "https://avatars.githubusercontent.com/u/57240557?v=4";
 
@@ -1365,20 +1373,48 @@
         '<div class="content-area">' +
         "<h1>My Vehicles</h1>" +
         "<h2>Alfa Romeo 159 (Saloon)</h2>" +
-        '<img src="assets/images/alfaromeo159.jpg" alt="Red Alfa Romeo 159" class="vehicle-image">' +
+        '<img src="assets/images/alfaromeo159.jpg" alt="Red Alfa Romeo 159" class="content-image">' +
         "<ul><li>Engine: 2.4L JTDm (240HP, 480NM)</li><li>Transmission: 6-Speed Manual</li><li>Color: Russo Red</li></ul>" +
         '<p class="intro-text">My first (and current) car. Handles like a train (despite the weight)!</p>' +
         "<h2>Chrysler Grand Voyager</h2>" +
-        '<img src="assets/images/chryslergrandvoyager.jpg" alt="Dark Blue Chrysler Grand Voyager" class="vehicle-image">' +
+        '<img src="assets/images/chryslergrandvoyager.jpg" alt="Dark Blue Chrysler Grand Voyager" class="content-image">' +
         "<ul><li>Engine: 2.8L CRD</li><li>Transmission: 6-Speed Automatic</li><li>Color: Dark Blue</li></ul>" +
         '<p class="intro-text">The daily driver when I am fixing the suspension of the Alfa. Cruiser.</p>' +
         "<h2>MN MODEL MN128 (RC - Toy)</h2>" +
-        '<img src="assets/images/mnmodelmn128.jpg" alt="Silver MN Model MN128 Remote Control Car" class="vehicle-image">' +
+        '<img src="assets/images/mnmodelmn128.jpg" alt="Silver MN Model MN128 Remote Control Car" class="content-image">' +
         "<ul><li>Motor: 540 (21T)</li><li>Transmission: 4WD Single-Speed</li><li>Color: Silver</li></ul>" +
         '<p class="intro-text">My Remote-Controlled (RC) car. Modified with upgraded motor and bigger battery (2s LiPo).</p>' +
         "</div>";
       var vehiclesFooter =
         '<button class="fluent-button close-window-button">Close</button>';
+      var devicesContent =
+        '<div class="content-area">' +
+        "<h1>My Devices</h1>" +
+        "<h2>Microsoft Surface Duo 2</h2>" +
+        '<img src="assets/images/surfaceduo2.png" alt="Obsidian Black Surface Duo 2" class="content-image">' +
+        "<ul><li>CPU: Snapdragon 865</li><li>RAM: 8GB</li><li>Color: Obsidian Black</li></ul>" +
+        '<p class="intro-text">My current phone. It has been rooted, and currently runs Android 12L.</p>' +
+        "<h2>Samsung Galaxy Watch 4 Classic LTE (46mm)</h2>" +
+        '<img src="assets/images/galaxywatch4classic.png" alt="Silver Galaxy Watch 4 Classic" class="content-image">' +
+        "<ul><li>Size: 46mm</li><li>Color: Titanium Silver</li><li>OS: Android WearOS (OneUI 6)</li></ul>" +
+        '<p class="intro-text">My smartwatch.</p>' +
+        "<h2>Sony WF-1000XM3 headphones</h2>" +
+        '<img src="assets/images/wf1000xm3.png" alt="Black Sony WF-1000XM3 bluetooth headphones" class="content-image">' +
+        '<p class="intro-text">My Bluetooth headphones.</p>' +
+        "</div>";
+      var devicesFooter =
+        '<button class="fluent-button close-window-button">Close</button>';
+
+      function isLikelyUrl(str) {
+        if (typeof str !== "string") return false;
+        return (
+          str.includes(".") ||
+          str.includes("/") ||
+          str.includes(":") ||
+          str.toLowerCase().startsWith("http") ||
+          str.toLowerCase().startsWith("data:")
+        );
+      }
 
       function FluentWindow(id, title, titleIconUrl, contentHtml, options) {
         options = options || {};
@@ -1455,11 +1491,19 @@
         var footerSection = footerHtml
           ? '<div class="links-section">' + footerHtml + "</div>"
           : "";
+
+        var iconHtml;
+        if (isLikelyUrl(titleIconUrl)) {
+          iconHtml =
+            '<img src="' + titleIconUrl + '" alt="" class="handle-pic">';
+        } else {
+          iconHtml =
+            '<span class="handle-emoji-icon">' + titleIconUrl + "</span>";
+        }
+
         card.innerHTML =
           '<div class="drag-handle">' +
-          '<img src="' +
-          titleIconUrl +
-          '" alt="" class="handle-pic">' +
+          iconHtml +
           '<h1 class="handle-title">' +
           title +
           "</h1>" +
@@ -1672,6 +1716,9 @@
               } else if (classNameStr.indexOf(" view-vehicles-button ") > -1) {
                 stopProp(e);
                 createVehiclesWindow();
+              } else if (classNameStr.indexOf(" view-devices-button ") > -1) {
+                stopProp(e);
+                createDevicesWindow();
               } else if (classNameStr.indexOf(" close-window-button ") > -1) {
                 stopProp(e);
                 self.destroy();
@@ -2862,7 +2909,7 @@
         var win = createWindow(
           windowId,
           "PC Rigs",
-          PC_RIGS_ICON_URL,
+          PC_RIGS_ICON,
           pcRigsContent,
           {
             footerHtml: pcRigsFooter,
@@ -2875,9 +2922,20 @@
         var win = createWindow(
           windowId,
           "My Vehicles",
-          VEHICLES_ICON_URL,
+          VEHICLES_ICON,
           vehiclesContent,
           { footerHtml: vehiclesFooter }
+        );
+        return win;
+      }
+      function createDevicesWindow() {
+        var windowId = "devices";
+        var win = createWindow(
+          windowId,
+          "My Devices",
+          DEVICES_ICON,
+          devicesContent,
+          { footerHtml: devicesFooter }
         );
         return win;
       }
@@ -3054,6 +3112,9 @@
                   break;
                 case "vehicles":
                   createVehiclesWindow();
+                  break;
+                case "devices":
+                  createDevicesWindow();
                   break;
               }
             });
