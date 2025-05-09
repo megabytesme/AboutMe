@@ -1034,8 +1034,11 @@
         .window-button:not(:disabled):hover {
           background-color: var(--window-button-hover-bg);
         }
-        .window-button.close:not(:disabled):hover,
-        .window-button.minimize:not(:disabled):hover {
+        .window-button.close {
+          font-size: x-large;
+          align-items: baseline;
+        }
+        .window-button.close:not(:disabled):hover {
           background-color: var(--window-button-close-hover-bg);
           color: var(--window-button-close-hover-text);
         }
