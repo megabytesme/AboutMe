@@ -249,6 +249,10 @@
         color: #f0f0f0;
       }
 
+      .fluent-card-tabs-container {
+        flex-shrink: 0;
+      }
+
       .content-area {
         flex-grow: 1;
         pointer-events: auto;
@@ -795,10 +799,8 @@
       .fluent-tabs {
         display: flex;
         border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
-        margin-bottom: 15px;
-        margin-left: -30px;
-        margin-right: -30px;
-        padding-left: 30px;
+        padding-left: 15px;
+        padding-right: 15px;
       }
 
       .fluent-tab-button {
@@ -833,17 +835,11 @@
 
       .fluent-tab-pane {
         display: none;
+        padding: 20px 30px 15px 30px;
       }
 
       .fluent-tab-pane.active {
         display: block;
-      }
-
-      .fluent-card-content .content-area > h1 + .fluent-tabs {
-        margin-top: 15px;
-      }
-      .fluent-card-content .content-area > .fluent-tabs {
-        margin-top: -5px;
       }
 
       @media (prefers-color-scheme: light) {
@@ -908,6 +904,7 @@
         .links-section {
           border-top-color: rgba(0, 0, 0, 0.08);
           background-color: rgba(0, 0, 0, 0.05);
+          flex-shrink: 0;
         }
         .fluent-button {
           background-color: #0078d4;
@@ -1833,6 +1830,9 @@
         this.maximizeButton = this.element.querySelector(
           ".window-button.maximize"
         );
+        this.tabsContainer = this.element.querySelector(
+          ".fluent-card-tabs-container"
+        );
 
         this.setContent(contentHtml);
         this._attachEventListeners();
@@ -1847,11 +1847,35 @@
 
       FluentWindow.prototype.setContent = function (html) {
         try {
-          if (this.contentContainer) {
+          this.tabsContainer.innerHTML = "";
+          this.contentContainer.innerHTML = "";
+
+          var tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html;
+
+          var contentArea = tempDiv.querySelector(".content-area");
+
+          if (!contentArea) {
             this.contentContainer.innerHTML = html;
+            _updateContentHeight(this);
+            return;
           }
+
+          var tabsElement = contentArea.querySelector(".fluent-tabs");
+
+          if (tabsElement) {
+            this.tabsContainer.appendChild(tabsElement);
+            while (contentArea.firstChild) {
+              this.contentContainer.appendChild(contentArea.firstChild);
+            }
+          } else {
+            this.contentContainer.appendChild(contentArea);
+          }
+          _updateContentHeight(this);
         } catch (e) {
           console.error("Error setting window content:", e);
+          this.contentContainer.innerHTML =
+            '<p class="error-message">Error loading content.</p>';
         }
       };
 
@@ -1899,6 +1923,7 @@
           '">×</button>' +
           "</div>" +
           "</div>" +
+          '<div class="fluent-card-tabs-container"></div>' +
           '<div class="fluent-card-content"></div>' +
           footerSection +
           '<div class="resize-handle"></div>';
@@ -1970,6 +1995,7 @@
             return;
           var card = windowInstance.element;
           var handle = windowInstance.dragHandle;
+          var tabsElContainer = windowInstance.tabsContainer;
           var footer = card.querySelector(".links-section");
           var content = windowInstance.contentContainer;
 
@@ -1978,18 +2004,31 @@
           var cardHeight = card.offsetHeight;
           var handleHeight = handle.offsetHeight;
           var footerHeight = footer ? footer.offsetHeight : 0;
+          var tabsContainerHeight = tabsElContainer
+            ? tabsElContainer.offsetHeight
+            : 0;
 
           handleHeight = typeof handleHeight === "number" ? handleHeight : 0;
           footerHeight = typeof footerHeight === "number" ? footerHeight : 0;
           cardHeight = typeof cardHeight === "number" ? cardHeight : 0;
+          tabsContainerHeight =
+            typeof tabsContainerHeight === "number" ? tabsContainerHeight : 0;
 
-          var contentHeight = cardHeight - handleHeight - footerHeight;
+          var contentHeight =
+            cardHeight - handleHeight - tabsContainerHeight - footerHeight;
 
           if (contentHeight > 10) {
             content.style.height = contentHeight + "px";
-          } else if (cardHeight > handleHeight + footerHeight) {
+          } else if (
+            cardHeight >
+            handleHeight + footerHeight + tabsContainerHeight
+          ) {
             content.style.height =
-              cardHeight - handleHeight - footerHeight + "px";
+              cardHeight -
+              handleHeight -
+              footerHeight -
+              tabsContainerHeight +
+              "px";
           } else {
             content.style.height = "100px";
           }
