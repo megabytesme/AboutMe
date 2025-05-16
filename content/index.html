@@ -708,6 +708,60 @@
         display: none;
       }
 
+      .fluent-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+        margin-bottom: 15px;
+        margin-left: -30px;
+        margin-right: -30px;
+        padding-left: 30px;
+      }
+
+      .fluent-tab-button {
+        background: none;
+        border: none;
+        color: var(--subtle-text, #cccccc);
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 15px;
+        font-family: inherit;
+        font-weight: 500;
+        position: relative;
+        transition: color 0.2s ease, border-color 0.2s ease;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -1px;
+        outline: none;
+      }
+
+      .fluent-tab-button:hover {
+        color: var(--heading-color, #ffffff);
+      }
+
+      .fluent-tab-button.active {
+        color: var(--link-color, #2899f5);
+        font-weight: 600;
+        border-bottom-color: var(--link-color, #2899f5);
+      }
+      .fluent-tab-button:focus-visible {
+        outline: 2px solid var(--link-color, #2899f5);
+        outline-offset: -2px;
+      }
+
+      .fluent-tab-pane {
+        display: none;
+      }
+
+      .fluent-tab-pane.active {
+        display: block;
+      }
+
+      .fluent-card-content .content-area > h1 + .fluent-tabs {
+        margin-top: 15px;
+      }
+      .fluent-card-content .content-area > .fluent-tabs {
+        margin-top: -5px;
+      }
+
       @media (prefers-color-scheme: light) {
         body {
           color: #201f1e;
@@ -1395,9 +1449,8 @@
         "</div>";
       var vehiclesFooter =
         '<button class="fluent-button close-window-button">Close</button>';
-      var devicesContent =
-        '<div class="content-area">' +
-        "<h1>My Devices</h1>" +
+
+      var currentDevicesListContent =
         "<h2>Microsoft Surface Duo 2</h2>" +
         '<img src="assets/images/surfaceduo2.png" alt="Obsidian Black Surface Duo 2" class="content-image">' +
         "<ul>" +
@@ -1422,7 +1475,20 @@
         "<li>Feature: Active Noise Cancellation</li>" +
         "</ul>" +
         '<p class="intro-text">My Bluetooth headphones.</p>';
-      
+      var devicesContent =
+        '<div class="content-area">' +
+        '<div class="fluent-tabs">' +
+        '<button class="fluent-tab-button active" data-tab-target="current-devices-tab" aria-selected="true">Current</button>' +
+        '<button class="fluent-tab-button" data-tab-target="phone-history-tab" aria-selected="false">Previous Phones</button>' +
+        "</div>" +
+        '<div class="fluent-tab-content-container">' +
+        '<div id="current-devices-tab" class="fluent-tab-pane active" role="tabpanel" aria-labelledby="current-devices-tab-button">' +
+        currentDevicesListContent +
+        "</div>" +
+        '<div id="phone-history-tab" class="fluent-tab-pane" role="tabpanel" aria-labelledby="phone-history-tab-button">' +
+        phoneHistoryListContent +
+        "</div>" +
+        "</div>" +
         "</div>";
       var devicesFooter =
         '<button class="fluent-button close-window-button">Close</button>';
@@ -2959,6 +3025,46 @@
           devicesContent,
           { footerHtml: devicesFooter }
         );
+
+        if (win && win.element) {
+          var tabButtons = win.element.querySelectorAll(".fluent-tab-button");
+          var tabPanes = win.element.querySelectorAll(".fluent-tab-pane");
+
+          if (tabButtons[0]) tabButtons[0].id = "current-devices-tab-button";
+          if (tabButtons[1]) tabButtons[1].id = "phone-history-tab-button";
+
+          tabButtons.forEach(function (button) {
+            addEvent(button, "click", function (e) {
+              var clickedButton = e.currentTarget || this;
+              var targetId = clickedButton.getAttribute("data-tab-target");
+
+              tabButtons.forEach(function (btn) {
+                if (btn.classList) btn.classList.remove("active");
+                else btn.className = btn.className.replace(/\bactive\b/g, "");
+                btn.setAttribute("aria-selected", "false");
+              });
+
+              if (clickedButton.classList)
+                clickedButton.classList.add("active");
+              else if (clickedButton.className.indexOf(" active") === -1)
+                clickedButton.className += " active";
+              clickedButton.setAttribute("aria-selected", "true");
+
+              tabPanes.forEach(function (pane) {
+                if (pane.id === targetId) {
+                  if (pane.classList) pane.classList.add("active");
+                  else if (pane.className.indexOf(" active") === -1)
+                    pane.className += " active";
+                } else {
+                  if (pane.classList) pane.classList.remove("active");
+                  else
+                    pane.className = pane.className.replace(/\bactive\b/g, "");
+                }
+              });
+              _updateContentHeight(win);
+            });
+          });
+        }
         return win;
       }
 
