@@ -1566,20 +1566,54 @@
         '<a href="https://github.com/' +
         GITHUB_USERNAME +
         '" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>';
-      var pcRigsContent =
-        '<div class="content-area">' +
+
+      var currentPcRigsListContent =
         "<h2>Main Desktop (2025)</h2>" +
         "<ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
         '<p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>' +
         '<h2>Surface Book 3 15" Laptop</h2>' +
         "<ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA Quadro RTX 3000 Mobile</li><li>RAM: 32GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
         '<p class="intro-text">Portable power for gaming and development on the go.</p>' +
-        '<h2>Surface Pro X SQ1 LTE" Tablet</h2>' +
-        "<ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomn Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
-        '<p class="intro-text">Lightweight & low-power for light development and media on the go.</p>' +
+        "<h2>Surface Pro X SQ1 LTE Tablet</h2>" +
+        "<ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomm Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
+        '<p class="intro-text">Lightweight & low-power for light development and media on the go.</p>';
+      var previousPcRigsListContent =
+        "<h2>Main Desktop (2022 - 2024)</h2>" +
+        "<ul><li>CPU: AMD Ryzen 9 3900X</li><li>GPU: NVIDIA GeForce RTX 2080</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
+        '<p class="intro-text">Served as my main powerhouse for the majority of my university course.</p>' +
+        "<h2>Main Desktop (2020 - 2022)</h2>" +
+        "<ul><li>CPU: AMD Ryzen 5 1600X</li><li>GPU: NVIDIA GeForce GTX 1070</li><li>RAM: 16GB DDR4-3200Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 10 Pro</li></ul>" +
+        '<p class="intro-text">My first "modern" PC build.</p>' +
+        "<h2>Main Desktop (2018 - 2020)</h2>" +
+        "<ul><li>CPU: Intel Core2Quad Q9650</li><li>GPU: AMD Radeon R9 270X</li><li>RAM: 8GB DDR2-800Mhz</li><li>Storage: 1TB HDD + 2x2TB HDD</li><li>OS: Windows 10 Pro</li></ul>" +
+        '<p class="intro-text">My first "proper" PC build.</p>' +
+        "<h2>Main Desktop (2016 - 2018)</h2>" +
+        "<ul><li>CPU: Intel Core2Duo E8400</li><li>GPU: AMD Radeon R9 270X</li><li>RAM: 8GB DDR2-800Mhz</li><li>Storage: 1TB HDD + 2x2TB HDD</li><li>OS: Windows 10 Pro</li></ul>" +
+        '<p class="intro-text">My first real GPU in a pre-built XP-era machine!</p>' +
+        '<h2>Surface Book 3 13.5" Laptop (2024)</h2>' +
+        "<ul><li>CPU: Intel i7 1065G7</li><li>GPU: NVIDIA GTX 1650 Mobile</li><li>RAM: 16GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
+        '<p class="intro-text">A more compact Surface Book.</p>' +
+        '<h2>Surface Book 2 15" Laptop (2022-2023)</h2>' +
+        "<ul><li>CPU: Intel i7 8650U</li><li>GPU: NVIDIA GTX 1060 Mobile</li><li>RAM: 16GB DDR4 3200Mhz</li><li>Storage: 512GB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
+        '<p class="intro-text">The predecessor to my current Surface Book.</p>';
+      var pcRigsContent =
+        '<div class="content-area">' +
+        '<div class="fluent-tabs">' +
+        '<button class="fluent-tab-button active" data-tab-target="current-pc-rigs-tab" aria-selected="true">Current</button>' +
+        '<button class="fluent-tab-button" data-tab-target="previous-pc-rigs-tab" aria-selected="false">Previous</button>' +
+        "</div>" +
+        '<div class="fluent-tab-content-container">' +
+        '<div id="current-pc-rigs-tab" class="fluent-tab-pane active" role="tabpanel" aria-labelledby="current-pc-rigs-tab-button">' +
+        currentPcRigsListContent +
+        "</div>" +
+        '<div id="previous-pc-rigs-tab" class="fluent-tab-pane" role="tabpanel" aria-labelledby="previous-pc-rigs-tab-button">' +
+        previousPcRigsListContent +
+        "</div>" +
+        "</div>" +
         "</div>";
       var pcRigsFooter =
         '<button class="fluent-button close-window-button">Close</button>';
+
       var vehiclesContent =
         '<div class="content-area">' +
         "<h2>Alfa Romeo 159 (Saloon)</h2>" +
@@ -3239,6 +3273,58 @@
             footerHtml: pcRigsFooter,
           }
         );
+
+        if (win && win.element) {
+          var tabButtons = win.element.querySelectorAll(".fluent-tab-button");
+          var tabPanes = win.element.querySelectorAll(".fluent-tab-pane");
+
+          if (tabButtons[0]) tabButtons[0].id = "current-pc-rigs-tab-button";
+          if (tabButtons[1]) tabButtons[1].id = "previous-pc-rigs-tab-button";
+
+          for (var i = 0; i < tabButtons.length; i++) {
+            var button = tabButtons[i];
+            addEvent(button, "click", function (e) {
+              var clickedButton = e.currentTarget || this;
+              var targetId = clickedButton.getAttribute("data-tab-target");
+
+              for (var k = 0; k < tabButtons.length; k++) {
+                var btn = tabButtons[k];
+                if (btn.classList) {
+                  btn.classList.remove("active");
+                } else {
+                  btn.className = btn.className.replace(/\bactive\b/g, "");
+                }
+                btn.setAttribute("aria-selected", "false");
+              }
+
+              for (var j = 0; j < tabPanes.length; j++) {
+                var pane = tabPanes[j];
+                if (pane.classList) {
+                  pane.classList.remove("active");
+                } else {
+                  pane.className = pane.className.replace(/\bactive\b/g, "");
+                }
+              }
+
+              if (clickedButton.classList) {
+                clickedButton.classList.add("active");
+              } else if (clickedButton.className.indexOf(" active") === -1) {
+                clickedButton.className += " active";
+              }
+              clickedButton.setAttribute("aria-selected", "true");
+
+              var targetPane = win.element.querySelector("#" + targetId);
+              if (targetPane) {
+                if (targetPane.classList) {
+                  targetPane.classList.add("active");
+                } else if (targetPane.className.indexOf(" active") === -1) {
+                  targetPane.className += " active";
+                }
+              }
+              _updateContentHeight(win);
+            });
+          }
+        }
         return win;
       }
       function createVehiclesWindow() {
