@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -392,8 +392,11 @@
         color: black;
         text-decoration: none;
         cursor: pointer;
-        transition: background-color 0.2s ease, border-color 0.2s ease,
-          box-shadow 0.2s ease, color 0.2s ease;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          color 0.2s ease;
       }
       .fluent-button:hover {
         background-color: #56b1f7;
@@ -813,7 +816,9 @@
         font-family: inherit;
         font-weight: 500;
         position: relative;
-        transition: color 0.2s ease, border-color 0.2s ease;
+        transition:
+          color 0.2s ease,
+          border-color 0.2s ease;
         border-bottom: 3px solid transparent;
         margin-bottom: -1px;
         outline: none;
@@ -1565,9 +1570,9 @@
         '" target="_blank" rel="noopener noreferrer" class="fluent-button">GitHub</a>';
 
       var currentPcRigsListContent =
-        "<h2>Main Desktop (2025)</h2>" +
+        "<h2>Main Desktop (2026)</h2>" +
         '<img src="assets/images/pcrigs/hafx.png" alt="Main Desktop 2025" class="content-image">' +
-        "<ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
+        "<ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 2TB + 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
         '<p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>' +
         '<h2>Surface Book 3 15" Laptop</h2>' +
         '<img src="assets/images/pcrigs/surfacebook3.png" alt="Surface Book 3 15 inch" class="content-image">' +
@@ -1578,6 +1583,10 @@
         "<ul><li>CPU: Microsoft SQ1</li><li>GPU: Qualcomm Adreno 685</li><li>RAM: 8GB DDR4 1866Mhz</li><li>Storage: 1TB NVMe SSD</li><li>OS: Windows 11 Pro</li></ul>" +
         '<p class="intro-text">Lightweight & low-power for light development and media on the go.</p>';
       var previousPcRigsListContent =
+        "<h2>Main Desktop (2025)</h2>" +
+        '<img src="assets/images/pcrigs/hafx.png" alt="Main Desktop 2025" class="content-image">' +
+        "<ul><li>CPU: AMD Ryzen 9 5950X</li><li>GPU: NVIDIA GeForce RTX 3090 Ti</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
+        '<p class="intro-text">My primary workstation for development, gaming, and everything in between.</p>' +
         "<h2>Main Desktop (2022 - 2024)</h2>" +
         '<img src="assets/images/pcrigs/hafx.png" alt="Main Desktop 2022-2024" class="content-image">' +
         "<ul><li>CPU: AMD Ryzen 9 3900X</li><li>GPU: NVIDIA GeForce RTX 2080</li><li>RAM: 32GB DDR4-3600Mhz</li><li>Storage: 256GB NVMe SSD + 2x2TB HDD</li><li>OS: Windows 11 Pro</li></ul>" +
@@ -1667,12 +1676,12 @@
         "<h2>Microsoft Surface Duo 2</h2>" +
         '<img src="assets/images/phones/surfaceduo2.png" alt="Obsidian Black Surface Duo 2" class="content-image">' +
         "<ul>" +
-        "<li>CPU: Snapdragon 865</li>" +
+        "<li>CPU: Snapdragon 888</li>" +
         "<li>RAM: 8GB</li>" +
         "<li>Color: Obsidian Black</li>" +
-        "<li>OS: Android 12L (Rooted), Windows 11</li>" +
+        "<li>OS: Android 12L (Rooted)</li>" +
         "</ul>" +
-        '<p class="intro-text">My current phone. It has been rooted, and currently runs Android 12L. Sometimes even runs Windows 11, thanks to the <a href="https://github.com/WOA-Project/SurfaceDuo-Guides">DuoWoA project!</a>.</p>' +
+        '<p class="intro-text">My current phone. It has been rooted, and currently runs Android 12L.</p>' +
         "<h2>Samsung Galaxy Watch 4 Classic LTE</h2>" +
         '<img src="assets/images/phones/galaxywatch4classic.png" alt="Silver Galaxy Watch 4 Classic" class="content-image">' +
         "<ul>" +
@@ -1686,8 +1695,19 @@
         "<ul>" +
         "<li>Type: True Wireless Earbuds</li>" +
         "<li>Feature: Active Noise Cancellation</li>" +
+        "<li>Color: Bronze</li>" +
         "</ul>" +
-        '<p class="intro-text">My Bluetooth headphones.</p>';
+        '<p class="intro-text">My Bluetooth headphones.</p>' +
+        "<h2>Microsoft Surface Duo</h2>" +
+        '<img src="assets/images/phones/surfaceduo.png" alt="White Surface Duo" class="content-image">' +
+        "<ul>" +
+        "<li>CPU: Snapdragon 855</li>" +
+        "<li>RAM: 6GB</li>" +
+        "<li>Color: White</li>" +
+        "<li>OS: Android 12L (Rooted), Windows 11</li>" +
+        "</ul>" +
+        '<p class="intro-text">My backup phone. It has been rooted, and currently runs Android 12L. Sometimes even runs the unreleased <a href="https://betawiki.net/wiki/Windows_Andromeda_OS">Windows Andromeda OS</a> (usually Windows 11), thanks to the <a href="https://github.com/WOA-Project/SurfaceDuo-Guides">DuoWoA project!</a>.</p>';
+
       var phoneHistoryListContent =
         "<h2>HTC Magic</h2>" +
         '<img src="assets/images/phones/htcmagic.png" alt="HTC Magic" class="content-image">' +
@@ -1828,22 +1848,22 @@
           id,
           title,
           titleIconUrl,
-          options.footerHtml
+          options.footerHtml,
         );
         this.contentContainer = this.element.querySelector(
-          ".fluent-card-content"
+          ".fluent-card-content",
         );
         this.dragHandle = this.element.querySelector(".drag-handle");
         this.resizeHandle = this.element.querySelector(".resize-handle");
         this.closeButton = this.element.querySelector(".window-button.close");
         this.minimizeButton = this.element.querySelector(
-          ".window-button.minimize"
+          ".window-button.minimize",
         );
         this.maximizeButton = this.element.querySelector(
-          ".window-button.maximize"
+          ".window-button.maximize",
         );
         this.tabsContainer = this.element.querySelector(
-          ".fluent-card-tabs-container"
+          ".fluent-card-tabs-container",
         );
 
         this.setContent(contentHtml);
@@ -1895,7 +1915,7 @@
         id,
         title,
         titleIconUrl,
-        footerHtml
+        footerHtml,
       ) {
         var card = document.createElement("div");
         card.className = "fluent-card";
@@ -2056,7 +2076,7 @@
           } else {
             this.element.className = this.element.className.replace(
               /\bmaximized\b/g,
-              ""
+              "",
             );
           }
           this.element.style.left = this.previousState.left;
@@ -2067,7 +2087,7 @@
           this.maximizeButton.innerHTML = "▢";
           this.maximizeButton.setAttribute(
             "aria-label",
-            "Maximize " + this.title
+            "Maximize " + this.title,
           );
           this.dragHandle.style.cursor = "grab";
           this.resizeHandle.style.display = "";
@@ -2092,7 +2112,7 @@
           this.maximizeButton.innerHTML = "❐";
           this.maximizeButton.setAttribute(
             "aria-label",
-            "Restore " + this.title
+            "Restore " + this.title,
           );
           this.dragHandle.style.cursor = "default";
           this.isMaximized = true;
@@ -2297,7 +2317,7 @@
 
         newCardY = Math.max(
           0,
-          Math.min(newCardY, availableHeight - cardHeight)
+          Math.min(newCardY, availableHeight - cardHeight),
         );
         this.element.style.left = newCardX + "px";
         this.element.style.top = newCardY + "px";
@@ -2460,7 +2480,7 @@
             removeEvent(
               this.maximizeButton,
               "click",
-              this._boundToggleMaximize
+              this._boundToggleMaximize,
             );
           if (this._boundToggleMaximize)
             removeEvent(this.dragHandle, "dblclick", this._boundToggleMaximize);
@@ -2526,7 +2546,7 @@
             title,
             titleIconUrl,
             contentHtml,
-            options
+            options,
           );
           windows[id] = newWindow;
         } catch (createErr) {
@@ -2550,7 +2570,7 @@
                   console.error(
                     "Error parsing JSON:",
                     parseError,
-                    xhr.responseText
+                    xhr.responseText,
                   );
                   callback(new Error("Invalid JSON received"), null);
                 }
@@ -2716,7 +2736,7 @@
               case 1:
                 var heartbeatIntervalMs = data.d.heartbeat_interval;
                 lanyardSocket.send(
-                  JSON.stringify({ op: 2, d: { subscribe_to_id: userId } })
+                  JSON.stringify({ op: 2, d: { subscribe_to_id: userId } }),
                 );
 
                 if (lanyardHeartbeatInterval)
@@ -2755,7 +2775,7 @@
             console.error(
               "Error processing WebSocket message:",
               msgError,
-              event.data
+              event.data,
             );
           }
         };
@@ -2780,7 +2800,7 @@
           ) {
             handleWebSocketFailure(
               userId,
-              "Unclean close (" + event.code + ")"
+              "Unclean close (" + event.code + ")",
             );
           } else {
             var currentAboutWindow = windows["about-me"];
@@ -2805,7 +2825,7 @@
         }
         if (lanyardWSRetryCount > LANYARD_MAX_WS_RETRIES) {
           console.error(
-            "Lanyard: Max WebSocket retries reached. Switching to polling."
+            "Lanyard: Max WebSocket retries reached. Switching to polling.",
           );
           updateDiscordStatusUI({
             contentHtml:
@@ -2885,11 +2905,11 @@
             lanyardPollFailureCount++;
             console.error(
               "Lanyard poll failed (Attempt " + lanyardPollFailureCount + "):",
-              error || "Invalid response"
+              error || "Invalid response",
             );
             if (lanyardPollFailureCount >= LANYARD_MAX_POLL_FAILURES) {
               console.error(
-                "Lanyard: Max polling failures reached. Stopping polling."
+                "Lanyard: Max polling failures reached. Stopping polling.",
               );
               updateDiscordStatusUI({
                 contentHtml:
@@ -2917,7 +2937,7 @@
             lanyardPollFailureCount++;
             console.error(
               "Lanyard poll: Success false or no data.",
-              responseData
+              responseData,
             );
             if (lanyardPollFailureCount >= LANYARD_MAX_POLL_FAILURES) {
               stopLanyardPolling();
@@ -3195,7 +3215,7 @@
 
           if (!statusAreaElement || !bubbleElement) {
             console.error(
-              "updateDiscordStatusUI: Could not find statusArea or bubbleElement in active window."
+              "updateDiscordStatusUI: Could not find statusArea or bubbleElement in active window.",
             );
             return;
           }
@@ -3205,7 +3225,7 @@
           } else {
             console.error(
               "updateDiscordStatusUI called with invalid statusResult:",
-              statusResult
+              statusResult,
             );
             statusAreaElement.innerHTML =
               '<p class="error-message">Error updating status display (Invalid data).</p>';
@@ -3224,7 +3244,7 @@
             reqAnimFrame(function () {
               try {
                 var currentBubble = document.getElementById(
-                  "custom-status-bubble"
+                  "custom-status-bubble",
                 );
                 if (currentBubble) {
                   if (currentBubble.classList) {
@@ -3236,10 +3256,10 @@
               } catch (rafError) {
                 console.error(
                   "Error adding visible class to bubbleElement:",
-                  rafError
+                  rafError,
                 );
                 var fallbackBubble = document.getElementById(
-                  "custom-status-bubble"
+                  "custom-status-bubble",
                 );
                 if (fallbackBubble) fallbackBubble.className += " visible";
               }
@@ -3251,7 +3271,7 @@
             } else if (bubbleElement) {
               bubbleElement.className = bubbleElement.className.replace(
                 /\bvisible\b/g,
-                ""
+                "",
               );
             }
             if (bubbleElement) bubbleElement.style.display = "none";
@@ -3283,7 +3303,7 @@
           "About Me - Ben",
           PROFILE_PIC_URL,
           aboutMeContent,
-          { footerHtml: aboutMeFooter, fullscreenMobile: true }
+          { footerHtml: aboutMeFooter, fullscreenMobile: true },
         );
         if (win) {
           if (
@@ -3306,7 +3326,7 @@
           "My Projects",
           GITHUB_ICON_URL,
           projectsInitialContent,
-          { footerHtml: projectsFooter }
+          { footerHtml: projectsFooter },
         );
         if (win) {
           var projectsListContainer =
@@ -3344,7 +3364,7 @@
           pcRigsContent,
           {
             footerHtml: pcRigsFooter,
-          }
+          },
         );
 
         if (win && win.element) {
@@ -3407,7 +3427,7 @@
           "My Vehicles",
           VEHICLES_ICON,
           vehiclesContent,
-          { footerHtml: vehiclesFooter }
+          { footerHtml: vehiclesFooter },
         );
         return win;
       }
@@ -3418,7 +3438,7 @@
           "My Devices",
           DEVICES_ICON,
           devicesContent,
-          { footerHtml: devicesFooter }
+          { footerHtml: devicesFooter },
         );
 
         if (win && win.element) {
@@ -3479,7 +3499,7 @@
           if (error || !data || !Array.isArray(data) || data.length === 0) {
             console.log(
               "Failed to fetch or got invalid Spotlight data:",
-              error || "Invalid data"
+              error || "Invalid data",
             );
             applyFallbackBackgroundStyles();
           } else {
@@ -3502,7 +3522,7 @@
           if (!landscapePath || !portraitPath) {
             console.warn(
               "Selected cached item missing required image paths:",
-              selectedItem
+              selectedItem,
             );
             if (copyrightDiv)
               copyrightDiv.textContent = "Image information unavailable";
@@ -3538,11 +3558,11 @@
             if (document.documentElement.style.setProperty) {
               document.documentElement.style.setProperty(
                 "--bg-image-landscape",
-                'url("' + fullLandscapeUrl + '")'
+                'url("' + fullLandscapeUrl + '")',
               );
               document.documentElement.style.setProperty(
                 "--bg-image-portrait",
-                'url("' + fullPortraitUrl + '")'
+                'url("' + fullPortraitUrl + '")',
               );
             }
           };
@@ -3552,7 +3572,7 @@
             if (mediaQuery.addEventListener) {
               mediaQuery.addEventListener(
                 "change",
-                setBackgroundBasedOnOrientation
+                setBackgroundBasedOnOrientation,
               );
             } else if (mediaQuery.addListener) {
               mediaQuery.addListener(setBackgroundBasedOnOrientation);
@@ -3578,7 +3598,7 @@
           console.error(
             "Error applying cached Spotlight data:",
             error.message,
-            error.stack
+            error.stack,
           );
           if (copyrightDiv) {
             copyrightDiv.textContent = "Error displaying image info.";
@@ -3602,11 +3622,11 @@
           if (document.documentElement.style.setProperty) {
             document.documentElement.style.setProperty(
               "--bg-image-landscape",
-              'url("' + FALLBACK_LANDSCAPE_IMG + '")'
+              'url("' + FALLBACK_LANDSCAPE_IMG + '")',
             );
             document.documentElement.style.setProperty(
               "--bg-image-portrait",
-              'url("' + FALLBACK_PORTRAIT_IMG + '")'
+              'url("' + FALLBACK_PORTRAIT_IMG + '")',
             );
           }
         };
