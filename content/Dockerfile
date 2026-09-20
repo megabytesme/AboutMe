@@ -18,5 +18,6 @@ RUN npx html-minifier-terser index.html -o index.min.html \
 FROM nginx:stable-alpine
 
 COPY --from=builder /app/index.min.html /usr/share/nginx/html/index.html
+COPY favicon.ico /usr/share/nginx/html/favicon.ico
 COPY assets/icons/ /usr/share/nginx/html/assets/icons/
 COPY assets/images/ /usr/share/nginx/html/assets/images/
