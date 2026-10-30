@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { Script } from 'node:vm';
+import { parse } from 'acorn';
 import test from 'node:test';
 
 const root = resolve(import.meta.dirname, '..');
@@ -12,10 +12,10 @@ test('production document retains the deployed device information', () => {
   assert.match(html, /Super thin \(5\.8mm\), running Android 17\./);
   assert.doesNotMatch(html, /OS: OneUI 8\.5 \(Android 16\)/);
 });
-test('every embedded application script parses before publication', () => {
+test('production application scripts retain ES5 syntax for legacy browsers', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
   assert.ok(scripts.length > 0);
-  for (const [, source] of scripts) new Script(source);
+  for (const [, source] of scripts) parse(source, { ecmaVersion: 5 });
 });
 test('all local document assets are present in the production directory', async () => {
   const assets = [...new Set([...html.matchAll(/(?:src|href)=\\?["'](assets\/[^"'\\<> ]+)/g)].map(match => match[1]))];
