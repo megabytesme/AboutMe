@@ -5,7 +5,7 @@ import { extname, resolve, sep } from 'node:path';
 import { chromium } from 'playwright-core';
 
 const root = resolve(import.meta.dirname, '../dist');
-const mime = { '.html': 'text/html', '.ico': 'image/x-icon', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.json': 'application/json' };
+const mime = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.ico': 'image/x-icon', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
@@ -23,7 +23,13 @@ try {
   browser = await chromium.launch({ executablePath, headless: true });
   for (const viewport of [{ width: 1600, height: 1000 }, { width: 390, height: 844 }]) {
     const context = await browser.newContext({ viewport });
-    await context.addInitScript(() => { window.WebSocket = undefined; });
+    await context.addInitScript(() => {
+      window.WebSocket = undefined;
+      String.prototype.includes = undefined;
+      String.prototype.startsWith = undefined;
+      Array.prototype.includes = undefined;
+      NodeList.prototype.forEach = undefined;
+    });
     const page = await context.newPage();
     const errors = [];
     const missing = [];
@@ -40,6 +46,12 @@ try {
     });
     assert.equal((await page.goto(origin)).status(), 200);
     await page.locator('#window-about-me').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#window-about-me').evaluate(element => getComputedStyle(element).position), 'absolute', 'The external stylesheet must apply');
+    assert.equal(await page.locator('script[src="app.js"]').count(), 1);
+    assert.equal(await page.evaluate(() =>
+      'legacy'.includes('leg') && 'legacy'.startsWith('leg') &&
+      [1, 2].includes(2) && typeof document.querySelectorAll('body').forEach === 'function'
+    ), true, 'The classic script must restore the existing legacy polyfills');
     await page.waitForFunction(() => document.body.style.backgroundImage.includes('fixture-'));
     await page.locator('#window-about-me .close').click();
     for (const id of ['projects', 'pc-rigs', 'vehicles', 'devices']) {
