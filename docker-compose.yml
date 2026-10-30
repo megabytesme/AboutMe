@@ -7,7 +7,9 @@ networks:
 
 services:
   content_server:
-    build: ./content
+    build:
+      context: .
+      dockerfile: content/Dockerfile
     container_name: aboutme_content_server
     networks:
       - aboutme_network
